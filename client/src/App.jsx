@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import AmistososPage from "./pages/AmistososPage";
+import FriendliesPage from "./pages/FriendliesPage";
 
 
 export default function App() {
@@ -7,8 +7,8 @@ export default function App() {
     <div className="min-h-screen bg-slate-900 text-white">
       <h1 className="text-3xl font-bold">Bot-ines</h1>
       <Routes>
-        <Route path="/" element={<Navigate to="/amistosos" replace />} />
-        <Route path="/amistosos" element={<AmistososPage />} /> //Esta es la página general de los amistosos.
+        <Route path="/" element={<Navigate to="/friendlies" replace />} />
+        <Route path="/friendlies" element={<FriendliesPage />} /> //Esta es la página general de los amistosos.
       </Routes>
     </div>
   );

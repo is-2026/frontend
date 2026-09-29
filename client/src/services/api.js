@@ -1,11 +1,16 @@
 import { API_URL } from "../config"; //en config estará la URL de la API.
 
 export async function request(path, options = {}) {// Función request recibe path y config adicionales en options
+  const token = localStorage.getItem("token");
   const res = await fetch(`${API_URL}${path}`, { // Espera un fetch de la URL combinada de la API con el path.
-    //Ejemplo: https://api.game.com/v1/amistosos. API_URL será lo que va hasta el .com y lo otro es el path
+    //Ejemplo: https://api.game.com/v1/friendlies. API_URL será lo que va hasta el .com y lo otro es el path
+    
     ...options, //el segundo parámetro de la función es una configuración adicional, como por ej method: 'POST'
-    headers: { "Content-Type": "application/json" }, 
-    ...options.headers, 
+    
+    headers: { "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers, 
+    }, 
   });// Este fetch se guarda en res, que será la respuesta del servidor.
 
   let data = null;

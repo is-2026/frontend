@@ -6,7 +6,7 @@ export default function FriendlyCard({ friendly }) {
       <div>
         <p className="font-semibold">{friendly.creator_club_id}</p>
         <p className="text-sm text-white/60">
-          {friendly.is_private ? "Privado" : "Público"}
+          {friendly.is_private ? "Privado" : "Público"} 
         </p>
       </div>
       <Link

@@ -11,7 +11,7 @@ export const DEFAULT_AVATAR = "https://placehold.co/150x150/png?text=Club";
 // =========================================================================
 // MOCK TEMPORAL (Para probar funcionamiento).
 // =========================================================================
-export function createClub(data) {
+/*export function createClub(data) {
   const { club_name, avatar_url } = data;
   console.log("Mock createClub recibido:", { club_name, avatar_url });
 
@@ -26,8 +26,8 @@ export function createClub(data) {
     }, 800);
   });
 }
+*/
 
-/*
 export function createClub(data) {
     const {club_name, avatar_url } = data;
     
@@ -39,4 +39,4 @@ export function createClub(data) {
         }),
     });
 }
-*/
+

@@ -17,8 +17,14 @@ export default function ClubPage() {
    const handleSubmit = async (e) => {
     e.preventDefault(); 
     setError("") // borra carteles de errores anteriores.
-    setLoading(true);
     
+    if(avatar && !avatar.endsWith('.png')) {
+        setError("La URL del avatar debe terminar en (.png)");
+        return;
+    }
+
+    setLoading(true);
+
     try {
         // peticion HTTP al backend
         await createClub({

@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Routes, Route, Navigate } from "react-router-dom";
 import ClubPage from "./pages/ClubPage";
 import FriendliesPage from "./pages/FriendliesPage";
+import LeaguesPage from './pages/LeaguesPage';
 
 export default function App() {
   return (
@@ -17,6 +17,7 @@ export default function App() {
           <Route path="/" element={<Navigate to="/friendlies" replace />} />
           <Route path="/friendlies" element={<FriendliesPage />} />
           <Route path="/create-club" element={<ClubPage />} />
+          <Route path="/ligas" element={<LeaguesPage />} />
           <Route
             path="/club"
             element={

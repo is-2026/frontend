@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
- import { createClub } from "../services/club";
+import { createClub } from "../services/club";
 
 
 export default function ClubPage() {

@@ -1,7 +1,7 @@
 import { request } from "./api" // hago un import de la funcion api.js
 
 // Exporto una constante para el avatar por defecto. Usamos esa url para generar un avatar temporal.
-export const DEFAULT_AVATAR = "https://via.placeholder.com/150?text=Club";
+export const DEFAULT_AVATAR = "https://placehold.co/150x150/png?text=Club";
 
 /**
  * Petición para crear un club (POST /club)

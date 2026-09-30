@@ -3,11 +3,12 @@ import { request } from "./api"; // Import de la función request de api. Ver ar
 
 /**
  Devuelve una lista con los amistosos disponibles
- export function getFriendlies() {
-   return request("/friendlies");
- }
  */
+export function getFriendlies() {
+  return request("/friendlies");
+}
 
+/*
 //Esto es un mock para ver si funciona:
 export function getFriendlies() {
     return Promise.resolve([
@@ -15,7 +16,6 @@ export function getFriendlies() {
       { id: "2", nombre: "Amistoso privado", is_private: true, password: "secretpass", creator_club_id: "3" },
     ]);
 }
-/*
 
 Simulación de error para ver mensaje de error
 export function getFriendlies() {
@@ -49,27 +49,15 @@ export async function getFriendlyById(id) {
  * Requiere exactamente 6 jugadores (3 titulares y 3 suplentes).
  */
 
-
-/*
 export function joinFriendly(friendly_id, data) {
   return request(`/friendlies/${friendly_id}/join`, {
     method: "POST",
     body: JSON.stringify(data),
   });
 }
-export async function joinFriendly(friendlyId, data) {
-  console.log("Payload enviado (MOCK):", { friendlyId, data });
 
-  // Simulamos una demora de red de 1 segundo
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  // Opcional: Descomenta esto si quieres probar cómo se ve un error 409
-  // throw { status: 409, message: "Tu club ya está inscripto" };
-
-  return { success: true };
-}
-*/
-
+/*
+//Mock para verificar que funciona la validación de password
 export async function joinFriendly(friendlyId, body) {
   console.log("Enviando a API (MOCK):", { friendlyId, body });
 
@@ -90,6 +78,7 @@ export async function joinFriendly(friendlyId, body) {
 
   return { success: true };
 }
+*/
 
 /**
  * Elimina amistoso creado por el usuario (sólo si no tiene oponente)

@@ -7,8 +7,8 @@ import { request } from "./api"; // Import de la función request de api. Ver ar
 export function getFriendlies() {
   return request("/friendlies");
 }
-/*
 
+/*
 export function getFriendlies() {
     return Promise.resolve([
       { id: "1", nombre: "Amistoso de prueba", is_private: false },
@@ -42,7 +42,7 @@ export function createFriendlies(data) {
  * @param {Object} data - { password?: string, players: [{ player_id, is_starter, behavior_id? }] }
  * Requiere exactamente 6 jugadores (3 titulares y 3 suplentes).
  */
-export function joinFriendlies(friendly_id, data) {
+export function joinFriendly(friendly_id, data) {
   return request(`/friendlies/${friendly_id}/join`, {
     method: "POST",
     body: JSON.stringify(data),

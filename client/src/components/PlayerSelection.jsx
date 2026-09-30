@@ -80,7 +80,7 @@ export default function PlayerSelection({
               return (
                 <li
                   key={player.id}
-                  className="flex items-center justify-between gap-2 rounded border border-white/10 p-2"
+                  className="flex items-center justify-between gap-2  border border-white/10 p-2"
                 >
                   <label className="flex cursor-pointer select-none items-center gap-2">
                     <input
@@ -93,7 +93,7 @@ export default function PlayerSelection({
 
                   {selectedStarter && (
                     <select
-                      className="rounded border border-white/20 bg-slate-800 px-2 py-1 text-sm text-white"
+                      className=" border border-white/20 bg-slate-800 px-2 py-1 text-sm text-white"
                       value={selectedStarter.behavior_id}
                       onChange={(e) =>
                         handleBehaviorChange(player.id, e.target.value)
@@ -124,7 +124,7 @@ export default function PlayerSelection({
             .map((player) => (
               <li
                 key={player.id}
-                className="flex items-center gap-2 rounded border border-white/10 p-2"
+                className="flex items-center gap-2 border border-white/10 p-2"
               >
                 <label className="flex cursor-pointer select-none items-center gap-2">
                   <input

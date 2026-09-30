@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import FriendliesPage from "./pages/FriendliesPage";
-
+import JoinFriendlyPage from "./pages/JoinFriendlyPage";
 
 export default function App() {
   return (
@@ -8,7 +8,8 @@ export default function App() {
       <h1 className="text-3xl font-bold">Bot-ines</h1>
       <Routes>
         <Route path="/" element={<Navigate to="/friendlies" replace />} />
-        <Route path="/friendlies" element={<FriendliesPage />} /> //Esta es la página general de los amistosos.
+        <Route path="/friendlies" element={<FriendliesPage />} /> 
+        <Route path="/friendlies/:friendly_id/join" element={<JoinFriendlyPage />} />
       </Routes>
     </div>
   );

@@ -9,3 +9,4 @@ export default defineConfig({
     setupFiles: './src/setupTests.js', // opcional para importar @testing-library/jest-dom
   },
 });
+

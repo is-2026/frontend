@@ -1,10 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { joinFriendly } from "../services/friendlies";
+import { joinFriendly, getFriendlyById } from "../services/friendlies";
 import PlayerSelection from "../components/PlayerSelection";
 
-// TODO: reemplazar por los jugadores reales del club del usuario logueado.
-// Todavía no hay un endpoint definido para esto en la documentación provista.
 const PLAYERS_MOCK = [
   { id: "j1", name: "Jugador 1" },
   { id: "j2", name: "Jugador 2" },
@@ -14,33 +12,60 @@ const PLAYERS_MOCK = [
   { id: "j6", name: "Jugador 6" },
 ];
 
-// TODO: confirmar los IDs reales de comportamiento contra el backend.
 const BEHAVIORS_MOCK = [
   { id: "ofensivo", name: "Ofensivo" },
   { id: "defensivo", name: "Defensivo" },
   { id: "equilibrado", name: "Equilibrado" },
 ];
 
-// TODO: confirmar cómo se sabe si el amistoso es privado en esta pantalla
-// (por ejemplo, si viene por parámetro desde el listado, o hay que consultarlo).
-export default function JoinFriendlyPage({ isPrivate = false }) {
+export default function JoinFriendlyPage() {
   const { friendlyId } = useParams();
   const navigate = useNavigate();
 
+  // Estados de carga e información del partido
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [confirmedPassword, setConfirmedPassword] = useState(false);
+
+  // Estados del formulario y feedback
   const [password, setPassword] = useState("");
-  const [confirmedPassword, setConfirmedPassword] = useState(!isPrivate);
   const [selection, setSelection] = useState({ starters: [], substitutes: [] });
   const [error, setError] = useState(null);
-  const [Sending, setSending] = useState(false);
+  const [sending, setSending] = useState(false);
+
+  // Carga inicial del partido
+  useEffect(() => {
+    async function fetchFriendly() {
+      try {
+        const friendly = await getFriendlyById(friendlyId);
+        if (!friendly) {
+          setNotFound(true);
+          return;
+        }
+
+        setIsPrivate(friendly.is_private);
+        // Si NO es privado, ingresa directo (confirmedPassword = true)
+        setConfirmedPassword(!friendly.is_private);
+      } catch (e) {
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchFriendly();
+  }, [friendlyId]);
 
   const validSelection =
     selection.starters.length === 3 &&
     selection.starters.every((t) => t.behavior_id) &&
     selection.substitutes.length === 3;
 
-  async function confirmationHandle() {
+  async function handleConfirm() {
     setError(null);
     setSending(true);
+
     try {
       const body = {
         ...(isPrivate ? { password } : {}),
@@ -68,32 +93,82 @@ export default function JoinFriendlyPage({ isPrivate = false }) {
       setSending(false);
     }
   }
+  // 1. Nueva función para validar la contraseña al hacer clic en "Continuar"
+  async function handlePasswordSubmit() {
+    setError(null);
+    const friendly = await getFriendlyById(friendlyId);
 
+    // Si tiene clave registrada en el mock y no coincide, no continua
+    if (friendly?.password && password !== friendly.password) {
+      setError("La contraseña es incorrecta.");
+      return; 
+    }
+
+    // Si coincide, habilita el paso a la alineación
+    setConfirmedPassword(true);
+  }
+
+  // Cargando
+  if (loading) {
+    return <div className="p-6 text-center">Cargando datos del partido...</div>;
+  }
+
+  // Partido privado (solicitar clave antes de mostrar alineación)
   if (isPrivate && !confirmedPassword) {
     return (
       <div className="mx-auto max-w-sm p-6">
         <h1 className="mb-4 text-xl font-bold">Amistoso privado</h1>
+
         <input
           type="password"
           placeholder="Contraseña"
-          className="mb-3 w-full bg-slate-800 p-2"
+          className="mb-3 w-full bg-slate-800 p-2 rounded"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            if (error) setError(null); // Limpia el mensaje al volver a tipear
+          }}
         />
-        <button
-          className="w-full bg-emerald-600 py-2 font-medium hover:bg-emerald-500 disabled:opacity-40"
-          onClick={() => setConfirmedPassword(true)}
-          disabled={!password}
-        >
-          Continuar
-        </button>
+
+        {/*mensaje de contraseña incorrecta definido en handlePasswordSubmit*/}
+        {error && (
+          <div className="mt-2 p-2 rounded bg-red-900/40 border border-red-500/50 text-red-300 text-sm flex items-center gap-2">
+            <span>{error}</span> 
+          </div>
+        )}
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className="w-1/2 rounded bg-slate-800 py-2 font-medium hover:bg-slate-700"
+            onClick={() => navigate("/friendlies")}
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            className="w-1/2 rounded bg-emerald-600 py-2 font-medium hover:bg-emerald-500 disabled:opacity-40"
+            onClick={handlePasswordSubmit} //llamada a handlePasswordSubmit al hacer click para validar
+            disabled={!password}
+          >
+            Continuar
+          </button>
+        </div>
       </div>
     );
   }
 
+  // Selección de jugadores
   return (
     <div className="mx-auto max-w-xl p-6">
-      <h1 className="mb-4 text-xl font-bold">Elegí tu alineación</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-xl font-bold">Elegí tu alineación</h1>
+        <button
+          onClick={() => navigate("/friendlies")}
+          className="text-sm text-slate-400 hover:text-white underline"
+        >
+          ← Volver a partidos
+        </button>
+      </div>
 
       <PlayerSelection
         availablePlayers={PLAYERS_MOCK}
@@ -101,14 +176,14 @@ export default function JoinFriendlyPage({ isPrivate = false }) {
         onChange={setSelection}
       />
 
-      {error && <p className="mt-4 text-red-400">{error}</p>}
+      {error && <p className="mt-4 text-red-400 text-sm">{error}</p>}
 
       <button
         className="mt-6 w-full rounded bg-emerald-600 py-2 font-medium hover:bg-emerald-500 disabled:opacity-40"
-        disabled={!validSelection || Sending}
-        onClick={confirmationHandle}
+        disabled={!validSelection || sending}
+        onClick={handleConfirm}
       >
-        {Sending ? "Uniéndose..." : "Confirmar"}
+        {sending ? "Uniéndose..." : "Confirmar"}
       </button>
     </div>
   );

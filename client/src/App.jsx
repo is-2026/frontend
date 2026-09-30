@@ -9,7 +9,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/friendlies" replace />} />
         <Route path="/friendlies" element={<FriendliesPage />} /> 
-        <Route path="/friendlies/:friendly_id/join" element={<JoinFriendlyPage />} />
+        <Route path="/friendlies/:friendlyId/join" element={<JoinFriendlyPage />} />
       </Routes>
     </div>
   );

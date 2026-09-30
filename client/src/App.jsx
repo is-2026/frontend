@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Routes, Route, Navigate } from "react-router-dom";
 import ClubPage from "./pages/ClubPage";
 import FriendliesPage from "./pages/FriendliesPage";
+import LoginPage from "./pages/LoginPage";
 
 export default function App() {
   return (
@@ -14,7 +14,8 @@ export default function App() {
 
       <main className="w-full max-w-md">
         <Routes>
-          <Route path="/" element={<Navigate to="/friendlies" replace />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/friendlies" element={<FriendliesPage />} />
           <Route path="/create-club" element={<ClubPage />} />
           <Route

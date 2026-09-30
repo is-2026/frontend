@@ -26,7 +26,7 @@ describe("friendlies service", () => {
 
       expect(api.request).toHaveBeenCalledWith("/friendlies"); //verifica que la ruta esté bien
       expect(result).toEqual(mockFriendlies); //verifica que la request pedida por getFriendlies sea correcta
-      expect(result.length).toBe(2); //
+      expect(result.length).toBe(2); 
     });
 
     it("debe lanzar un error cuando el backend responde con error (ej. 400 Bad Request)", async () => {

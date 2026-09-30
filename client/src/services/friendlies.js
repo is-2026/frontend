@@ -7,15 +7,15 @@ import { request } from "./api"; // Import de la función request de api. Ver ar
 export function getFriendlies() {
   return request("/friendlies");
 }
-
 /*
-Esto es un mock para ver si funciona:
+
 export function getFriendlies() {
     return Promise.resolve([
       { id: "1", nombre: "Amistoso de prueba", is_private: false },
       { id: "2", nombre: "Amistoso privado", is_private: true },
     ]);
 }
+Esto es un mock para ver si funciona:
 
 Simulación de error para ver mensaje de error
 export function getFriendlies() {

@@ -122,7 +122,7 @@ export default function JoinFriendlyPage() {
         <input
           type="password"
           placeholder="Contraseña"
-          className="mb-3 w-full bg-slate-800 p-2 "
+          className="mb-3 w-full bg-slate-800 p-2"
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
@@ -132,21 +132,21 @@ export default function JoinFriendlyPage() {
 
         {/*mensaje de contraseña incorrecta definido en handlePasswordSubmit*/}
         {error && (
-          <div className="mt-2 p-2  bg-red-900/40 border border-red-500/50 text-red-300 text-sm flex items-center gap-2">
+          <div className="mt-2 p-2 rounded bg-red-900/40 border border-red-500/50 text-red-300 text-sm flex items-center gap-2">
             <span>{error}</span> 
           </div>
         )}
         <div className="flex gap-2">
           <button
             type="button"
-            className="w-1/2  bg-slate-800 py-2 font-medium hover:bg-slate-700"
+            className="w-1/2 rounded bg-slate-800 py-2 font-medium hover:bg-slate-700"
             onClick={() => navigate("/friendlies")}
           >
             Cancelar
           </button>
           <button
             type="button"
-            className="w-1/2  bg-emerald-600 py-2 font-medium hover:bg-emerald-500 disabled:opacity-40"
+            className="w-1/2 rounded bg-emerald-600 py-2 font-medium hover:bg-emerald-500 disabled:opacity-40"
             onClick={handlePasswordSubmit} //llamada a handlePasswordSubmit al hacer click para validar
             disabled={!password}
           >

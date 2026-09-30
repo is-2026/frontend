@@ -56,6 +56,7 @@ describe("JoinFriendlyPage", () => {
     vi.clearAllMocks();
   });
 
+  
   it("1. Muestra directamente la alineación si el partido es público", async () => {
     friendliesService.getFriendlyById.mockResolvedValue({
       id: "1",
@@ -69,6 +70,7 @@ describe("JoinFriendlyPage", () => {
       expect(screen.getByTestId("player-selection")).toBeInTheDocument();
     });
   });
+
 
   it("2. Pide contraseña en partido privado y muestra error si es incorrecta", async () => {
     friendliesService.getFriendlyById.mockResolvedValue({
@@ -96,6 +98,7 @@ describe("JoinFriendlyPage", () => {
     });
     expect(screen.queryByText("Elegí tu alineación")).not.toBeInTheDocument();
   });
+
 
   it("3. Permite avanzar y unirse correctamente si la contraseña es válida", async () => {
     friendliesService.getFriendlyById.mockResolvedValue({

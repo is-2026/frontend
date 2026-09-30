@@ -3,21 +3,21 @@ import { request } from "./api"; // Import de la función request de api. Ver ar
 
 /**
  Devuelve una lista con los amistosos disponibles
+ export function getFriendlies() {
+   return request("/friendlies");
+ }
  */
-export function getFriendlies() {
-  return request("/friendlies");
-}
 
 /*
 Esto es un mock para ver si funciona:
 
+*/
 export function getFriendlies() {
     return Promise.resolve([
       { id: "1", nombre: "Amistoso de prueba", is_private: false },
       { id: "2", nombre: "Amistoso privado", is_private: true },
     ]);
 }
-*/
 /**
  * Crea lobby de un nuevo amistoso
  * @param {Object} data - { password?: string, players: [{ player_id, is_starter, behavior_id? }] }

@@ -5,12 +5,32 @@ export const DEFAULT_AVATAR = "https://via.placeholder.com/150?text=Club";
 
 /**
  * Petición para crear un club (POST /club)
- * @param {Object} params
- * @param {string} params.club_name - Nombre del club
- * @param {string} [params.avatar_url] - URL del avatar
+ * @param {Object} data
  */
 
+// =========================================================================
+// MOCK TEMPORAL (Para probar funcionamiento).
+// =========================================================================
 export function createClub(data) {
+  const { club_name, avatar_url } = data;
+  console.log("Mock createClub recibido:", { club_name, avatar_url });
+
+  // Simula un delay de 800ms para que veas el botón en estado "Creando club..."
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        id: "123-club-fake",
+        club_name: club_name,
+        avatar_url: avatar_url?.trim() ? avatar_url : DEFAULT_AVATAR,
+      });
+    }, 800);
+  });
+}
+
+/*
+export function createClub(data) {
+    const {club_name, avatar_url } = data;
+    
     return request("/club", {
         method: "POST",
         body: JSON.stringify({
@@ -19,4 +39,4 @@ export function createClub(data) {
         }),
     });
 }
-
+*/

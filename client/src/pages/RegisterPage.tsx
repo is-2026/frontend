@@ -14,7 +14,7 @@ export default function RegisterPage() {
         // fetch devuelve la data directa, ya no existe "response.data"
         if (response && response.token) {
             localStorage.setItem("token", response.token);
-            navigate("/crear-club");
+            navigate("/create-club");
             }
         } catch (error : any) {
         // Nuestro auth.js tira directamente el status, ya no existe "error.response"

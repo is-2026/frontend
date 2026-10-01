@@ -1,17 +1,21 @@
+import { request } from './api';
+
+/**
+ * Realiza el registro de un nuevo usuario.
+ * @param {Object} credentials - { email, password }
+ */
+
 export const registrarUsuario = async (email, password) => {
-  const res = await fetch('/auth/registro', {
+  const data = await request('/auth/register', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
   });
 
-  if (!res.ok) {
-    throw { status: res.status };
+  if (data?.token) {
+    localStorage.setItem('token', data.token);
   }
-  
-  return await res.json();
+  return data;
 }
-import { request } from './api';
 
 /**
  * Realiza el inicio de sesión del usuario y guarda el token.

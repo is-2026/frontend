@@ -55,11 +55,11 @@ describe('LoginPage Component', () => {
         // Si la pass tiene 7 caracteres seguira deshabilitada.
         fireEvent.change(inputEmail, { target: { value: 'usuario@ejemplo.com'}});
         fireEvent.change(inputPassword, { target: { value: '1234567'}});
-        expect(submitBtn).toBeDisabled;
+        expect(submitBtn).toBeDisabled();
 
         // Al llegar a los 8 carac. se habilita
         fireEvent.change(inputPassword, { target: { value: '12345678'}});
-        expect(submitBtn).not.toBeDisabled;
+        expect(submitBtn).not.toBeDisabled();
     });
 
     test('llama a loginUser y redirige a /friendlies, en caso de exito', async () => {
@@ -89,7 +89,7 @@ describe('LoginPage Component', () => {
     });
 
     test('muestra mensaje de error si la auntenticación falla', async () => {
-        const errorMensagge = 'Error al iniciar sesón, porfavor verifique sus datos';
+        const errorMensagge = 'email o contraseña incorrectos';
         loginUser.mockRejectedValueOnce(new Error(errorMensagge));
 
         render(

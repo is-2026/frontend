@@ -3,6 +3,7 @@ import ClubPage from "./pages/ClubPage";
 import FriendliesPage from "./pages/FriendliesPage";
 import LoginPage from "./pages/LoginPage";
 import JoinFriendlyPage from "./pages/JoinFriendlyPage";
+import RegisterPage from "./pages/RegisterPage";
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/friendlies" element={<FriendliesPage />} />
           <Route path="/friendlies/:friendlyId/join" element={<JoinFriendlyPage />} />
           <Route path="/create-club" element={<ClubPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route
             path="/club"
             element={

@@ -56,7 +56,7 @@ export default function ClubPage() {
            ¡Ingresá los datos para registrar a tu equipo!
           </p>
          </div>
-         {/* Muestramos el mensaje de error en pantalla */}
+         {/* Mostramos el mensaje de error en pantalla */}
         {error && <div className="error-message" style={{ color: "red" }}>{error} </div>}
         
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

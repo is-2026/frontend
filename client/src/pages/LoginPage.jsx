@@ -25,7 +25,7 @@ export default function LoginPage() {
 
         try {
           await loginUser({ email, password});
-          navigate('/') // pongo '/' ya que todavia no definimos un main page  
+          navigate('/friendlies') // pongo '/' ya que todavia no definimos un main page  
         } catch (err) {
             setError(err.message || 'Error al iniciar sesión, porfavor verifique sus datos.');
         } finally {

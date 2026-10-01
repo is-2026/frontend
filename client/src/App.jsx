@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import ClubPage from "./pages/ClubPage";
 import FriendliesPage from "./pages/FriendliesPage";
 import LoginPage from "./pages/LoginPage";
+import JoinFriendlyPage from "./pages/JoinFriendlyPage";
 
 export default function App() {
   return (
@@ -12,11 +13,12 @@ export default function App() {
         </h1>
       </header>
 
-      <main className="w-full max-w-md">
+      <main className="w-full max-w-2xl">
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/friendlies" element={<FriendliesPage />} />
+          <Route path="/friendlies/:friendlyId/join" element={<JoinFriendlyPage />} />
           <Route path="/create-club" element={<ClubPage />} />
           <Route
             path="/club"

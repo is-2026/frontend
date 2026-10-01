@@ -10,6 +10,7 @@ export const registrarUsuario = async (email, password) => {
   }
   
   return await res.json();
+}
 import { request } from './api';
 
 /**

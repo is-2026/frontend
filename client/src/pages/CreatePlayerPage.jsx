@@ -145,7 +145,7 @@ export default function CreatePlayerPage({ onPlayerCreated }) {
             max="99"
             value={number}
             onChange={(e) => setNumber(e.target.value)}
-            placeholder="Ingrese el numero del jugador"
+            placeholder="Ingrese el número del jugador"
             required
             className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
           />

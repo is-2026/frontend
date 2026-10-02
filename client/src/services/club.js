@@ -58,3 +58,9 @@ export function createPlayer(data) {
     }),
   });
 }
+
+export function getPlayers(data) {
+  return request("/club/players", {
+    method: "GET",
+  });
+}

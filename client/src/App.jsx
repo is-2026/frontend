@@ -4,6 +4,7 @@ import FriendliesPage from "./pages/FriendliesPage";
 import LoginPage from "./pages/LoginPage";
 import JoinFriendlyPage from "./pages/JoinFriendlyPage";
 import RegisterPage from "./pages/RegisterPage";
+import CreatePlayerPage from "./pages/CreatePlayerPage"; 
 
 export default function App() {
   return (
@@ -16,12 +17,15 @@ export default function App() {
 
       <main className="w-full max-w-2xl">
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Navigate to="/register" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/friendlies" element={<FriendliesPage />} />
           <Route path="/friendlies/:friendlyId/join" element={<JoinFriendlyPage />} />
           <Route path="/create-club" element={<ClubPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/club/players/create" element={<CreatePlayerPage />} />
+          <Route path="/club/players" element={<Navigate to="/club/players/create" replace />} /> 
+
           <Route
             path="/club"
             element={

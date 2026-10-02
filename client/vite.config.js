@@ -6,7 +6,13 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: './src/setupTests.js', // opcional para importar @testing-library/jest-dom
+    setupFiles: './src/setupTests.js',
+    // Evita el error de hilos/clonación en Node 20 + JSDOM
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        singleThread: true,
+      },
+    },
   },
 });
-

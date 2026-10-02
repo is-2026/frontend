@@ -4,7 +4,8 @@ import FriendliesPage from "./pages/FriendliesPage";
 import LoginPage from "./pages/LoginPage";
 import JoinFriendlyPage from "./pages/JoinFriendlyPage";
 import RegisterPage from "./pages/RegisterPage";
-import CreatePlayerPage from "./pages/CreatePlayerPage"; 
+import CreatePlayerPage from "./pages/CreatePlayerPage";
+import PlayersPage from "./pages/PlayersPage"; 
 
 export default function App() {
   return (
@@ -24,7 +25,7 @@ export default function App() {
           <Route path="/create-club" element={<ClubPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/club/players/create" element={<CreatePlayerPage />} />
-          <Route path="/club/players" element={<Navigate to="/club/players/create" replace />} /> 
+          <Route path="/club/players" element={<PlayersPage />} />
 
           <Route
             path="/club"

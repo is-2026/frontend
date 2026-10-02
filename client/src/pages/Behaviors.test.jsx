@@ -2,8 +2,9 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
 import BehavioursPage from './Behaviors';
 import * as behaviorsService from '../services/behaviors';
+import { MemoryRouter } from 'react-router-dom';
 
-// Mockeamos el servicio que trae los comportamientos
+// Mockeamos de servicio de los comportamientos
 vi.mock('../services/behaviors', () => ({
     getBehaviors: vi.fn(),
 }));
@@ -27,7 +28,11 @@ describe('BehavioursPage Component', () => {
         ];
         behaviorsService.getBehaviors.mockResolvedValueOnce(mockData);
 
-        render(<BehavioursPage />);
+        render(
+            <MemoryRouter>
+                <BehavioursPage />
+            </MemoryRouter>
+        );
 
         await waitFor(() => {
             // Verificamos que los 3 nombres de los comportamientos default estén en pantalla

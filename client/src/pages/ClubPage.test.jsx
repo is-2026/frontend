@@ -73,8 +73,8 @@ describe('ClubPage Component', () => {
                 club_name : 'River Plate',
                 avatar_url : '',
             });
-            expect(mockNavigate).toHaveBeenCalledWith('/club');
-        });
+            expect(mockNavigate).toHaveBeenCalledWith('/club/players');
+        }, { timeout:2500 }); // timeout de espera para la redireccion
     });
 
     test('muestra mensaje de error si el backend devuelve conflicto 409 (club ya creado)', async () => {

@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
-import BehavioursPage from './Behaviors';
+import BehaviorsPage from './BehaviorsPage';
 import * as behaviorsService from '../services/behaviors';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -9,12 +9,16 @@ vi.mock('../services/behaviors', () => ({
     getBehaviors: vi.fn(),
 }));
 
-describe('BehavioursPage Component', () => {
+describe('BehaviorsPage Component', () => {
     test('1. muestra el mensaje de carga al iniciar', () => {
         // Promesa vacía para que quede en el estado inicial
         behaviorsService.getBehaviors.mockReturnValue(new Promise(() => {})); 
         
-        render(<BehavioursPage />);
+        render(
+            <MemoryRouter>
+                <BehaviorsPage />
+            </MemoryRouter>
+        );
         
         expect(screen.getByText('Cargando...')).toBeInTheDocument();
     });
@@ -30,7 +34,7 @@ describe('BehavioursPage Component', () => {
 
         render(
             <MemoryRouter>
-                <BehavioursPage />
+                <BehaviorsPage />
             </MemoryRouter>
         );
 
@@ -48,7 +52,11 @@ describe('BehavioursPage Component', () => {
     test('3. muestra mensaje de error si la API falla', async () => {
         behaviorsService.getBehaviors.mockRejectedValueOnce(new Error('Fallo de conexión'));
 
-        render(<BehavioursPage />);
+        render(
+            <MemoryRouter>
+                <BehaviorsPage />
+            </MemoryRouter>
+        );
 
         await waitFor(() => {
             expect(screen.getByText('Fallo de conexión')).toBeInTheDocument();
@@ -57,7 +65,11 @@ describe('BehavioursPage Component', () => {
 
     test('4. muestra mensaje de lista vacia si no hay comportamientos', async () => {
         behaviorsService.getBehaviors.mockResolvedValueOnce([]);
-        render(<BehavioursPage />);
+        render(
+            <MemoryRouter>
+                <BehaviorsPage />
+            </MemoryRouter>
+        );
 
         await waitFor(() => {
             expect(screen.getByText('No se encontraron comportamientos.')).toBeInTheDocument();

@@ -6,7 +6,8 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: './src/setupTests.js', // opcional para importar @testing-library/jest-dom
+    setupFiles: './src/setupTests.js',
+    pool: 'threads',
+    fileParallelism: false,
   },
 });
-

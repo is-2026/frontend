@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+/* global test */
+import { describe, expect, vi, beforeEach } from 'vitest';
 import { loginUser, registrarUsuario } from './auth';
 import * as api from './api';
 

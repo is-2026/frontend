@@ -4,6 +4,7 @@ import FriendliesPage from "./pages/FriendliesPage";
 import LoginPage from "./pages/LoginPage";
 import JoinFriendlyPage from "./pages/JoinFriendlyPage";
 import RegisterPage from "./pages/RegisterPage";
+import BehaviorsPage from "./pages/BehaviorsPage";
 import CreatePlayerPage from "./pages/CreatePlayerPage";
 import PlayersPage from "./pages/PlayersPage"; 
 
@@ -36,6 +37,7 @@ export default function App() {
               </div>
             }
           />
+          <Route path="/club/behaviors" element={<BehaviorsPage />} />
         </Routes>
       </main>
     </div>

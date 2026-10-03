@@ -45,7 +45,7 @@ describe('RegisterPage Component', () => {
 
         await waitFor(() => {
             expect(authService.registrarUsuario).toHaveBeenCalledWith('test@gmail.com', '123456');
-            expect(mockNavigate).toHaveBeenCalledWith('/crear-club');
+            expect(mockNavigate).toHaveBeenCalledWith('/create-club');
         });
     });
 

@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import MatchHeader from "../components/match/MatchHeader";
-import useMatchSocket from "../hooks/useMatchSocket";
-import PlayerCard from "../components/match/PlayerCard";
+import Field from "../components/match/Field";
+import { useMatchSocket } from "../hooks/useMatchSocket";
 
 /* // Mock para probar la vista:
 const scores = { home_score: 2, away_score: 20 };
@@ -26,11 +26,7 @@ const lineups = {
 
 export default function MatchPage() {
     const { matchId } = useParams();
-    const { lineups, scores, ball_position, players } = useMatchSocket(matchId);
-
-    const pitchWidth = 1000;
-    const pitchHeight = 500;
-    const goalHeight = 75;
+    const { lineups, scores, state } = useMatchSocket(matchId);
 
     return (
         // fixed para sobreescribir configuracion default de app
@@ -43,37 +39,8 @@ export default function MatchPage() {
                 <MatchHeader scores={scores} />
 
                 <div className="flex gap-4">
-                    <div 
-                        className="relative bg-green-700 border-2 border-white shrink-0"
-                        style={{ width: `${pitchWidth}px`, height: `${pitchHeight}px` }}
-                    >
-                        {/* Líneas de la cancha */}
-                        <div className="absolute w-px h-full bg-white/60 left-1/2 -translate-x-1/2"></div>
-                        <div className="absolute w-[150px] h-[150px] border-2 border-white/60 rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-                        
-                        {/* Arcos */}
-                        <div 
-                            className="absolute left-0 border-2 border-white border-l-0 bg-green-800/60"
-                            style={{ height: `${goalHeight}px`, width: '30px', top: '50%', transform: 'translateY(-50%)' }}
-                        ></div>
-                        <div 
-                            className="absolute right-0 border-2 border-white border-r-0 bg-green-800/60"
-                            style={{ height: `${goalHeight}px`, width: '30px', top: '50%', transform: 'translateY(-50%)' }}
-                        ></div>
-
-                        {/* Pelota */}
-                        {ball_position && (
-                            <div className="absolute w-4 h-4 bg-white rounded-full border-2 border-black z-10 shadow-md -translate-x-1/2 -translate-y-1/2"
-                                style={{ left: ball_position.x, top: ball_position.y }}
-                            ></div>
-                        )}
-                        
-                        {/* Jugadores  */}
-                        {players?.map((p) => ( 
-                            <PlayerCard key={p.player_id} 
-                                        player={p} 
-                                        team={lineups?.home?.some(h => h.player_id === p.player_id) ? "home" : "away"}
-                            />))}
+                    <div className="min-w-0 flex-1">
+                        <Field state={state} lineups={lineups} />
                     </div>
 
                     <div className="flex flex-col gap-4 w-64 shrink-0">

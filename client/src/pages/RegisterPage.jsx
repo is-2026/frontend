@@ -16,7 +16,7 @@ export default function RegisterPage() {
             localStorage.setItem("token", response.token);
             navigate("/create-club");
             }
-        } catch (error : any) {
+        } catch (error) {
         // Nuestro auth.js tira directamente el status, ya no existe "error.response"
             if (error.status === 409) {
                 setApiError("Este email ya está registrado.");

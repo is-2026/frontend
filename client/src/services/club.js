@@ -40,3 +40,27 @@ export function createClub(data) {
     });
 }
 
+/**
+ * Petición para crear un jugador en la plantilla (POST /club/players)
+ * @param {Object} data
+ */
+export function createPlayer(data) {
+  return request("/club/players", {
+    method: "POST",
+    body: JSON.stringify({
+      name: data.name,
+      number: data.number,
+      power: data.power,
+      agility: data.agility,
+      control: data.control,
+      speed: data.speed,
+      strength: data.strength,
+    }),
+  });
+}
+
+export function getPlayers(data) {
+  return request("/club/players", {
+    method: "GET",
+  });
+}

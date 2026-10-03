@@ -6,6 +6,10 @@ import JoinFriendlyPage from "./pages/JoinFriendlyPage";
 import RegisterPage from "./pages/RegisterPage";
 import LobbyPage from "./pages/LobbyPage";
 import MatchPage from "./pages/MatchPage";
+import BehaviorsPage from "./pages/BehaviorsPage";
+import CreatePlayerPage from "./pages/CreatePlayerPage";
+import PlayersPage from "./pages/PlayersPage"; 
+import ClubDashboardPage from "./pages/ClubDashboardPage";
 
 export default function App() {
   return (
@@ -18,7 +22,7 @@ export default function App() {
 
       <main className="w-full max-w-2xl">
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Navigate to="/register" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/friendlies" element={<FriendliesPage />} />
           <Route path="/friendlies/:friendlyId/join" element={<JoinFriendlyPage />} />
@@ -26,15 +30,11 @@ export default function App() {
           <Route path="/match/:matchId" element={<MatchPage />} />
           <Route path="/create-club" element={<ClubPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route
-            path="/club"
-            element={
-              <div className="bg-slate-900 border border-slate-800 p-8 text-center shadow-xl">
-                <h2 className="text-2xl font-semibold">Mi Club</h2>
-                <p className="text-slate-400 mt-2">El club se creó correctamente.</p>
-              </div>
-            }
-          />
+          <Route path="/club/players/create" element={<CreatePlayerPage />} />
+          <Route path="/club/players" element={<PlayersPage />} />
+
+          <Route path="/club" element={<ClubDashboardPage />} />
+          <Route path="/club/behaviors" element={<BehaviorsPage />} />
         </Routes>
       </main>
     </div>

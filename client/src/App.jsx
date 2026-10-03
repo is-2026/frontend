@@ -8,6 +8,7 @@ import BehaviorsPage from "./pages/BehaviorsPage";
 import CreatePlayerPage from "./pages/CreatePlayerPage";
 import PlayersPage from "./pages/PlayersPage"; 
 import ClubDashboardPage from "./pages/ClubDashboardPage";
+import BehaviorDetail from "./pages/BehaviorDetail";
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
 
           <Route path="/club" element={<ClubDashboardPage />} />
           <Route path="/club/behaviors" element={<BehaviorsPage />} />
+          <Route path="/club/behaviors/:id" element={<BehaviorDetail />} />
         </Routes>
       </main>
     </div>

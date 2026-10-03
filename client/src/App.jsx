@@ -8,6 +8,7 @@ import BehaviorsPage from "./pages/BehaviorsPage";
 import CreatePlayerPage from "./pages/CreatePlayerPage";
 import PlayersPage from "./pages/PlayersPage"; 
 import ClubDashboardPage from "./pages/ClubDashboardPage";
+import CreateFriendlyPage from "./pages/CreateFriendlyPage";
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/" element={<Navigate to="/register" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/friendlies" element={<FriendliesPage />} />
+          <Route path="/friendlies/create" element={<CreateFriendlyPage />} />
           <Route path="/friendlies/:friendlyId/join" element={<JoinFriendlyPage />} />
           <Route path="/create-club" element={<ClubPage />} />
           <Route path="/register" element={<RegisterPage />} />

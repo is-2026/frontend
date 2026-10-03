@@ -7,14 +7,14 @@ export default function LobbyPage() {
     const navigate = useNavigate();
     
     // Llamada al hook para escuchar inicio de partido 
-    const { partidoId } = useInitFriendlySocket(friendlyId);
+    const { matchId } = useInitFriendlySocket(friendlyId);
 
     // Redireccion al partido cuando se recibe el ID del partido
     useEffect(() => {
-        if (partidoId) {
-            navigate(`/partido/${partidoId}`);
+        if (matchId) {
+            navigate(`/match/${matchId}`);
         }
-    }, [partidoId, navigate]);
+    }, [matchId, navigate]);
 
     return (
         <div className="p-6 text-center text-white">

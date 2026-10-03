@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 
 
 export default function useInitFriendlySocket(friendlyId) {
-    const [partidoId, setPartidoId] = useState(null);
+    const [matchId, setMatchId] = useState(null);
     const socketRef = useRef(null);
 
     useEffect(() => {
@@ -18,7 +18,7 @@ export default function useInitFriendlySocket(friendlyId) {
             const message = JSON.parse(e.data);
             switch (message.type) {
             case "friendlyStart":
-                setPartidoId(message.data.match_id);
+                setMatchId(message.data.match_id);
                 socket.close();
                 break;
             default:
@@ -33,5 +33,5 @@ export default function useInitFriendlySocket(friendlyId) {
             }
         };
     }, [friendlyId]);
-    return { partidoId };
+    return { matchId };
 }

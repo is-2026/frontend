@@ -25,8 +25,8 @@ const lineups = {
 }; */
 
 export default function MatchPage() {
-    const { partidoId } = useParams();
-    const { lineups, scores, ball_position, players } = useMatchSocket(partidoId);
+    const { matchId } = useParams();
+    const { lineups, scores, ball_position, players } = useMatchSocket(matchId);
 
     const pitchWidth = 1000;
     const pitchHeight = 500;

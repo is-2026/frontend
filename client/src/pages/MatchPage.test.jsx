@@ -30,7 +30,7 @@ describe('MatchPage', () => {
         const { container } = render(
             <MemoryRouter initialEntries={['/match/123']}>
                 <Routes>
-                    <Route path="/match/:partidoId" element={<MatchPage />} />
+                    <Route path="/match/:matchId" element={<MatchPage />} />
                 </Routes>
             </MemoryRouter>
         );

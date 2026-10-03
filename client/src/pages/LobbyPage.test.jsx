@@ -24,8 +24,8 @@ describe('LobbyPage', () => {
         vi.clearAllMocks();
     });
 
-    test('Verifica el flujo: mantiene la espera y redirige automáticamente al recibir el partidoId', () => {
-        useInitFriendlySocket.mockReturnValue({ partidoId: null });
+    test('Verifica el flujo: mantiene la espera y redirige automáticamente al recibir el matchId', () => {
+        useInitFriendlySocket.mockReturnValue({ matchId: null });
 
         const { rerender } = render(
             <MemoryRouter>
@@ -36,7 +36,7 @@ describe('LobbyPage', () => {
         expect(screen.getByText('Esperando para iniciar el partido...')).toBeInTheDocument();
         expect(mockNavigate).not.toHaveBeenCalled();
 
-        useInitFriendlySocket.mockReturnValue({ partidoId: 'match-999' });
+        useInitFriendlySocket.mockReturnValue({ matchId: 'match-999' });
 
         rerender(
             <MemoryRouter>
@@ -44,6 +44,6 @@ describe('LobbyPage', () => {
             </MemoryRouter>
         );
 
-        expect(mockNavigate).toHaveBeenCalledWith('/partido/match-999');
+        expect(mockNavigate).toHaveBeenCalledWith('/match/match-999');
     });
 });

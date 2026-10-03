@@ -33,7 +33,7 @@ describe('useInitFriendlySocket', () => {
         const { result } = renderHook(() => useInitFriendlySocket(null));
 
         expect(global.WebSocket).not.toHaveBeenCalled();
-        expect(result.current.partidoId).toBeNull();
+        expect(result.current.matchId).toBeNull();
     });
 
     test('2. Instancia el WebSocket con la URL correcta', () => {
@@ -61,7 +61,7 @@ describe('useInitFriendlySocket', () => {
             });
         });
 
-        expect(result.current.partidoId).toBe('match-999');
+        expect(result.current.matchId).toBe('match-999');
         expect(mockWebSocketInstance.close).toHaveBeenCalledTimes(1);
     });
 

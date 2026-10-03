@@ -4,7 +4,7 @@ import FriendliesPage from "./pages/FriendliesPage";
 import LoginPage from "./pages/LoginPage";
 import JoinFriendlyPage from "./pages/JoinFriendlyPage";
 import RegisterPage from "./pages/RegisterPage";
-import BehavioursPage from "./pages/Behaviors";
+import BehaviorsPage from "./pages/BehaviorsPage";
 
 export default function App() {
   return (
@@ -32,7 +32,7 @@ export default function App() {
               </div>
             }
           />
-          <Route path="/club/behaviors" element={<BehavioursPage />} />
+          <Route path="/club/behaviors" element={<BehaviorsPage />} />
         </Routes>
       </main>
     </div>

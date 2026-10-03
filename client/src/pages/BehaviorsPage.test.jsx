@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
-import BehavioursPage from './Behaviors';
+import BehaviorsPage from './BehaviorsPage';
 import * as behaviorsService from '../services/behaviors';
 
 // Mockeamos el servicio que trae los comportamientos
@@ -8,12 +8,12 @@ vi.mock('../services/behaviors', () => ({
     getBehaviors: vi.fn(),
 }));
 
-describe('BehavioursPage Component', () => {
+describe('BehaviorsPage Component', () => {
     test('1. muestra el mensaje de carga al iniciar', () => {
         // Promesa vacía para que quede en el estado inicial
         behaviorsService.getBehaviors.mockReturnValue(new Promise(() => {})); 
         
-        render(<BehavioursPage />);
+        render(<BehaviorsPage />);
         
         expect(screen.getByText('Cargando...')).toBeInTheDocument();
     });
@@ -27,7 +27,7 @@ describe('BehavioursPage Component', () => {
         ];
         behaviorsService.getBehaviors.mockResolvedValueOnce(mockData);
 
-        render(<BehavioursPage />);
+        render(<BehaviorsPage />);
 
         await waitFor(() => {
             // Verificamos que los 3 nombres de los comportamientos default estén en pantalla
@@ -43,7 +43,7 @@ describe('BehavioursPage Component', () => {
     test('3. muestra mensaje de error si la API falla', async () => {
         behaviorsService.getBehaviors.mockRejectedValueOnce(new Error('Fallo de conexión'));
 
-        render(<BehavioursPage />);
+        render(<BehaviorsPage />);
 
         await waitFor(() => {
             expect(screen.getByText('Fallo de conexión')).toBeInTheDocument();
@@ -52,7 +52,7 @@ describe('BehavioursPage Component', () => {
 
     test('4. muestra mensaje de lista vacia si no hay comportamientos', async () => {
         behaviorsService.getBehaviors.mockResolvedValueOnce([]);
-        render(<BehavioursPage />);
+        render(<BehaviorsPage />);
 
         await waitFor(() => {
             expect(screen.getByText('No se encontraron comportamientos.')).toBeInTheDocument();

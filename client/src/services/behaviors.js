@@ -1,0 +1,33 @@
+import { request } from "./api"; 
+
+export const getBehaviors = async () => {
+    const data = await request('/club/behaviors', {
+        method: 'GET',
+    });
+    return data;
+};
+
+export const getBehaviorById = async (id) => {
+    return await request(`/club/behaviors/${id}`, { 
+        method: 'GET' 
+    });
+};
+
+/* export const getBehaviorById = async (id) => {
+    // MOCK: Simula la base de datos para probar estilos y funcionalidad 
+    const mockDb = {
+        "1": { id: "1", name: "Comportamiento Defensivo", code: "defend()" },
+        "2": { id: "2", name: "Comportamiento Ofensivo", code: "attack()" },
+        "3": { id: "3", name: "Comportamiento Equilibrado", code: "balance()" }
+    };
+
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (mockDb[id]) {
+                resolve(mockDb[id]);
+            } else {
+                reject(new Error("404")); // Simula el error 404
+            }
+        }, 500);
+    });
+}; */

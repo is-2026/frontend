@@ -8,6 +8,8 @@ import { WS_URL, MATCH_WS_PATH } from "../config";
 
 export function useMatchSocket(matchId) {
   const [state, setState] = useState(null); // { tick, players, ballPosition } | null
+  const [finished, setFinished] = useState(null);
+  const [goalInfo, setGoalInfo] = useState(null);
 
   useEffect(() => {
     if (!matchId) return;
@@ -18,6 +20,19 @@ export function useMatchSocket(matchId) {
       const msg = JSON.parse(event.data);
       
       switch (msg.type) {
+        
+        case "matchFinished": {
+          //Se implementa en otro ticket
+          const { match_end, home_score, away_score } = msg.data;
+            //Se setea finished con estos valores, deja de ser null.
+            setFinished({
+              matchEnd: match_end,
+              homeScore: home_score ?? 0,
+              awayScore: away_score ?? 0,
+            })
+          break;
+        }
+
         //Si llega estado del partido, entra a este case.
         case "matchState": {
           const { match_id, tick, players, ball_position } = msg.data;
@@ -28,7 +43,7 @@ export function useMatchSocket(matchId) {
           }
 
           setState({
-            tick,
+            tick: tick,
             players: players.map((p) => ({
               playerId: p.player_id,
               x: p.position?.x ?? 0,
@@ -42,9 +57,14 @@ export function useMatchSocket(matchId) {
           break;
         }
 
-        case "goal": 
-          //Se implementa en otro ticket.
+        case "goal": {
+          const { player_name, club_name } = msg.data;
+          setGoalInfo({
+            scoringPlayer: player_name,
+            scoringClub: club_name,
+          });
           break;
+        }
 
         default:
           console.warn("Tipo de mensaje desconocido (partido):", msg.type);
@@ -56,5 +76,5 @@ export function useMatchSocket(matchId) {
     return () => ws.close();
   }, [matchId]);
 
-  return state;
+  return { state, finished, goalInfo } ;
 }

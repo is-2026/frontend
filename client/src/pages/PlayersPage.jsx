@@ -32,7 +32,7 @@ export default function PlayersPage() {
                 <p className="text-slate-300 text-sm">Cargando plantilla del equipo...</p>
             </div>
         );
-    } // 👈 AQUÍ FALTABA LA LLAVE DE CIERRE
+    }
 
     return (
     <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 shadow-2xl w-full max-w-5xl mx-auto">

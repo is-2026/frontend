@@ -45,6 +45,53 @@ describe("CreatePlayerPage Component", () => {
         expect(submitBtn).not.toBeDisabled();
     });
 
+    test("no permite crear el jugador si la suma de PACSS es MENOR a 300pts", async () => {
+        renderWithRouter(<CreatePlayerPage />);
+
+        // completamos datos básicos
+        fireEvent.change(screen.getByPlaceholderText(/ingrese el nombre del jugador/i), { target: { value: "Ariel Ortega" } });
+        fireEvent.change(screen.getByPlaceholderText(/ingrese el número del jugador/i), { target: { value: "10" } });
+
+        // asignamos 50 a cada atributo
+        const inputsNumber = screen.getAllByRole("spinbutton");
+        fireEvent.change(inputsNumber[1], { target: { value: "50" } });
+        fireEvent.change(inputsNumber[2], { target: { value: "50" } });
+        fireEvent.change(inputsNumber[3], { target: { value: "50" } });
+        fireEvent.change(inputsNumber[4], { target: { value: "50" } });
+        fireEvent.change(inputsNumber[5], { target: { value: "50" } });
+
+        const submitBtn = screen.getByRole("button", { name: /confirmar y crear jugador/i});
+
+        expect(submitBtn).toBeDisabled();
+
+        // Intentamos enviar y verificamos que NO llame al servicio de creación
+        fireEvent.click(submitBtn);
+        expect(createPlayer).not.toHaveBeenCalled();
+    });
+
+    test("no permite crear el jugador si la suma de PACSS es MAYOR a 300pts", async () => {
+        renderWithRouter(<CreatePlayerPage />);
+
+        // completamos datos básicos
+        fireEvent.change(screen.getByPlaceholderText(/ingrese el nombre del jugador/i), { target: { value: "Ariel Ortega" } });
+        fireEvent.change(screen.getByPlaceholderText(/ingrese el número del jugador/i), { target: { value: "10" } });
+
+        const inputsNumber = screen.getAllByRole("spinbutton");
+        fireEvent.change(inputsNumber[1], { target: { value: "80" } });
+        fireEvent.change(inputsNumber[2], { target: { value: "60" } });
+        fireEvent.change(inputsNumber[3], { target: { value: "50" } });
+        fireEvent.change(inputsNumber[4], { target: { value: "50" } });
+        fireEvent.change(inputsNumber[5], { target: { value: "70" } });
+
+        const submitBtn = screen.getByRole("button", { name: /confirmar y crear jugador/i });
+    
+        expect(submitBtn).toBeDisabled();
+
+        fireEvent.click(submitBtn);
+        expect(createPlayer).not.toHaveBeenCalled();
+    });
+
+
     test("crea un jugador con éxito, invoca a onPlayerCreated y redirige a /club/players", async () => {
         const mockOnPlayerCreated = vi.fn(); // funcion espia para probar el callback
         const fakePlayer = { id: 1, name: "Fernando Cavenaghi", number: 9 };

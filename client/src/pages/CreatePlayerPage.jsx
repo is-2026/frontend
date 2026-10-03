@@ -195,7 +195,7 @@ export default function CreatePlayerPage({ onPlayerCreated }) {
         <button
           type="submit"
           disabled={sending || totalPacss !== 300}
-          className="mt-2 w-full py-3 px-4 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold shadow-md transition-all duration-200"
+          className="mt-2 w-full py-3 px-4 bg-green-600 hover:bg-green-500 active:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold shadow-md transition-all duration-200"
         >
           {sending ? "Guardando Jugador..." : "Confirmar y Crear Jugador"}
         </button>

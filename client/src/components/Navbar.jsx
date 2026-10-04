@@ -1,9 +1,7 @@
-import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { logout } from "../services/auth";
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {

@@ -1,8 +1,8 @@
-import { request } from "./api"; 
+import { request } from "./api";
 
 export const getBehaviors = async () => {
-    const data = await request('/club/behaviors', {
-        method: 'GET',
+    const data = await request("/club/behaviors", {
+        method: "GET",
     });
     return data;
 };
@@ -19,8 +19,8 @@ export const getBehaviors = async () => {
 };
 */
 export const getBehaviorById = async (id) => {
-    return await request(`/club/behaviors/${id}`, { 
-        method: 'GET' 
+    return await request(`/club/behaviors/${id}`, {
+        method: "GET",
     });
 };
 

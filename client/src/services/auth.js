@@ -1,4 +1,4 @@
-import { request } from './api';
+import { request } from "./api";
 
 /**
  * Realiza el registro de un nuevo usuario.
@@ -6,16 +6,16 @@ import { request } from './api';
  */
 
 export const registrarUsuario = async (email, password) => {
-  const data = await request('/auth/register', {
-    method: 'POST',
-    body: JSON.stringify({ email, password })
-  });
+    const data = await request("/auth/register", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+    });
 
-  if (data?.token) {
-    localStorage.setItem('token', data.token);
-  }
-  return data;
-}
+    if (data?.token) {
+        localStorage.setItem("token", data.token);
+    }
+    return data;
+};
 
 /**
  * Realiza el inicio de sesión del usuario y guarda el token.
@@ -23,13 +23,13 @@ export const registrarUsuario = async (email, password) => {
  */
 
 export const loginUser = async ({ email, password }) => {
-    const data = await request('/auth/login', {
-        method: 'POST',
+    const data = await request("/auth/login", {
+        method: "POST",
         body: JSON.stringify({ email, password }),
     });
 
     if (data?.token) {
-        localStorage.setItem('token', data.token);
+        localStorage.setItem("token", data.token);
     }
     return data;
 };

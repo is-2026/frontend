@@ -2,8 +2,9 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
 import BehaviorsPage from './BehaviorsPage';
 import * as behaviorsService from '../services/behaviors';
+import { MemoryRouter } from 'react-router-dom';
 
-// Mockeamos el servicio que trae los comportamientos
+// Mockeamos de servicio de los comportamientos
 vi.mock('../services/behaviors', () => ({
     getBehaviors: vi.fn(),
 }));
@@ -13,7 +14,11 @@ describe('BehaviorsPage Component', () => {
         // Promesa vacía para que quede en el estado inicial
         behaviorsService.getBehaviors.mockReturnValue(new Promise(() => {})); 
         
-        render(<BehaviorsPage />);
+        render(
+            <MemoryRouter>
+                <BehaviorsPage />
+            </MemoryRouter>
+        );
         
         expect(screen.getByText('Cargando...')).toBeInTheDocument();
     });
@@ -27,7 +32,11 @@ describe('BehaviorsPage Component', () => {
         ];
         behaviorsService.getBehaviors.mockResolvedValueOnce(mockData);
 
-        render(<BehaviorsPage />);
+        render(
+            <MemoryRouter>
+                <BehaviorsPage />
+            </MemoryRouter>
+        );
 
         await waitFor(() => {
             // Verificamos que los 3 nombres de los comportamientos default estén en pantalla
@@ -43,7 +52,11 @@ describe('BehaviorsPage Component', () => {
     test('3. muestra mensaje de error si la API falla', async () => {
         behaviorsService.getBehaviors.mockRejectedValueOnce(new Error('Fallo de conexión'));
 
-        render(<BehaviorsPage />);
+        render(
+            <MemoryRouter>
+                <BehaviorsPage />
+            </MemoryRouter>
+        );
 
         await waitFor(() => {
             expect(screen.getByText('Fallo de conexión')).toBeInTheDocument();
@@ -52,7 +65,11 @@ describe('BehaviorsPage Component', () => {
 
     test('4. muestra mensaje de lista vacia si no hay comportamientos', async () => {
         behaviorsService.getBehaviors.mockResolvedValueOnce([]);
-        render(<BehaviorsPage />);
+        render(
+            <MemoryRouter>
+                <BehaviorsPage />
+            </MemoryRouter>
+        );
 
         await waitFor(() => {
             expect(screen.getByText('No se encontraron comportamientos.')).toBeInTheDocument();

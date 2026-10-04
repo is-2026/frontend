@@ -1,6 +1,11 @@
+import { useNavigate } from "react-router-dom";
+
 export default function BehaviorCard({ behavior }) {
+  const navigate = useNavigate();
+
   return (
-    <li className="bg-slate-900 border border-slate-800 rounded-lg p-5 flex flex-col h-full shadow-lg transition-all hover:border-slate-700">
+    <li onClick={() => navigate(`/club/behaviors/${behavior.id}`)}
+      className="bg-slate-900 border border-slate-800 rounded-lg p-5 flex flex-col h-full shadow-lg transition-all hover:border-slate-700 hover:cursor-pointer hover:bg-slate-800/60">
       <h2 className="text-xl font-bold text-indigo-400 mb-3 truncate" title={behavior.name}>
         {behavior.name}
       </h2>

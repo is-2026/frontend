@@ -8,6 +8,7 @@ import { LobbyPage } from "./pages/LobbyPage";
 import { MatchPage } from "./pages/MatchPage";
 import { BehaviorsPage } from "./pages/BehaviorsPage";
 import { CreatePlayerPage } from "./pages/CreatePlayerPage";
+import { CreateFriendlyPage } from "./pages/CreateFriendlyPage";
 import { PlayersPage } from "./pages/PlayersPage"; 
 import { ClubDashboardPage } from "./pages/ClubDashboardPage";
 import { BehaviorDetail } from "./pages/BehaviorDetail";

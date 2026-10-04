@@ -75,7 +75,7 @@ describe('useMatchSocket', () => {
 
     test('4. Procesa el evento "matchState" y actualiza posiciones en cada tick', () => {
         const { result } = renderHook(() => useMatchSocket('123'));
-        
+
         const messageCallback = mockWebSocketInstance.addEventListener.mock.calls.find(
             (call) => call[0] === 'message'
         )[1];
@@ -102,9 +102,9 @@ describe('useMatchSocket', () => {
 
     test('5. Cierra el WebSocket correctamente al desmontar el componente', () => {
         const { unmount } = renderHook(() => useMatchSocket('123'));
-        
+
         unmount();
-        
+
         expect(mockWebSocketInstance.close).toHaveBeenCalledTimes(1);
     });
 

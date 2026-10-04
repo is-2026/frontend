@@ -118,4 +118,49 @@ describe("useMatchSocket", () => {
 
         expect(mockWebSocketInstance.close).toHaveBeenCalledTimes(1);
     });
+
+    test('6. Procesar el evento "goal" e incrementa marcador', () => {
+        const { result } = renderHook(() => useMatchSocket("123"));
+
+        const messageCallback =
+            mockWebSocketInstance.addEventListener.mock.calls.find(
+                (call) => call[0] === "message",
+            )[1];
+
+        act(() => {
+            messageCallback({
+                data: JSON.stringify({
+                    type: "matchStarted",
+                    data: {
+                        home_lineup: [{ player_id: "p1" }],
+                        away_lineup: [{ player_id: "p2" }],
+                        home_score: 0,
+                        away_score: 0,
+                    },
+                }),
+            });
+        });
+
+        act(() => {
+            messageCallback({
+                data: JSON.stringify({
+                    type: "goal",
+                    data: {
+                        player_id: "p1",
+                        minute: 12,
+                        tick: 150,
+                    },
+                }),
+            });
+        });
+
+        expect(result.current.scores).toEqual({ home: 1, away: 0 });
+        expect(result.current.goalInfo).toEqual({
+            tick: 150,
+            minute: 12,
+            playerId: "p1",
+            team: "home",
+        });
+    });
+
 });

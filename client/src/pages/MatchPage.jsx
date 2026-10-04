@@ -3,26 +3,41 @@ import { MatchHeader } from "../components/match/MatchHeader";
 import { Field } from "../components/match/Field";
 import { useMatchSocket } from "../hooks/useMatchSocket";
 
-/* // Mock para probar la vista:
-const scores = { home_score: 2, away_score: 20 };
-    
-// Pelota en el medio exacto
-const ball_position = { x: 500, y: 250 }; 
-    
-// 6 jugadores distribuidos
-const players = [
-    { player_id: "p1", position: { x: 450, y: 250 } },
-    { player_id: "p2", position: { x: 400, y: 100 } },
-    { player_id: "p3", position: { x: 200, y: 400 } },
-    { player_id: "p4", position: { x: 550, y: 250 } },
-    { player_id: "p5", position: { x: 600, y: 100 } },
-    { player_id: "p6", position: { x: 100, y: 400 } }
-];
-// Mock lineups
-const lineups = {
-    home: [{ player_id: "p1" }, { player_id: "p2" }, { player_id: "p3" }],
-    away: [{ player_id: "p4" }, { player_id: "p5" }, { player_id: "p6" }]
-}; */
+/*
+
+// Mock para probar la vista:
+const mockScores = { home: 2, away: 1 };
+  
+  const mockLineups = {
+  home: [
+    { player_id: "p1" },
+    { player_id: "p2" },
+    { player_id: "p3" },
+  ],
+  away: [
+    { player_id: "p4" },
+    { player_id: "p5" },
+    { player_id: "p6" },
+  ],
+};
+
+
+const mockState = {
+    tick: 150,
+    ballPosition: { x: 20, y: 10 }, 
+    players: [
+    // Equipo Local (lado izquierdo)
+    { playerId: "p1", x: 3, y: 10 },   // Arquero Local (cerca del arco izq)
+    { playerId: "p2", x: 12, y: 5 },   // Defensor Local (arriba)
+    { playerId: "p3", x: 18, y: 12 },  // Mediocampista Local (centro)
+
+    // Equipo Visitante (lado derecho)
+    { playerId: "p4", x: 22, y: 8 },   // Mediocampista Visitante (centro)
+    { playerId: "p5", x: 28, y: 15 },  // Defensor Visitante (abajo)
+    { playerId: "p6", x: 37, y: 10 },  // Arquero Visitante (cerca del arco der)
+  ],
+};
+*/
 
 export function MatchPage() {
     const { matchId } = useParams();
@@ -59,3 +74,5 @@ export function MatchPage() {
         </div>
     );
 }
+
+

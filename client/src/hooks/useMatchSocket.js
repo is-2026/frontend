@@ -50,6 +50,7 @@ export function useMatchSocket(matchId) {
                 return;
               }
               setState({
+                matchId: match_id,
                 tick: tick,
                 players: players.map((p) => ({
                   playerId: p.player_id,

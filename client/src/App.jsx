@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import { ClubPage } from "./pages/ClubPage";
+import { CreateFriendlyPage } from "./pages/CreateFriendlyPage";
 import { FriendliesPage } from "./pages/FriendliesPage";
 import { LoginPage } from "./pages/LoginPage";
 import { JoinFriendlyPage } from "./pages/JoinFriendlyPage";

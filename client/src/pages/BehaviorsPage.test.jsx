@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
-import BehaviorsPage from './BehaviorsPage';
+import { BehaviorsPage } from './BehaviorsPage';
 import * as behaviorsService from '../services/behaviors';
 import { MemoryRouter } from 'react-router-dom';
 

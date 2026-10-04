@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as matchers from '@testing-library/jest-dom/matchers';
-import RegisterPage from '../pages/RegisterPage';
+import { RegisterPage } from '../pages/RegisterPage';
 import * as authService from '../services/auth';
 
 expect.extend(matchers);

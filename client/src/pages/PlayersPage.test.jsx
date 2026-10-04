@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import PlayersPage from "./PlayersPage";
+import { describe, expect, vi, beforeEach } from "vitest";
+import { PlayersPage } from "./PlayersPage";
 import * as clubService from "../services/club";
 
 // mock para los services de club

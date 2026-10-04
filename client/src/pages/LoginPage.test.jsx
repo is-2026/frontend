@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import LoginPage from './LoginPage';
+import { LoginPage } from './LoginPage';
 import { loginUser } from '../services/auth';
 
 // Mock del servicio de autenticación

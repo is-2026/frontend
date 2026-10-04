@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { getBehaviors } from "../services/behaviors";
-import BehaviorCard from "../components/BehaviorsCard";
+import { BehaviorCard } from "../components/BehaviorsCard";
 
-export default function BehaviorsPage() {
+export function BehaviorsPage() {
   const [behaviors, setBehaviors] = useState([]); // Acá se guarda la lista de comportamientos disponibles
   const [loading, setLoading] = useState(true);     // Inicia en true para mostrar msj cargando
   const [error, setError] = useState(null);         // Acá se guarda el mensaje de error

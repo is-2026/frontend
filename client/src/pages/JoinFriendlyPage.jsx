@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { joinFriendly, getFriendlyById } from "../services/friendlies";
-import PlayerSelection from "../components/PlayerSelection";
+import { PlayerSelection } from "../components/PlayerSelection";
 
 const PLAYERS_MOCK = [
   { id: "j1", name: "Jugador 1" },
@@ -18,7 +18,7 @@ const BEHAVIORS_MOCK = [
   { id: "equilibrado", name: "Equilibrado" },
 ];
 
-export default function JoinFriendlyPage() {
+export function JoinFriendlyPage() {
   const { friendlyId } = useParams();
   const navigate = useNavigate();
 

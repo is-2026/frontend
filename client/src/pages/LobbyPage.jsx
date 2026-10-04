@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import useInitFriendlySocket from "../hooks/useInitFriendlySocket";
+import { useInitFriendlySocket } from "../hooks/useInitFriendlySocket";
 
-export default function LobbyPage() {
+export function LobbyPage() {
     const { friendlyId } = useParams();
     const navigate = useNavigate();
     

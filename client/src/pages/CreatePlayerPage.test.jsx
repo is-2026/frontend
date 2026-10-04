@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import CreatePlayerPage from "./CreatePlayerPage";
+import { describe, expect, vi, beforeEach } from "vitest";
+import { CreatePlayerPage } from "./CreatePlayerPage";
 import { createPlayer } from "../services/club";
 
 // mock del serivicio HTTP

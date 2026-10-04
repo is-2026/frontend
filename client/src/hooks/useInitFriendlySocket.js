@@ -2,7 +2,7 @@ import { WS_URL, FRIENDLY_LOBBY_WS_PATH } from "../config";
 import { useState, useEffect, useRef } from "react";
 
 
-export default function useInitFriendlySocket(friendlyId) {
+export function useInitFriendlySocket(friendlyId) {
     const [matchId, setMatchId] = useState(null);
     const socketRef = useRef(null);
 

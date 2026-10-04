@@ -1,17 +1,16 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import ClubPage from "./pages/ClubPage";
-import FriendliesPage from "./pages/FriendliesPage";
-import LoginPage from "./pages/LoginPage";
-import JoinFriendlyPage from "./pages/JoinFriendlyPage";
-import RegisterPage from "./pages/RegisterPage";
-import LobbyPage from "./pages/LobbyPage";
-import MatchPage from "./pages/MatchPage";
-import BehaviorsPage from "./pages/BehaviorsPage";
-import CreatePlayerPage from "./pages/CreatePlayerPage";
-import PlayersPage from "./pages/PlayersPage"; 
-import ClubDashboardPage from "./pages/ClubDashboardPage";
-import CreateFriendlyPage from "./pages/CreateFriendlyPage";
-import BehaviorDetail from "./pages/BehaviorDetail";
+import { ClubPage } from "./pages/ClubPage";
+import { FriendliesPage } from "./pages/FriendliesPage";
+import { LoginPage } from "./pages/LoginPage";
+import { JoinFriendlyPage } from "./pages/JoinFriendlyPage";
+import { RegisterPage } from "./pages/RegisterPage";
+import { LobbyPage } from "./pages/LobbyPage";
+import { MatchPage } from "./pages/MatchPage";
+import { BehaviorsPage } from "./pages/BehaviorsPage";
+import { CreatePlayerPage } from "./pages/CreatePlayerPage";
+import { PlayersPage } from "./pages/PlayersPage"; 
+import { ClubDashboardPage } from "./pages/ClubDashboardPage";
+import { BehaviorDetail } from "./pages/BehaviorDetail";
 
 export default function App() {
   return (

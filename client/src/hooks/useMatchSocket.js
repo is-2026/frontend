@@ -6,11 +6,11 @@ import { useState, useEffect, useRef } from "react";
   envuelto como { type, data }, con "type" como string constante
   ("matchState", "goal", etc.).*/
 
-export default function useMatchSocket(matchId) {
-    const [lineups, setLineups] = useState(null);
-    const [scores, setScores] = useState(null);
-    const [state, setState] = useState(null);
-    const [finished, setFinished] = useState(null);
+export function useMatchSocket(matchId) {
+    const [lineups, setLineups] = useState(null); // home, away
+    const [scores, setScores] = useState(null); // home, away
+    const [state, setState] = useState(null); // match_id, tick, players, ball_position
+    //const [finished, setFinished] = useState(null); comentado porque es de otro ticket
     const socketRef = useRef(null);
 
     useEffect(() => {
@@ -24,8 +24,8 @@ export default function useMatchSocket(matchId) {
         ws.addEventListener("close", () => { console.log("DISCONNECTED"); });
 
         ws.addEventListener("message", (e) => {
-            const message = JSON.parse(e.data);
-            switch (message.type) {
+            const msg = JSON.parse(e.data);
+            switch (msg.type) {
 
             //caso de inicio de partido
             case "matchStarted": {
@@ -70,8 +70,8 @@ export default function useMatchSocket(matchId) {
     });
 
         return () => {
-            if (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING) {
-                socket.close();
+            if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+                ws.close();
             }
         };
     }, [matchId]);

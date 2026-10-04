@@ -38,7 +38,7 @@ export function ClubPage() {
 
          // Espera 1.5 segundos para que el usuario lea el mensaje y luego navega
         setTimeout(() => {
-        navigate("/club/players");
+        navigate("/club");
         }, 1500);
     } catch (err) {
         // Capturamos el error 409 si el club ya esta creado.

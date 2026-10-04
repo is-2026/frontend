@@ -26,6 +26,7 @@ export default function App() {
           <Route path="/" element={<Navigate to="/register" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/friendlies" element={<FriendliesPage />} />
+          <Route path="/friendlies/create" element={<CreateFriendlyPage />} />
           <Route path="/friendlies/:friendlyId/join" element={<JoinFriendlyPage />} />
           <Route path="/friendlies/:friendlyId/lobby" element={<LobbyPage />} />
           <Route path="/match/:matchId" element={<MatchPage />} />

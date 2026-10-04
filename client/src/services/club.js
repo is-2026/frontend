@@ -59,8 +59,22 @@ export function createPlayer(data) {
   });
 }
 
-export function getPlayers(data) {
+/*export function getPlayers(data) {
   return request("/club/players", {
     method: "GET",
   });
+}
+*/
+
+/* MOCK para ver funcionamiento de crear amistoso.*/
+export function getPlayers() {
+  return Promise.resolve([
+    { id: "p1", name: "Lionel Messi", number: 10, power: 95 },
+    { id: "p2", name: "Julián Álvarez", number: 9, power: 88 },
+    { id: "p3", name: "Ángel Di María", number: 11, power: 89 },
+    { id: "p4", name: "Rodrigo De Paul", number: 7, power: 85 },
+    { id: "p5", name: "Alexis Mac Allister", number: 20, power: 84 },
+    { id: "p6", name: "Enzo Fernández", number: 24, power: 86 },
+    { id: "p7", name: "Emiliano Martínez", number: 23, power: 90 },
+  ]);
 }

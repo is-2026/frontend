@@ -123,11 +123,12 @@ export function CreateLiguePage() {
 
         {/* Nombre */}
         <div>
-          <label className="block text-sm font-medium mb-1">
+          <label htmlFor="name" className="block text-sm font-medium mb-1">
             Nombre de la liga
           </label>
           <input
             type="text"
+            id="name"   
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full border border-white/10 bg-slate-800 p-2 text-white focus:outline-none focus:border-white/30"
@@ -139,11 +140,12 @@ export function CreateLiguePage() {
 
         {/* Duración */}
         <div>
-          <label className="block text-sm font-medium mb-1">
+          <label htmlFor="duration" className="block text-sm font-medium mb-1">
             Duración del partido (minutos)
           </label>
           <input
             type="number"
+            id="duration"
             min="1"
             max="90"
             value={duration}
@@ -156,7 +158,7 @@ export function CreateLiguePage() {
 
         {/* Contraseña */}
         <div>
-          <label className="block text-sm font-medium mb-1">
+          <label htmlFor="password" className="block text-sm font-medium mb-1">
             Contraseña (Opcional)
           </label>
           <p className="text-xs text-white/60 mb-2">
@@ -164,6 +166,7 @@ export function CreateLiguePage() {
           </p>
           <input
             type="password"
+            id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full border border-white/10 bg-slate-800 p-2 text-white focus:outline-none focus:border-white/30"
@@ -173,11 +176,12 @@ export function CreateLiguePage() {
 
         {/* Cantidad maxima de clubs */}
         <div>
-          <label className="block text-sm font-medium mb-1">
+          <label htmlFor="maxClubs" className="block text-sm font-medium mb-1">
             Cantidad máxima de clubs
           </label>
           <input
             type="number"
+            id="maxClubs"
             min="3"
             max="30"
             value={maxClubs}

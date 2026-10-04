@@ -67,6 +67,7 @@ export function createPlayer(data) {
 */
 
 /* MOCK para ver funcionamiento de crear amistoso.*/
+/*
 export function getPlayers() {
   return Promise.resolve([
     { id: "p1", name: "Lionel Messi", number: 10, power: 95 },
@@ -77,4 +78,9 @@ export function getPlayers() {
     { id: "p6", name: "Enzo Fernández", number: 24, power: 86 },
     { id: "p7", name: "Emiliano Martínez", number: 23, power: 90 },
   ]);
+}
+*/
+
+export async function getPlayers() {
+  return request("/players");
 }

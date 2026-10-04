@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
-import MatchHeader from "../components/match/MatchHeader";
+import MatchHeader from "../components/match/matchHeader";
 import useMatchSocket from "../hooks/useMatchSocket";
-import PlayerCard from "../components/match/PlayerCard";
+import PlayerCard from "../components/match/playerCard";
 
 /* // Mock para probar la vista:
 const scores = { home_score: 2, away_score: 20 };

@@ -10,6 +10,7 @@ import BehaviorsPage from "./pages/BehaviorsPage";
 import CreatePlayerPage from "./pages/CreatePlayerPage";
 import PlayersPage from "./pages/PlayersPage"; 
 import ClubDashboardPage from "./pages/ClubDashboardPage";
+import CreateFriendlyPage from "./pages/CreateFriendlyPage";
 import BehaviorDetail from "./pages/BehaviorDetail";
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/" element={<Navigate to="/register" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/friendlies" element={<FriendliesPage />} />
+          <Route path="/friendlies/create" element={<CreateFriendlyPage />} />
           <Route path="/friendlies/:friendlyId/join" element={<JoinFriendlyPage />} />
           <Route path="/friendlies/:friendlyId/lobby" element={<LobbyPage />} />
           <Route path="/match/:matchId" element={<MatchPage />} />

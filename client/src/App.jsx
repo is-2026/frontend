@@ -11,6 +11,8 @@ import { CreatePlayerPage } from "./pages/CreatePlayerPage";
 import { PlayersPage } from "./pages/PlayersPage"; 
 import { ClubDashboardPage } from "./pages/ClubDashboardPage";
 import { BehaviorDetail } from "./pages/BehaviorDetail";
+import { CreateFriendlyPage } from "./pages/CreateFriendlyPage";
+import { CreateLiguePage } from "./pages/CreateLiguePage";
 
 export default function App() {
   return (
@@ -34,6 +36,7 @@ export default function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/club/players/create" element={<CreatePlayerPage />} />
           <Route path="/club/players" element={<PlayersPage />} />
+          <Route path="/ligues/create" element={<CreateLiguePage />} />
 
           <Route path="/club" element={<ClubDashboardPage />} />
           <Route path="/club/behaviors" element={<BehaviorsPage />} />

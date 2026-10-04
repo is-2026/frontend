@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-export default function ClubDashboardPage() {
+export function ClubDashboardPage() {
   const navigate = useNavigate();
 
   return (

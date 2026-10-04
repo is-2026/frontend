@@ -10,7 +10,7 @@ const INITIAL_PACSS = {
     strength: 60,
 };
 
-export default function CreatePlayerPage({ onPlayerCreated }) {
+export function CreatePlayerPage({ onPlayerCreated }) {
     const navigate = useNavigate();
 
     const [name, setName] = useState("");

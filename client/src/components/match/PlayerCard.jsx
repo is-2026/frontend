@@ -1,9 +1,10 @@
+
 // Ahora recibe "left"/"top" ya calculados (en porcentaje) en vez de
 // leer player.position.x/y en píxeles, y se le agregó la transición CSS para
 // mantener el movimiento fluido con transition-all duration-100
 
 
-export default function PlayerCard({ player , team, left, top }) {
+export function PlayerCard({ player , team, left, top }) {
     const bgColor = team === "home" ? "bg-blue-500" : "bg-red-500";
     return (
         <div 

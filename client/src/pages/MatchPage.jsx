@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
-import MatchHeader from "../components/match/MatchHeader";
-import Field from "../components/match/Field";
+import { MatchHeader } from "../components/match/MatchHeader";
+import { Field } from "../components/match/Field";
 import { useMatchSocket } from "../hooks/useMatchSocket";
 
 /* // Mock para probar la vista:
@@ -24,7 +24,7 @@ const lineups = {
     away: [{ player_id: "p4" }, { player_id: "p5" }, { player_id: "p6" }]
 }; */
 
-export default function MatchPage() {
+export function MatchPage() {
     const { matchId } = useParams();
     const { lineups, scores, state } = useMatchSocket(matchId);
 

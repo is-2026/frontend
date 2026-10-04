@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getPlayers } from "../services/club";
 
-export default function PlayersPage() {
+export function PlayersPage() {
     const [players, setPlayers] = useState([]);
     const [loading, setLoading] = useState(true); // Corregido: decía 'loadign'
     const [error, setError] = useState(null);

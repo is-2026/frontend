@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { createClub } from "../services/club";
 
 
-export default function ClubPage() {
+export function ClubPage() {
     const [clubName, setClubName] = useState("");
     const [avatar, setAvatar] = useState("");
     const [error, setError] = useState("");

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getBehaviorById } from "../services/behaviors";
 
-export default function BehaviorDetail() {
+export function BehaviorDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [behavior, setBehavior] = useState(null);

@@ -1,5 +1,5 @@
-import { FIELD_WIDTH, FIELD_HEIGHT } from "../../config"
-import PlayerCard from "./PlayerCard";
+import { FIELD_WIDTH, FIELD_LENGTH } from "../../config"
+import { PlayerCard } from "./PlayerCard";
 
 function stayInBounds(value, min, max) {
   if (value < min) 
@@ -13,7 +13,7 @@ function stayInBounds(value, min, max) {
 
 // lineups: { home: [{ player_id, ... }], away: [...] } | null — viene de
 // useMatchSocket (del mensaje matchStarted, todavía sin traducir a camelCase).
-export default function Field({ state, lineups }) {
+export function Field({ state, lineups }) {
   const players = state?.players ?? []; //Esto es por si stat llega undefined, se usa lista vacía que no hace nada y no rompe nada
   const ball = state?.ballPosition;
 
@@ -30,7 +30,7 @@ export default function Field({ state, lineups }) {
 
       {players.map((p) => {
         const x = stayInBounds(p.x, 0, FIELD_WIDTH);
-        const y = stayInBounds(p.y, 0, FIELD_HEIGHT);
+        const y = stayInBounds(p.y, 0, FIELD_LENGTH);
         const isHome = lineups?.home?.some((h) => h.player_id === p.playerId);
 
         return (
@@ -38,8 +38,8 @@ export default function Field({ state, lineups }) {
             key={p.playerId}
             player={p}
             team={isHome ? "home" : "away"}
-            left={`${(x / FIELD_WIDTH) * 100}%`}
-            top={`${(y / FIELD_HEIGHT) * 100}%`}
+            left={`${(x / FIELD_LENGTH) * 100}%`}
+            top={`${(y / FIELD_LENGTH) * 100}%`}
           />
         );
       })}
@@ -50,7 +50,7 @@ export default function Field({ state, lineups }) {
           className="absolute -ml-1.5 -mt-1.5 h-3 w-3 rounded-full bg-white transition-all duration-100 "
           style = {{
             left:`${stayInBounds(ball.x, 0, FIELD_WIDTH) / FIELD_WIDTH * 100}%`,
-            top:`${stayInBounds(ball.y, 0, FIELD_HEIGHT) / FIELD_HEIGHT * 100}%`,
+            top:`${stayInBounds(ball.y, 0, FIELD_LENGTH) / FIELD_LENGTH * 100}%`,
           }}
         />
       )}

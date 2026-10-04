@@ -72,7 +72,7 @@ export function ClubPage() {
     <div className="bg-slate-900 border border-slate-800 p-8 shadow-2xl w-full">
         {/* Encabezado centrado, grande y con degradado */}
         <div className="text-center mb-8">
-         <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-indigo-500 tracking-tight">
+         <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
         Creación de Club
          </h2>
           <p className="text-slate-400 text-sm mt-2">

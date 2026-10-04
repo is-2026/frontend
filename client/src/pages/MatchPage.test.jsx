@@ -77,4 +77,75 @@ describe('MatchPage', () => {
             top: toPercent(10,0,FIELD_HEIGHT)
         });
     });
+    test('ajusta automáticamente con stayInBounds a los jugadores que están fuera de la cancha', () => {
+        useMatchSocket.mockReturnValue({
+            lineups: {
+                home: [{ player_id: 'p1' }], // Local -> Azul
+                away: [{ player_id: 'p2' }]  // Visitante -> Rojo
+            },
+            scores: { home: 0, away: 0 },
+            state: {
+                matchId: 1,
+                tick: 1,
+                players: [
+                    // Jugador fuera por la izquierda y arriba
+                    { playerId: 'p1', x: -10, y: -5 },
+                    // Jugador fuera por la derecha y abajo
+                    { playerId: 'p2', x: 100, y: 50 }
+                ],
+                ballPosition: { x: -20, y: 50 }
+            }
+        });
+    });
+
+    test('stayInBounds mantiene a los jugadores y la pelota dentro de la cancha', () => {
+        useMatchSocket.mockReturnValue({
+            lineups: {
+                home: [{ player_id: 'p1' }], 
+                away: [{ player_id: 'p2' }]  
+            },
+            scores: { home: 0, away: 0 },
+            state: {
+                matchId: 1,
+                tick: 1,
+                players: [
+                    // Jugador fuera por la izquierda y arriba
+                    { playerId: 'p1', x: -10, y: -5 },
+                    // Jugador fuera por la derecha y abajo
+                    { playerId: 'p2', x: 100, y: 50 }
+                ],
+                ballPosition: { x: 200, y: -10 }
+            }
+        });
+        
+        const { container } = render(
+            <MemoryRouter initialEntries={['/match/123']}>
+                <Routes>
+                    <Route path="/match/:matchId" element={<MatchPage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        const homePlayer = container.querySelector('.bg-blue-500');
+        const awayPlayer = container.querySelector('.bg-red-500');
+        const ball = screen.getByTestId('ball');
+
+        // p1 (-10, -5) debe ser limitado al borde superior izquierdo -> 0%, 0%
+        expect(homePlayer).toHaveStyle({
+            left: toPercent(-10, 0, FIELD_WIDTH),
+            top: toPercent(-5, 0, FIELD_HEIGHT)
+        });
+
+        // p2 (100, 50) debe ser limitado al borde inferior derecho -> 100%, 100%
+        expect(awayPlayer).toHaveStyle({
+            left: toPercent(100, 0, FIELD_WIDTH),
+            top: toPercent(50, 0, FIELD_HEIGHT)
+        });
+
+        expect(ball).toHaveStyle({
+            left: toPercent(200, 0, FIELD_WIDTH),
+            top: toPercent(-10, 0, FIELD_HEIGHT)
+        })
+
+    });
 });

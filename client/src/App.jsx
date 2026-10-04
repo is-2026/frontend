@@ -1,20 +1,20 @@
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import ClubPage from "./pages/ClubPage";
-import FriendliesPage from "./pages/FriendliesPage";
-import LoginPage from "./pages/LoginPage";
-import JoinFriendlyPage from "./pages/JoinFriendlyPage";
-import RegisterPage from "./pages/RegisterPage";
-import BehaviorsPage from "./pages/BehaviorsPage";
 import BehaviorDetail from "./pages/BehaviorDetail";
-import CreatePlayerPage from "./pages/CreatePlayerPage";
-import PlayersPage from "./pages/PlayersPage"; 
+import BehaviorsPage from "./pages/BehaviorsPage";
 import ClubDashboardPage from "./pages/ClubDashboardPage";
+import ClubPage from "./pages/ClubPage";
 import CreateFriendlyPage from "./pages/CreateFriendlyPage";
+import CreatePlayerPage from "./pages/CreatePlayerPage";
+import FriendliesPage from "./pages/FriendliesPage";
+import JoinFriendlyPage from "./pages/JoinFriendlyPage";
 import LobbyPage from "./pages/LobbyPage";
+import LoginPage from "./pages/LoginPage";
 import MatchPage from "./pages/MatchPage";
+import PlayersPage from "./pages/PlayersPage"; 
+import RegisterPage from "./pages/RegisterPage";
 
-// Layout para vistas autenticadas / protegidas con Navbar
+//layout para vistas autenticadas / protegidas con Navbar
 function MainLayout() {
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col">
@@ -26,7 +26,7 @@ function MainLayout() {
   );
 }
 
-// Layout para vistas públicas (Login, Register, Crear Club) sin Navbar
+// layout para vistas públicas (Login, Register, Crear Club) sin Navbar
 function PublicLayout() {
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
@@ -46,7 +46,7 @@ function PublicLayout() {
 export default function App() {
   return (
     <Routes>
-      {/* Rutas Públicas: Muestran el título "Bot-ines" centrado */}
+      {/* Rutas Públicas: Muestran "Bot-ines" centrado */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Navigate to="/register" replace />} />
         <Route path="/login" element={<LoginPage />} />

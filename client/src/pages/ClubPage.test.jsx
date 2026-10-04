@@ -73,7 +73,7 @@ describe('ClubPage Component', () => {
                 club_name : 'River Plate',
                 avatar_url : '',
             });
-            expect(mockNavigate).toHaveBeenCalledWith('/club/players');
+            expect(mockNavigate).toHaveBeenCalledWith('/club');
         }, { timeout:2500 }); // timeout de espera para la redireccion
     });
 

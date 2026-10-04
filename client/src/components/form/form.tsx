@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 interface SearchProps {
   onSubmit: (email: string, password: string) => void;
@@ -12,7 +13,7 @@ export default function Form({ onSubmit, apiError }: SearchProps) {
   const [passwordError, setPasswordError] = useState('');
 
   const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?$/;
-  const regexPassword = /^.{5,}$/;
+  const regexPassword = /^.{8,}$/;
 
   const manejarEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -26,7 +27,7 @@ export default function Form({ onSubmit, apiError }: SearchProps) {
     const value = e.target.value;
     setPassword(value);
     if (value.trim() === '') setPasswordError('La contraseña es obligatoria.');
-    else if (!regexPassword.test(value)) setPasswordError('La contraseña debe tener al menos 5 caracteres.');
+    else if (!regexPassword.test(value)) setPasswordError('La contraseña debe tener al menos 8 caracteres.');
     else setPasswordError('');
   };
 
@@ -36,7 +37,7 @@ export default function Form({ onSubmit, apiError }: SearchProps) {
     const passwordValida = regexPassword.test(password);
 
     if (!emailValido) setEmailError('Por favor, escribe un correo válido.');
-    if (!passwordValida) setPasswordError('La contraseña debe tener al menos 5 caracteres.');
+    if (!passwordValida) setPasswordError('La contraseña debe tener al menos 8 caracteres.');
     
     if (!emailValido || !passwordValida) return;
     
@@ -48,7 +49,7 @@ export default function Form({ onSubmit, apiError }: SearchProps) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col w-full max-w-sm mx-auto bg-[#0b1120] p-6 rounded-lg">
-      <div className="text-4xl font-black text-[#a5b4fc] mb-6 text-center w-full">Register</div>
+      <div className="text-3xl font-black text-white mb-6 text-center w-full">Registrar Usuario</div>
       
       <div className="flex flex-col mb-4 w-full">
         <h1 className="text-sm font-bold text-slate-200 mb-1">
@@ -74,9 +75,12 @@ export default function Form({ onSubmit, apiError }: SearchProps) {
         Register
       </button>
       
-      <div className="text-slate-400 p-2 mt-2 text-center w-full cursor-pointer hover:text-white">
+      <Link
+        to="/login"
+        className="mt-4 text-center text-ms font-bold tracking-wider text-slate-400 hover:text-white transition-colors block py-2"
+      >
         Iniciar Sesión
-      </div>
+      </Link>
     </form>
   );
 }

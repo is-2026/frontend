@@ -3,7 +3,7 @@ import { useState } from "react";
 // availablePlayers: [{ id, name }]
 // behaviors: [{ id, name }]
 // onChange(selection): { starters: [{ player_id, behavior_id }], substitutes: [player_id] }
-export default function PlayerSelection({
+export function PlayerSelection({
   availablePlayers = [],
   behaviors = [],
   onChange,

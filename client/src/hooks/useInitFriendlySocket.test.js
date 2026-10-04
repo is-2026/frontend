@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
-import useInitFriendlySocket from './useInitFriendlySocket';
+import { useInitFriendlySocket } from './useInitFriendlySocket';
 
 vi.mock('../config', () => ({
     WS_URL: 'ws://localhost:8080',

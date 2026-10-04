@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Form from "../components/form/form";
 import { registrarUsuario } from "../services/auth";
 
-export default function RegisterPage() {
+export function RegisterPage() {
   const [apiError, setApiError] = useState("");
   const navigate = useNavigate();
 

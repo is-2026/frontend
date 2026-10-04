@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getPlayers } from "../services/club";
 
-export default function PlayersPage() {
-  const [players, setPlayers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export function PlayersPage() {
+    const [players, setPlayers] = useState([]);
+    const [loading, setLoading] = useState(true); 
+    const [error, setError] = useState(null);
 
   const navigate = useNavigate();
 

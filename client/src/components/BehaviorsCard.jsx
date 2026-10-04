@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-export default function BehaviorCard({ behavior }) {
+export function BehaviorCard({ behavior }) {
   const navigate = useNavigate();
 
   return (

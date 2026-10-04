@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
-import useMatchSocket from './useMatchSocket';
+import { useMatchSocket } from './useMatchSocket';
 
 vi.mock('../config', () => ({
     WS_URL: 'ws://localhost:8080',
@@ -35,8 +35,7 @@ describe('useMatchSocket', () => {
         expect(global.WebSocket).not.toHaveBeenCalled();
         expect(result.current.lineups).toBeNull();
         expect(result.current.scores).toBeNull();
-        expect(result.current.ball_position).toBeNull();
-        expect(result.current.players).toBeNull();
+        expect(result.current.state).toBeNull();
     });
 
     test('2. Instancia el WebSocket con la URL correcta', () => {
@@ -84,17 +83,21 @@ describe('useMatchSocket', () => {
         act(() => {
             messageCallback({
                 data: JSON.stringify({
-                    type: 'matchState',
+                    type: 'matchState', //match_id, tick, players, ball_position
                     data: {
-                        ball_position: { x: 500, y: 250 },
-                        players: [{ player_id: 'p1', position: { x: 100, y: 100 } }]
+                        match_id: '123',
+                        tick: 4,
+                        players: [{ player_id: 'p1', position: { x: 4, y: 4 }}],
+                        ball_position: { x: 20, y: 10 }
                     }
                 })
             });
         });
 
-        expect(result.current.ball_position).toEqual({ x: 500, y: 250 });
-        expect(result.current.players).toEqual([{ player_id: 'p1', position: { x: 100, y: 100 } }]);
+        expect(result.current.state.ballPosition).toEqual({ x: 20, y: 10 });
+        expect(result.current.state.players).toEqual([{ playerId: 'p1', x: 4, y: 4 }]);
+        expect(result.current.state.matchId).toEqual('123');
+        expect(result.current.state.tick).toEqual(4);
     });
 
     test('5. Cierra el WebSocket correctamente al desmontar el componente', () => {
@@ -104,4 +107,5 @@ describe('useMatchSocket', () => {
         
         expect(mockWebSocketInstance.close).toHaveBeenCalledTimes(1);
     });
+
 });

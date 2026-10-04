@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getFriendlies } from "../services/friendlies";
-import FriendlyCard from "../components/FriendlyCard";
+import { FriendlyCard } from "../components/FriendlyCard";
 
-export default function FriendliesPage() {
-  const [friendlies, setFriendlies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export function FriendliesPage() {
+  const [friendlies, setFriendlies] = useState([]); // Acá se guarda la lista de amistosos disponibles
+  const [loading, setLoading] = useState(true);     // Inicia en true para mostrar msj cargando
+  const [error, setError] = useState(null);         // Acá se guarda el mensaje de error
 
   useEffect(() => {
     getFriendlies()

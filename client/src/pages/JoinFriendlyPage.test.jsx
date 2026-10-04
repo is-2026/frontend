@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { vi, describe, it, expect,afterEach, beforeEach } from "vitest";
 import * as matchers from "@testing-library/jest-dom/matchers";
-import JoinFriendlyPage from "./JoinFriendlyPage";
+import { JoinFriendlyPage } from "./JoinFriendlyPage";
 import * as friendliesService from "../services/friendlies";
 
 expect.extend(matchers);
@@ -15,7 +15,7 @@ afterEach(() => {
 
 // Mockeamos PlayerSelection
 vi.mock("../components/PlayerSelection", () => ({
-  default: ({ onChange }) => (
+  PlayerSelection: ({ onChange }) => (
     <div data-testid="player-selection">
       <button
         onClick={() =>

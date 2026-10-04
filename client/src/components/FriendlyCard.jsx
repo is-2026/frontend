@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export default function FriendlyCard({ friendly }) {
+export function FriendlyCard({ friendly }) {
   return (
     <li className="flex items-center justify-between border border-white/10 bg-slate-800 p-4">
       <div>

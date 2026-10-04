@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import LobbyPage from './LobbyPage';
-import useInitFriendlySocket from '../hooks/useInitFriendlySocket';
+import { LobbyPage } from './LobbyPage';
+import { useInitFriendlySocket } from '../hooks/useInitFriendlySocket';
 
 const mockNavigate = vi.fn();
 
@@ -16,7 +16,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('../hooks/useInitFriendlySocket', () => ({
-    default: vi.fn()
+    useInitFriendlySocket: vi.fn()
 }));
 
 describe('LobbyPage', () => {

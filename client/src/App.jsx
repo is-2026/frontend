@@ -1,18 +1,17 @@
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import BehaviorDetail from "./pages/BehaviorDetail";
-import BehaviorsPage from "./pages/BehaviorsPage";
-import ClubDashboardPage from "./pages/ClubDashboardPage";
-import ClubPage from "./pages/ClubPage";
-import CreateFriendlyPage from "./pages/CreateFriendlyPage";
-import CreatePlayerPage from "./pages/CreatePlayerPage";
-import FriendliesPage from "./pages/FriendliesPage";
-import JoinFriendlyPage from "./pages/JoinFriendlyPage";
-import LobbyPage from "./pages/LobbyPage";
-import LoginPage from "./pages/LoginPage";
-import MatchPage from "./pages/MatchPage";
-import PlayersPage from "./pages/PlayersPage"; 
-import RegisterPage from "./pages/RegisterPage";
+import { ClubPage } from "./pages/ClubPage";
+import { FriendliesPage } from "./pages/FriendliesPage";
+import { LoginPage } from "./pages/LoginPage";
+import { JoinFriendlyPage } from "./pages/JoinFriendlyPage";
+import { RegisterPage } from "./pages/RegisterPage";
+import { LobbyPage } from "./pages/LobbyPage";
+import { MatchPage } from "./pages/MatchPage";
+import { BehaviorsPage } from "./pages/BehaviorsPage";
+import { CreatePlayerPage } from "./pages/CreatePlayerPage";
+import { PlayersPage } from "./pages/PlayersPage"; 
+import { ClubDashboardPage } from "./pages/ClubDashboardPage";
+import { BehaviorDetail } from "./pages/BehaviorDetail";
 
 //layout para vistas autenticadas / protegidas con Navbar
 function MainLayout() {

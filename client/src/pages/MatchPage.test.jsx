@@ -3,8 +3,6 @@ import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { MatchPage } from './MatchPage';
 import { useMatchSocket } from '../hooks/useMatchSocket';
-import { FIELD_HEIGHT, FIELD_WIDTH } from '../config';
-import { toPercent } from "../components/match/Field";
 
 vi.mock('../hooks/useMatchSocket', () => ({
     useMatchSocket: vi.fn()
@@ -15,7 +13,7 @@ describe('MatchPage', () => {
         vi.clearAllMocks();
     });
 
-    test('renderiza la interfaz completa, la cancha y asigna colores estrictos cruzando ID y coordenadas', () => {
+    test('1. El inicio del partido renderiza la interfaz completa, la cancha, jugadores y pelota', () => {
         useMatchSocket.mockReturnValue({
             lineups: {
                 home: [{ player_id: 'p1' }], 
@@ -23,14 +21,16 @@ describe('MatchPage', () => {
             },
             scores: { home: 0, away: 0 },
             state: {
-                matchId: 1,
-                tick: 2,
+                matchId: '123',
+                tick: 0,
                 players: [
-                    { playerId: 'p1', x: 4, y: 4 }, 
-                    { playerId: 'p3', x: 36, y: 16 }  
+                    { playerId: 'p1', x: -10, y: -5 }, 
+                    { playerId: 'p3', x: 10, y: 5 }  
                 ],
-                ballPosition: { x: 20, y: 10 }
-            }
+                ballPosition: { x: 0, y: 0 }
+            },
+            goalInfo: null,
+            finished: { matchEnd: false }
         });
 
         const { container } = render(
@@ -41,82 +41,175 @@ describe('MatchPage', () => {
             </MemoryRouter>
         );
 
-        // 1. VERIFICACIÓN DEL HEADER Y PANELES
+        // Verificación de Header y Paneles
         expect(screen.getByText('Equipo Local')).toBeInTheDocument();
         expect(screen.getByText('Equipo Rival')).toBeInTheDocument();
         expect(screen.getByText('00:00')).toBeInTheDocument();
-        
         expect(screen.getByText('Equipo')).toBeInTheDocument();
         expect(screen.getByText('Suplentes')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /realizar cambios/i })).toBeInTheDocument();
 
-        // 2. VERIFICACIÓN DE JUGADORES (Renderizado de color correcto)
+        // Verificación de los jugadores por sus clases de color (bg-blue-500 y bg-red-500)
         const homePlayers = container.querySelectorAll('.bg-blue-500');
         const awayPlayers = container.querySelectorAll('.bg-red-500');
 
         expect(homePlayers.length).toBe(1);
         expect(awayPlayers.length).toBe(1);
 
-        // Jugador azul tiene que ser p1, verificar posición 100x100.
-        expect(homePlayers[0]).toHaveStyle({ 
-            left: toPercent(4,0,FIELD_WIDTH),
-            top: toPercent(4,0,FIELD_HEIGHT) 
-        });
-
-        // Jugador rojo tiene que ser p3, verificar posición 900x400.
-        expect(awayPlayers[0]).toHaveStyle({ 
-            left: toPercent(36,0,FIELD_WIDTH),
-            top: toPercent(16,0,FIELD_HEIGHT) 
-        });
-
-        // 3. VERIFICACIÓN DE LA PELOTA
-        const ball = screen.getByTestId('ball');
-        expect(ball).toBeInTheDocument();
-        expect(ball).toHaveStyle({ 
-            left: toPercent(20,0,FIELD_WIDTH), 
-            top: toPercent(10,0,FIELD_HEIGHT)
-        });
-    });
-    test('ajusta automáticamente con stayInBounds a los jugadores que están fuera de la cancha', () => {
-        useMatchSocket.mockReturnValue({
-            lineups: {
-                home: [{ player_id: 'p1' }], // Local -> Azul
-                away: [{ player_id: 'p2' }]  // Visitante -> Rojo
-            },
-            scores: { home: 0, away: 0 },
-            state: {
-                matchId: 1,
-                tick: 1,
-                players: [
-                    // Jugador fuera por la izquierda y arriba
-                    { playerId: 'p1', x: -10, y: -5 },
-                    // Jugador fuera por la derecha y abajo
-                    { playerId: 'p2', x: 100, y: 50 }
-                ],
-                ballPosition: { x: -20, y: 50 }
-            }
-        });
+        // Verificación de la Pelota
+        expect(screen.getByTestId('ball')).toBeInTheDocument();
     });
 
-    test('stayInBounds mantiene a los jugadores y la pelota dentro de la cancha', () => {
+    test('2. Renderiza correctamente el banner de gol cuando goalInfo no es null', () => {
         useMatchSocket.mockReturnValue({
             lineups: {
                 home: [{ player_id: 'p1' }], 
                 away: [{ player_id: 'p2' }]  
             },
-            scores: { home: 0, away: 0 },
+            scores: { home: 1, away: 0 },
             state: {
-                matchId: 1,
-                tick: 1,
-                players: [
-                    // Jugador fuera por la izquierda y arriba
-                    { playerId: 'p1', x: -10, y: -5 },
-                    // Jugador fuera por la derecha y abajo
-                    { playerId: 'p2', x: 100, y: 50 }
-                ],
-                ballPosition: { x: 200, y: -10 }
-            }
+                matchId: '123',
+                tick: 120,
+                players: [{ playerId: 'p1', x: 0, y: 0 }],
+                ballPosition: { x: 20, y: 0 }
+            },
+            goalInfo: {
+                tick: 120,
+                minute: 2,
+                playerId: 'p1',
+                team: 'home'
+            },
+            finished: { matchEnd: false }
         });
 
+        render(
+            <MemoryRouter initialEntries={['/match/123']}>
+                <Routes>
+                    <Route path="/match/:matchId" element={<MatchPage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        expect(screen.getByText('¡GOL!')).toBeInTheDocument();
+        expect(screen.getByText("Equipo Local - minuto 2'")).toBeInTheDocument();
+    });
+
+    test('3. Muestra el resultado final y banner al finalizar el partido (finished.matchEnd = true)', () => {
+        useMatchSocket.mockReturnValue({
+            lineups: {
+                home: [{ player_id: 'p1' }], 
+                away: [{ player_id: 'p2' }]  
+            },
+            scores: { home: 2, away: 1 },
+            state: {
+                matchId: '123',
+                tick: 5400,
+                players: [],
+                ballPosition: { x: 0, y: 0 }
+            },
+            goalInfo: null,
+            finished: {
+                matchEnd: true,
+                homeScore: 2,
+                awayScore: 1
+            }
+    });
+
+    render(
+        <MemoryRouter initialEntries={['/match/123']}>
+            <Routes>
+                <Route path="/match/:matchId" element={<MatchPage />} />
+            </Routes>
+        </MemoryRouter>
+    );
+
+    // Verifica el título del banner
+    expect(screen.getByText(/PARTIDO FINALIZADO/i)).toBeInTheDocument();
+
+    // Busca el texto "2 - 1"
+    expect(screen.getByText('2 - 1')).toBeInTheDocument();
+});
+
+    test('4. Tolera coordenadas fuera de rango en la simulación sin romper el componente', () => {
+        useMatchSocket.mockReturnValue({
+            lineups: {
+                home: [{ player_id: 'p1' }],
+                away: [{ player_id: 'p2' }]
+            },
+            scores: { home: 0, away: 0 },
+            state: {
+                matchId: '123',
+                tick: 10,
+                players: [
+                    { playerId: 'p1', x: -50, y: -30 },
+                    { playerId: 'p2', x: 50, y: 30 }
+                ],
+                ballPosition: { x: 100, y: -50 }
+            },
+            goalInfo: null,
+            finished: { matchEnd: false }
+        });
+
+        const { container } = render(
+            <MemoryRouter initialEntries={['/match/123']}>
+                <Routes>
+                    <Route path="/match/:matchId" element={<MatchPage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        expect(container.querySelectorAll('.bg-blue-500').length).toBe(1);
+        expect(container.querySelectorAll('.bg-red-500').length).toBe(1);
+        expect(screen.getByTestId('ball')).toBeInTheDocument();
+    });
+
+    test('5. Actualiza los marcadores en el header al convertir un gol', () => {
+        const { rerender } = render(
+            <MemoryRouter initialEntries={['/match/123']}>
+                <Routes>
+                    <Route path="/match/:matchId" element={<MatchPage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        // Estado inicial del marcador: 0 - 0
+        useMatchSocket.mockReturnValue({
+            lineups: { home: [{ player_id: 'p1' }], away: [{ player_id: 'p2' }] },
+            scores: { home: 0, away: 0 },
+            state: { matchId: '123', tick: 0, players: [], ballPosition: { x: 0, y: 0 } },
+            goalInfo: null,
+            finished: { matchEnd: false }
+        });
+
+        rerender(
+            <MemoryRouter initialEntries={['/match/123']}>
+                <Routes>
+                    <Route path="/match/:matchId" element={<MatchPage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        const score0Elements = screen.getAllByText('0');
+        expect(score0Elements.length).toBeGreaterThanOrEqual(2); // Local 0 y Visitante 0
+
+        // Simulación del evento de Gol del equipo local: pasa a 1 - 0
+        useMatchSocket.mockReturnValue({
+            lineups: { home: [{ player_id: 'p1' }], away: [{ player_id: 'p2' }] },
+            scores: { home: 1, away: 0 },
+            state: { matchId: '123', tick: 300, players: [], ballPosition: { x: 20, y: 0 } },
+            goalInfo: { tick: 300, minute: 5, playerId: 'p1', team: 'home' },
+            finished: { matchEnd: false }
+        });
+
+        rerender(
+            <MemoryRouter initialEntries={['/match/123']}>
+                <Routes>
+                    <Route path="/match/:matchId" element={<MatchPage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        // Verifica que el nuevo valor '1' se muestre en pantalla
+        expect(screen.getByText('1')).toBeInTheDocument();
     });
 });

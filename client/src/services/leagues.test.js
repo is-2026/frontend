@@ -115,7 +115,7 @@ describe("leagues service", () => {
     test("da error si la liga no existe o la API falla", async () => {
       request.mockRejectedValueOnce(new Error("Liga no encontrada"));
 
-      await expect(getLeagues("999")).rejects.toThrow("Liga no encontrada");
+      await expect(getLeague("999")).rejects.toThrow("Liga no encontrada");
     });
   });
 });

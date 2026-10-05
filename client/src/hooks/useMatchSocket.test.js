@@ -2,15 +2,22 @@ import { renderHook, act } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useMatchSocket } from './useMatchSocket';
 
-vi.mock('../config', () => ({
-    WS_URL: 'ws://localhost:8080',
-    MATCH_WS_PATH: (id) => `/ws/matches/${id}`
-}));
-
+vi.mock('../config', () => {
+    const WS_URL = 'ws://localhost:8000';
+    const MATCH_WS_PATH = (id) => `/ws/matches/${id}`;
+    return {
+        WS_URL,
+        MATCH_WS_PATH,
+        wsUrl: (path) => `${WS_URL}${path}?token=${encodeURIComponent(localStorage.getItem('token') ?? '')}`,
+    };
+});
 describe('useMatchSocket', () => {
     let mockWebSocketInstance;
 
     beforeEach(() => {
+
+        localStorage.setItem('token', 'test-token-123');
+
         mockWebSocketInstance = {
             addEventListener: vi.fn(),
             close: vi.fn(),
@@ -26,6 +33,7 @@ describe('useMatchSocket', () => {
     });
 
     afterEach(() => {
+        localStorage.clear();
         vi.clearAllMocks();
     });
 
@@ -41,7 +49,7 @@ describe('useMatchSocket', () => {
     test('2. Instancia el WebSocket con la URL correcta', () => {
         renderHook(() => useMatchSocket('123'));
         
-        expect(global.WebSocket).toHaveBeenCalledWith('ws://localhost:8080/ws/matches/123');
+        expect(global.WebSocket).toHaveBeenCalledWith('ws://localhost:8000/ws/matches/123?token=test-token-123');
         expect(mockWebSocketInstance.addEventListener).toHaveBeenCalledWith('message', expect.any(Function));
     });
 

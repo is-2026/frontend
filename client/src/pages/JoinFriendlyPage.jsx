@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { getPlayers } from "../services/club"; 
+import { getBehaviors } from "../services/behaviors";
 import { joinFriendly, getFriendlyById } from "../services/friendlies";
 import { PlayerSelection } from "../components/PlayerSelection";
-
+/*
 const PLAYERS_MOCK = [
   { id: "j1", name: "Jugador 1" },
   { id: "j2", name: "Jugador 2" },
@@ -17,6 +19,7 @@ const BEHAVIORS_MOCK = [
   { id: "defensivo", name: "Defensivo" },
   { id: "equilibrado", name: "Equilibrado" },
 ];
+*/
 
 export function JoinFriendlyPage() {
   const { friendlyId } = useParams();
@@ -28,6 +31,10 @@ export function JoinFriendlyPage() {
   const [isPrivate, setIsPrivate] = useState(false);
   const [confirmedPassword, setConfirmedPassword] = useState(false);
 
+  // Datos reales para el formulario
+  const [availablePlayers, setAvailablePlayers] = useState([]);
+  const [behaviors, setBehaviors] = useState([]);
+
   // Estados del formulario y feedback
   const [password, setPassword] = useState("");
   const [selection, setSelection] = useState({ starters: [], substitutes: [] });
@@ -36,13 +43,22 @@ export function JoinFriendlyPage() {
 
   // Carga inicial del partido
   useEffect(() => {
-    async function fetchFriendly() {
+    async function fetchData() {
       try {
-        const friendly = await getFriendlyById(friendlyId);
+        const [friendly, playersData, behaviorsData] = await Promise.all([
+          getFriendlyById(friendlyId),
+          getPlayers(),
+          getBehaviors(),
+        ]);
+
         if (!friendly) {
           setNotFound(true);
           return;
         }
+
+        // Guardar datos devueltos por los servicios
+        setAvailablePlayers(playersData || []);
+        setBehaviors(behaviorsData || []);
 
         setIsPrivate(friendly.is_private);
         // Si NO es privado, ingresa directo (confirmedPassword = true)
@@ -54,7 +70,7 @@ export function JoinFriendlyPage() {
       }
     }
 
-    fetchFriendly();
+    fetchData();
   }, [friendlyId]);
 
   const validSelection =
@@ -93,24 +109,33 @@ export function JoinFriendlyPage() {
       setSending(false);
     }
   }
-  // 1. Nueva función para validar la contraseña al hacer clic en "Continuar"
+  // Validar contraseña antes de avanzar
   async function handlePasswordSubmit() {
     setError(null);
-    const friendly = await getFriendlyById(friendlyId);
+    try {
+      const friendly = await getFriendlyById(friendlyId);
 
     // Si tiene clave registrada en el mock y no coincide, no continua
     if (friendly?.password && password !== friendly.password) {
       setError("La contraseña es incorrecta.");
-      return; 
+      return;
     }
 
     // Si coincide, habilita el paso a la alineación
-    setConfirmedPassword(true);
+      setConfirmedPassword(true);
+    } catch (e) {
+      setError("Error al verificar la contraseña.");
+  }
   }
 
   // Cargando
   if (loading) {
     return <div className="p-6 text-center">Cargando datos del partido...</div>;
+  }
+
+  // Partido no encontrado
+  if (notFound) {
+    return <div className="p-6 text-center text-red-400">El amistoso no existe o fue cancelado.</div>;
   }
 
   // Partido privado (solicitar clave antes de mostrar alineación)
@@ -171,8 +196,8 @@ export function JoinFriendlyPage() {
       </div>
 
       <PlayerSelection
-        availablePlayers={PLAYERS_MOCK}
-        behaviors={BEHAVIORS_MOCK}
+        availablePlayers={availablePlayers}
+        behaviors={behaviors}
         onChange={setSelection}
       />
 

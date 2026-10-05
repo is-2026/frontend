@@ -70,17 +70,15 @@ describe("CreateFriendlyPage", () => {
         render(
             <MemoryRouter>
                 <CreateFriendlyPage />
-            </MemoryRouter>,
+            </MemoryRouter>
         );
 
         // debe mostrar cargando
         expect(screen.getByText("Cargando datos...")).toBeInTheDocument();
-
+        
         // esperar a que se carguen los datos
         await waitFor(() => {
-            expect(
-                screen.getByText("Crear partido amistoso"),
-            ).toBeInTheDocument();
+            expect(screen.getByText("Crear partido amistoso")).toBeInTheDocument();
         });
 
         expect(getPlayers).toHaveBeenCalledTimes(1);
@@ -93,32 +91,26 @@ describe("CreateFriendlyPage", () => {
         render(
             <MemoryRouter>
                 <CreateFriendlyPage />
-            </MemoryRouter>,
+            </MemoryRouter>
         );
 
         await waitFor(() => {
             expect(
-                screen.getByText(
-                    "Error al cargar los jugadores y comportamientos de tu club.",
-                ),
+                screen.getByText("Error al cargar los jugadores y comportamientos de tu club.")
             ).toBeInTheDocument();
         });
     });
 
-    test("mantiene el botón de confirmar deshabilitado si la alineación no es válida", async () => {
+    test("mantiene el botón de confirmar deshabilitado si la alineación no es válida", async () => {        
         render(
             <MemoryRouter>
                 <CreateFriendlyPage />
-            </MemoryRouter>,
+            </MemoryRouter>
         );
         await waitFor(() => {
-            expect(
-                screen.getByText("Crear partido amistoso"),
-            ).toBeInTheDocument();
+            expect(screen.getByText("Crear partido amistoso")).toBeInTheDocument();
         });
-        const submitButton = screen.getByRole("button", {
-            name: "Confirmar y Crear Amistoso",
-        });
+        const submitButton = screen.getByRole("button", { name: "Confirmar y Crear Amistoso"});
         expect(submitButton).toBeDisabled();
     });
 
@@ -126,27 +118,21 @@ describe("CreateFriendlyPage", () => {
         render(
             <MemoryRouter>
                 <CreateFriendlyPage />
-            </MemoryRouter>,
+            </MemoryRouter>
         );
 
         await waitFor(() => {
-            expect(
-                screen.getByText("Crear partido amistoso"),
-            ).toBeInTheDocument();
+            expect(screen.getByText("Crear partido amistoso")).toBeInTheDocument();
         });
 
         // simular selección válida mediante el mock
         fireEvent.click(screen.getByTestId("select-valid-team"));
 
-        const submitButton = screen.getByRole("button", {
-            name: "Confirmar y Crear Amistoso",
-        });
+        const submitButton = screen.getByRole("button", { name: "Confirmar y Crear Amistoso" });
         expect(submitButton).not.toBeDisabled();
 
         // completar campo opcional de contraseña
-        const passwordInput = screen.getByPlaceholderText(
-            "Dejar en blanco para amistoso público",
-        );
+        const passwordInput = screen.getByPlaceholderText("Dejar en blanco para amistoso público");
         fireEvent.change(passwordInput, { target: { value: "secreto123" } });
 
         // enviar formulario
@@ -160,9 +146,9 @@ describe("CreateFriendlyPage", () => {
                     { player_id: "p1", is_starter: true, behavior_id: "b1" },
                     { player_id: "p2", is_starter: true, behavior_id: "b2" },
                     { player_id: "p3", is_starter: true, behavior_id: "b3" },
-                    { player_id: "p4", is_starter: false },
-                    { player_id: "p5", is_starter: false },
-                    { player_id: "p6", is_starter: false },
+                    { player_id: "p4", is_starter: false},
+                    { player_id: "p5", is_starter: false},
+                    { player_id: "p6", is_starter: false},
                 ],
             });
         });
@@ -173,32 +159,26 @@ describe("CreateFriendlyPage", () => {
     });
 
     test("muetra mensaje de error cuando la creación del amistoso falla (Error 404)", async () => {
-        const errorResponse = new Error(
-            "El club ya cuenta con un partido activo.",
-        );
+        const errorResponse = new Error("El club ya cuenta con un partido activo.");
         errorResponse.status = 400;
         createFriendlies.mockRejectedValueOnce(errorResponse);
 
         render(
             <MemoryRouter>
                 <CreateFriendlyPage />
-            </MemoryRouter>,
+            </MemoryRouter>
         );
 
         await waitFor(() => {
-            expect(
-                screen.getByText("Crear partido amistoso"),
-            ).toBeInTheDocument();
+            expect(screen.getByText("Crear partido amistoso")).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getByTestId("select-valid-team"));
-        fireEvent.click(
-            screen.getByRole("button", { name: "Confirmar y Crear Amistoso" }),
-        );
+        fireEvent.click(screen.getByRole("button", { name: "Confirmar y Crear Amistoso" }));
 
         await waitFor(() => {
             expect(
-                screen.getByText("El club ya cuenta con un partido activo."),
+                screen.getByText("El club ya cuenta con un partido activo.")
             ).toBeInTheDocument();
         });
     });

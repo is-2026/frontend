@@ -1,6 +1,7 @@
 import { WS_URL, FRIENDLY_LOBBY_WS_PATH } from "../config";
 import { useState, useEffect, useRef } from "react";
 
+
 export function useInitFriendlySocket(friendlyId) {
     const [matchId, setMatchId] = useState(null);
     const socketRef = useRef(null);
@@ -8,40 +9,26 @@ export function useInitFriendlySocket(friendlyId) {
     useEffect(() => {
         if (!friendlyId) return;
 
-        socketRef.current = new WebSocket(
-            `${WS_URL}${FRIENDLY_LOBBY_WS_PATH(friendlyId)}`,
-        );
+        socketRef.current = new WebSocket(`${WS_URL}${FRIENDLY_LOBBY_WS_PATH(friendlyId)}`);
         const socket = socketRef.current;
 
-        socket.addEventListener("open", () => {
-            console.log("CONNECTED");
-        });
-        socket.addEventListener("error", () => {
-            console.error(`ERROR`);
-        });
+        socket.addEventListener("open", () => { console.log("CONNECTED"); });
+        socket.addEventListener("error", () => { console.error(`ERROR`); });
         socket.addEventListener("message", (e) => {
             const message = JSON.parse(e.data);
             switch (message.type) {
-                case "friendlyStart":
-                    setMatchId(message.data.match_id);
-                    socket.close();
-                    break;
-                default:
-                    console.warn(
-                        "Recibido un tipo de mensaje desconocido:",
-                        message.type,
-                    );
+            case "friendlyStart":
+                setMatchId(message.data.match_id);
+                socket.close();
+                break;
+            default:
+                console.warn("Recibido un tipo de mensaje desconocido:", message.type);
             }
         });
-        socket.addEventListener("close", () => {
-            console.log("DISCONNECTED");
-        });
+        socket.addEventListener("close", () => { console.log("DISCONNECTED"); });
 
         return () => {
-            if (
-                socket.readyState === WebSocket.OPEN ||
-                socket.readyState === WebSocket.CONNECTING
-            ) {
+            if (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING) {
                 socket.close();
             }
         };

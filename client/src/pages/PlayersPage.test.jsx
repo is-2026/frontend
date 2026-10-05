@@ -21,43 +21,39 @@ describe("PlayersPage Component", () => {
 
     test("muestra el indicador de carga inicialmente", () => {
         vi.spyOn(clubService, "getPlayers").mockImplementation(
-            () => new Promise(() => {}),
+            () => new Promise(() => {})
         );
 
-        renderWithRouter(<PlayersPage />);
-        expect(
-            screen.getByText("Cargando plantilla del equipo..."),
-        ).toBeInTheDocument();
+        renderWithRouter(<PlayersPage/>);
+        expect(screen.getByText("Cargando plantilla del equipo...")).toBeInTheDocument();
     });
 
     test("muestra un mensaje si la plantilla esta vacía", async () => {
         // simulamos que la plantilla esta vacía, la API responde con exito pero no trae jugadores.
         vi.spyOn(clubService, "getPlayers").mockResolvedValueOnce([]);
 
-        renderWithRouter(<PlayersPage />);
+        renderWithRouter(<PlayersPage/>);
 
         await waitFor(() => {
-            expect(
-                screen.getByText(/aún no tenés jugadores/i),
-            ).toBeInTheDocument();
+            expect(screen.getByText(/aún no tenés jugadores/i)).toBeInTheDocument();
         });
     });
 
     test("muestra mensaje de error si la API falla", async () => {
         // simulamos una falla en el servidor HTTP
         vi.spyOn(clubService, "getPlayers").mockRejectedValueOnce(
-            new Error("Error 500: Error interno del servidor."),
+            new Error("Error 500: Error interno del servidor.")
         );
-        renderWithRouter(<PlayersPage />);
+        renderWithRouter(<PlayersPage/>);
 
         await waitFor(() => {
             expect(
-                screen.getByText(/Error 500: Error interno del servidor/i),
+                screen.getByText(/Error 500: Error interno del servidor/i)
             ).toBeInTheDocument();
         });
     });
 
-    test("renderiza la lista de los jugadores creados y suma PACSS correctamente", async () => {
+    test("renderiza la lista de los jugadores creados y suma PACSS correctamente", async () =>{
         // preparamos un jugador de preuba con sus estadisticas conocidas
         const mockPlayers = [
             {
@@ -69,12 +65,12 @@ describe("PlayersPage Component", () => {
                 control: 70,
                 speed: 35,
                 strength: 55,
-            },
+            }
         ];
 
         vi.spyOn(clubService, "getPlayers").mockResolvedValueOnce(mockPlayers);
 
-        renderWithRouter(<PlayersPage />);
+        renderWithRouter(<PlayersPage/>);
 
         // esperamos a que los datos del jugador se dibujen en la tabla
         await waitFor(() => {

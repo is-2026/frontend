@@ -1,11 +1,12 @@
 import { request } from "./api"; // Import de la función request de api. Ver archivo api.js
 
+
 /**
  Devuelve una lista con los amistosos disponibles
  */
 
 export function getFriendlies() {
-    return request("/friendlies");
+  return request("/friendlies");
 }
 
 /*
@@ -32,10 +33,10 @@ export function getFriendlies() {
  */
 
 export function createFriendlies(data) {
-    return request("/friendlies", {
-        method: "POST",
-        body: JSON.stringify(data),
-    });
+  return request("/friendlies", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 }
 
 /* MOCK para ver funcionamiento de crear amistoso 
@@ -54,8 +55,8 @@ export function createFriendlies(data) {
 }
 */
 export async function getFriendlyById(id) {
-    const friendlies = await getFriendlies();
-    return friendlies.find((f) => String(f.id) === String(id));
+  const friendlies = await getFriendlies();
+  return friendlies.find((f) => String(f.id) === String(id));
 }
 
 /**
@@ -66,10 +67,10 @@ export async function getFriendlyById(id) {
  */
 
 export function joinFriendly(friendly_id, data) {
-    return request(`/friendlies/${friendly_id}/join`, {
-        method: "POST",
-        body: JSON.stringify(data),
-    });
+  return request(`/friendlies/${friendly_id}/join`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 }
 
 /*
@@ -101,7 +102,7 @@ export async function joinFriendly(friendlyId, body) {
  * @param {string} friendly_id - UUID del amistoso
  */
 export function cancelfriendly(friendly_id) {
-    return request(`/friendlies/${friendly_id}`, {
-        method: "DELETE",
-    });
+  return request(`/friendlies/${friendly_id}`, {
+    method: "DELETE",
+  });
 }

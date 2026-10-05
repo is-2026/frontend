@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { stayInBounds, toLeft, toTop } from "./Field";
+import { stayInBounds, toLeft, toTop } from "./utils/utils";
 
 describe("stayInBounds", () => {
   test("limita valores por debajo del mínimo", () => {

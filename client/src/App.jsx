@@ -4,7 +4,6 @@ import { ClubPage } from "./pages/ClubPage";
 import { FriendliesPage } from "./pages/FriendliesPage";
 import { LoginPage } from "./pages/LoginPage";
 import { JoinFriendlyPage } from "./pages/JoinFriendlyPage";
-import { CreateFriendlyPage } from "./pages/CreateFriendlyPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { LobbyPage } from "./pages/LobbyPage";
 import { MatchPage } from "./pages/MatchPage";

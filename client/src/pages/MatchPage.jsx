@@ -3,10 +3,10 @@ import { MatchHeader } from "../components/match/MatchHeader";
 import { Field } from "../components/match/Field";
 import { useMatchSocket } from "../hooks/useMatchSocket";
 import { GoalBanner } from "../components/match/GoalBanner";
+import { MatchFinishedBanner } from "../components/match/MatchFinishedBanner";
 /*
 
 // Mock para probar la vista:
-*/
 const mockScores = { home: 2, away: 1 };
   
   const mockLineups = {
@@ -25,24 +25,31 @@ const mockScores = { home: 2, away: 1 };
 
 const mockState = {
     tick: 150,
-    ballPosition: { x: 20, y: 10 }, 
+    ballPosition: { x: 3, y: 3 }, // Pelota en el centro de la cancha
     players: [
-    // Equipo Local (lado izquierdo)
-    { playerId: "p1", x: 3, y: 10 },   // Arquero Local (cerca del arco izq)
-    { playerId: "p2", x: 12, y: 5 },   // Defensor Local (arriba)
-    { playerId: "p3", x: 18, y: 12 },  // Mediocampista Local (centro)
+        // Equipo Local (lado izquierdo: X de -20 a 0)
+        { playerId: "p1", x: -18, y: 0 },  // Arquero Local (cerca del arco izq)
+        { playerId: "p2", x: -10, y: 5 },  // Defensor Local (arriba)
+        { playerId: "p3", x: -2, y: -2 },  // Mediocampista Local (centro)
 
-    // Equipo Visitante (lado derecho)
-    { playerId: "p4", x: 22, y: 8 },   // Mediocampista Visitante (centro)
-    { playerId: "p5", x: 28, y: 15 },  // Defensor Visitante (abajo)
-    { playerId: "p6", x: 37, y: 10 },  // Arquero Visitante (cerca del arco der)
-  ],
+        // Equipo Visitante (lado derecho: X de 0 a 20)
+        { playerId: "p4", x: 2, y: 3 },    // Mediocampista Visitante (centro)
+        { playerId: "p5", x: 10, y: -5 },  // Defensor Visitante (abajo)
+        { playerId: "p6", x: 18, y: 0 },   // Arquero Visitante (cerca del arco der)
+    ],
 };
 const mockGoalInfo = { tick: 150, minute: 23, playerId: "p2", team: "home" };
 
+const mockFinished = {
+        matchEnd: false,
+        homeScore: 3,
+        awayScore: 1
+    };
+*/
+
 export function MatchPage() {
     const { matchId } = useParams();
-    const { lineups, scores, state, goalInfo } = useMatchSocket(matchId);
+    const { lineups, scores, state, goalInfo, finished } = useMatchSocket(matchId);
 
     return (
         // fixed para sobreescribir configuracion default de app
@@ -51,16 +58,26 @@ export function MatchPage() {
             {/* Contenedor de cancha.*/}
             <div className="w-[1272px] mx-auto pb-8">
 
-                {/* Header: equipos , contador y score */}
-                <MatchHeader scores={mockScores} />
-
                 <div className="flex gap-4">
                     <div className="min-w-0 flex-1 relative">
+
+                        {/*cronómetro y evento partido finalizado */}
+                        <MatchHeader 
+                            scores={scores} 
+                            tick={state?.tick} 
+                        />
+
                         {/*cancha */}
-                        <Field state={mockState} lineups={mockLineups} />
+                        <Field state={state} lineups={lineups} />
 
                         {/*evento de gol */}
-                        <GoalBanner goalInfo={mockGoalInfo} />                        
+                        <GoalBanner goalInfo={goalInfo} />                        
+
+                        
+
+                        {/* banner de fin de partido */}
+                        <MatchFinishedBanner finished={finished.matchEnd} />
+
                     </div>
 
                     <div className="flex flex-col gap-4 w-64 shrink-0">

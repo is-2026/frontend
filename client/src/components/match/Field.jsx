@@ -1,26 +1,6 @@
-import { 
-    FIELD_WIDTH, FIELD_HEIGHT,
-    HALF_WIDTH, HALF_HEIGHT, 
-    NEG_HALF_WIDTH, NEG_HALF_HEIGHT 
-} from "../../config";
+
 import { PlayerCard } from "./PlayerCard";
-
-export function stayInBounds(value, min, max) {
-    if (value < min) return min;
-
-    if (value > max) return max;
-    else return value;
-}
-
-export function toLeft(x) {
-    const xInBounds = stayInBounds(x, NEG_HALF_WIDTH, HALF_WIDTH);
-    return `${((xInBounds + HALF_WIDTH) / FIELD_WIDTH) * 100}%`;
-}
-
-export function toTop(y) {
-    const yInBounds = stayInBounds(y, NEG_HALF_HEIGHT, HALF_HEIGHT);
-    return `${((HALF_HEIGHT - yInBounds) / FIELD_HEIGHT) * 100}%`;
-}
+import {toLeft, toTop} from "./utils/utils";
 
 // lineups: { home: [{ player_id, ... }], away: [...] } | null — viene de
 // useMatchSocket (del mensaje matchStarted, todavía sin traducir a camelCase).
@@ -67,7 +47,7 @@ export function Field({ state, lineups }) {
             {ball && (
                 <div
                     data-testid="ball"
-                    className="absolute -ml-1.5 -mt-1.5 h-3 w-3 rounded-full bg-white transition-all duration-100 "
+                    className="absolute -translate-x-1/2 -translate-y-1/2 h-3 w-3 rounded-full bg-white transition-all duration-100 "
                     style={{
                         left: toLeft(ball.x),
                         top: toTop(ball.y),

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { MemoryRouter } from 'react-router-dom';
 import { FriendliesPage } from "./FriendliesPage";
 import * as friendliesService from "../services/friendlies";
 
@@ -9,10 +10,14 @@ describe("FriendliesPage Component", () => {
     // Congela la llamada para que se quede en estado de carga (loading = true)
     vi.spyOn(friendliesService, "getFriendlies").mockReturnValue(new Promise(() => {}));
 
-    render(<FriendliesPage />);
+    render(
+        <MemoryRouter>
+            <FriendliesPage />
+        </MemoryRouter>
+    );
 
     // Verifica que exista el mensaje "Cargando..." en pantalla
-    expect(screen.getByText("Cargando...")).toBeDefined();
+    expect(screen.getByText(/cargando amistosos/i)).toBeDefined();
   });
 
   it("debe mostrar el mensaje de error cuando la petición falla", async () => {
@@ -23,7 +28,11 @@ describe("FriendliesPage Component", () => {
       new Error(mensajeError)
     );
 
-    render(<FriendliesPage />);
+    render(
+        <MemoryRouter>
+            <FriendliesPage />
+        </MemoryRouter>
+    );
 
     // findByText espera asincrónicamente al catch() del componente 
     const errorElement = await screen.findByText(mensajeError);

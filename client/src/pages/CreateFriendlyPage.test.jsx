@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import CreateFriendlyPage from "./CreateFriendlyPage";
+import { CreateFriendlyPage } from "./CreateFriendlyPage";
 import { createFriendlies } from "../services/friendlies";
 import { getPlayers } from "../services/club";
 import { getBehaviors } from "../services/behaviors";
@@ -31,7 +31,7 @@ vi.mock("react-router-dom", async () => {
 
 // mock del componente playerselection para facilitar la simulacion de selección
 vi.mock("../components/PlayerSelection", () => ({
-    default: ({ onChange }) => (
+    PlayerSelection: ({ onChange }) => (
         <div data-testid="mock-player-selection">
             <button
                 type="button"

@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import Navbar from "./components/Navbar";
 import { ClubPage } from "./pages/ClubPage";
 import { FriendliesPage } from "./pages/FriendliesPage";
 import { LoginPage } from "./pages/LoginPage";

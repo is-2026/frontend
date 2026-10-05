@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { getFriendlies } from "../services/friendlies";
 import { FriendlyCard } from "../components/FriendlyCard";
 

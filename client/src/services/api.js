@@ -1,4 +1,4 @@
-import { API_URL } from "../config"; // en config estará la URL de la API.
+import { API_URL } from "../config";
 
 export async function request(path, options = {}) {
     // Función request recibe path y config adicionales en options

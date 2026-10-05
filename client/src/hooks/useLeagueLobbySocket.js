@@ -36,14 +36,14 @@ export const useLeagueLobbySocket = (leagueId, setLeague, setError) => {
                             return {
                                 ...prev,
                                 registered_clubs: prev.registered_clubs.filter( // filtramos la liga actual de clubes
-                                    (c) => c.club_id !=== data.club_id // conservamos los clubes con id distinta al que abandona la liga
+                                    (c) => c.club_id !== data.club_id // conservamos los clubes con id distinta al que abandona la liga
                                 ),
                             };
                         });
                         break;
 
                     case "leagueStarted":
-                        navigate(`/leagues/{leagueId}`); // cuando la liga empieza, redirigimos a la pantalla de la liga
+                        navigate(`/leagues/${leagueId}`); // cuando la liga empieza, redirigimos a la pantalla de la liga
                         break;
 
                     case "leagueCancelled":

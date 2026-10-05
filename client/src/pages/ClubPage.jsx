@@ -62,7 +62,7 @@ export function ClubPage() {
             ¡Club Creado con Éxito!
             </h2>
             <p className="text-slate-300 text-sm">
-            Redirigiendo a la creación de jugadores...
+            Redirigiendo a la vista de tu Club...
             </p>
         </div>
         );

@@ -48,6 +48,9 @@ export default function Navbar() {
             <NavLink to="/friendlies" className={navLinkClass}>
               Amistosos
             </NavLink>
+            <NavLink to="/leagues" className={navLinkClass}>
+              Ligas
+            </NavLink>
 
             <button
               type="button"

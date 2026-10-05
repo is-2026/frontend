@@ -5,6 +5,7 @@ import { CreateFriendlyPage } from "./pages/CreateFriendlyPage";
 import { FriendliesPage } from "./pages/FriendliesPage";
 import { LoginPage } from "./pages/LoginPage";
 import { JoinFriendlyPage } from "./pages/JoinFriendlyPage";
+import { CreateFriendlyPage } from "./pages/CreateFriendlyPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { LobbyPage } from "./pages/LobbyPage";
 import { MatchPage } from "./pages/MatchPage";
@@ -14,6 +15,8 @@ import { PlayersPage } from "./pages/PlayersPage";
 import { ClubDashboardPage } from "./pages/ClubDashboardPage";
 import { BehaviorDetail } from "./pages/BehaviorDetail";
 import { LeagueLobbyPage } from "./pages/LeagueLobbyPage";
+import { CreateFriendlyPage } from "./pages/CreateFriendlyPage";
+import { CreateLeaguePage } from "./pages/CreateLeaguePage";
 
 //layout para vistas autenticadas / protegidas con Navbar
 function MainLayout() {
@@ -68,6 +71,7 @@ export default function App() {
         <Route path="/friendlies/:friendlyId/lobby" element={<LobbyPage />} />
         <Route path="/match/:matchId" element={<MatchPage />} />
         <Route path="/leagues/:leagueId/lobby" element={<LeagueLobbyPage />} />
+        <Route path="/leagues/create" element={<CreateLeaguePage />} />
       </Route>
     </Routes>
   );

@@ -10,8 +10,14 @@ export function useMatchSocket(matchId) {
     const [lineups, setLineups] = useState(null); // home, away
     const [scores, setScores] = useState(null); // home, away
     const [state, setState] = useState(null); // match_id, tick, players, ball_position
+    const [goalInfo, setGoalInfo] = useState(null);
     //const [finished, setFinished] = useState(null); comentado porque es de otro ticket
     const socketRef = useRef(null);
+    const lineupsRef = useRef(null);
+
+    useEffect(() => {
+    lineupsRef.current = lineups;
+    }, [lineups]);
 
     useEffect(() => {
         if (!matchId) return;
@@ -64,6 +70,28 @@ export function useMatchSocket(matchId) {
               });
               break;
             }
+
+            //Caso gol
+            case "goal": {
+              const { player_id, minute, tick } = msg.data;
+              const isHomeGoal = lineupsRef.current?.home?.some(
+                (h) => h.player_id === player_id,
+              );
+
+              setScores((prev) => ({
+                home: isHomeGoal ? prev.home + 1 : prev.home, //Si el gol es de home, +1 a score.home
+                away: !isHomeGoal ? prev.away + 1 : prev.away, //Si es de away, +1 en score.away
+              }));
+
+              setGoalInfo({
+                tick: tick,
+                minute: minute,
+                playerId: player_id,
+                team: isHomeGoal ? "home" : "away",
+              });
+              break;
+            }
+
             //error
             default:
               console.warn("Tipo de mensaje desconocido (partido):", msg.type);
@@ -76,5 +104,5 @@ export function useMatchSocket(matchId) {
             }
         };
     }, [matchId]);
-    return { lineups , scores , state };
+    return { lineups , scores , state, goalInfo };
 }

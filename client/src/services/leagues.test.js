@@ -7,7 +7,7 @@ describe("leagues service", () => {
     vi.restoreAllMocks();
   });
 
-  describe("createLeaues", () => {
+  describe("createLeagues", () => {
     it("ante una respuesta 201, debe enviar el payload a /leagues y retornar la liga creada", async () => {
       const mockData = {
         name: "Liga de Prueba",

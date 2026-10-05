@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { CreateFriendlyPage } from "./CreateFriendlyPage";
 import { createFriendlies } from "../services/friendlies";

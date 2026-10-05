@@ -8,9 +8,16 @@ expect.extend(matchers);
 
 const mockNavigate = vi.fn();
 
-vi.mock('react-router-dom', () => ({
-    useNavigate: () => mockNavigate,
-}));
+vi.mock("react-router-dom", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("react-router-dom")>();
+    return {
+        ...actual,
+        useNavigate: () => mockNavigate,
+        Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+            <a href={to}>{children}</a>
+        ),
+    };
+});
 
 vi.mock('../services/auth', () => ({
     registrarUsuario: vi.fn(),
@@ -28,17 +35,17 @@ describe('RegisterPage Component', () => {
 
     test('el botón está deshabilitado por defecto', () => {
         render(<RegisterPage />);
-        expect(screen.getByRole('button', { name: /register/i })).toBeDisabled();
+        expect(screen.getByRole('button', { name: /registrar usuario/i })).toBeDisabled();
     });
 
     test('habilita botón, envía datos y navega a /crear-club en éxito', async () => {
         authService.registrarUsuario.mockResolvedValueOnce({ token: '123' });
         render(<RegisterPage />);
 
-        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'test@gmail.com' } });
-        fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: '123456' } });
+        fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@gmail.com' } });
+        fireEvent.change(screen.getByLabelText(/contraseña/i), { target: { value: '123456' } });
         
-        const submitBtn = screen.getByRole('button', { name: /register/i });
+        const submitBtn = screen.getByRole('button', { name: /registrar usuario/i });
         expect(submitBtn).not.toBeDisabled();
         
         fireEvent.click(submitBtn);
@@ -53,9 +60,9 @@ describe('RegisterPage Component', () => {
         authService.registrarUsuario.mockRejectedValueOnce({ status: 409 });
         render(<RegisterPage />);
 
-        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'test@gmail.com' } });
-        fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: '123456' } });
-        fireEvent.click(screen.getByRole('button', { name: /register/i }));
+        fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@gmail.com' } });
+        fireEvent.change(screen.getByLabelText(/contraseña/i), { target: { value: '123456' } });
+        fireEvent.click(screen.getByRole('button', { name: /registrar usuario/i }));
 
         await waitFor(() => {
             expect(screen.getByText('Este email ya está registrado.')).toBeInTheDocument();

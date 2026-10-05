@@ -32,7 +32,7 @@ describe('LoginPage Component', () => {
             </MemoryRouter>,
         );
 
-        const inputEmail = screen.getByLabelText(/correo electrónico/i);
+        const inputEmail = screen.getByLabelText(/email/i);
         const inputPassword = screen.getByLabelText(/contraseña/i);
         const submitBtn = screen.getByRole('button', { name: /iniciar sesión/i});
 
@@ -48,7 +48,7 @@ describe('LoginPage Component', () => {
         </MemoryRouter>
         );
 
-        const inputEmail = screen.getByLabelText(/correo electrónico/i);
+        const inputEmail = screen.getByLabelText(/email/i);
         const inputPassword = screen.getByLabelText(/contraseña/i);
         const submitBtn = screen.getByRole('button', { name: /iniciar sesión/i});
 
@@ -70,7 +70,7 @@ describe('LoginPage Component', () => {
             </MemoryRouter>
         );
 
-        const inputEmail = screen.getByLabelText(/correo electrónico/i);
+        const inputEmail = screen.getByLabelText(/email/i);
         const inputPassword = screen.getByLabelText(/contraseña/i);
         const submitBtn = screen.getByRole('button', { name: /iniciar sesión/i});
 
@@ -98,7 +98,7 @@ describe('LoginPage Component', () => {
             </MemoryRouter>
         );
 
-        const inputEmail = screen.getByLabelText(/correo electrónico/i);
+        const inputEmail = screen.getByLabelText(/email/i);
         const inputPassword = screen.getByLabelText(/contraseña/i);
         const submitBtn = screen.getByRole('button', { name: /iniciar sesión/i});
 

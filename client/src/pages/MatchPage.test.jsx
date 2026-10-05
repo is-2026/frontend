@@ -127,7 +127,7 @@ describe('MatchPage', () => {
     expect(screen.getByText(/PARTIDO FINALIZADO/i)).toBeInTheDocument();
 
     // Busca el texto "2 - 1"
-    expect(screen.getByText('2 - 1')).toBeInTheDocument();
+    expect(screen.getByText('Equipo Local 2 - 1 Equipo Rival')).toBeInTheDocument();
 });
 
     test('4. Tolera coordenadas fuera de rango en la simulación sin romper el componente', () => {

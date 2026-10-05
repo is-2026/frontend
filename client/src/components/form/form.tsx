@@ -15,7 +15,7 @@ export default function Form({ onSubmit, apiError }: SearchProps) {
   const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?$/;
   const regexPassword = /^.{5,}$/;
 
-  const manejarEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmail(value);
     if (value.trim() === '') setEmailError('El correo es obligatorio.');
@@ -23,7 +23,7 @@ export default function Form({ onSubmit, apiError }: SearchProps) {
     else setEmailError('');
   };
 
-  const manejarPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
     if (value.trim() === '') setPasswordError('La contraseña es obligatoria.');
@@ -33,18 +33,18 @@ export default function Form({ onSubmit, apiError }: SearchProps) {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const emailValido = regexEmail.test(email);
-    const passwordValida = regexPassword.test(password);
+    const validEmail = regexEmail.test(email);
+    const validPassword = regexPassword.test(password);
 
-    if (!emailValido) setEmailError('Por favor, escribe un correo válido.');
-    if (!passwordValida) setPasswordError('La contraseña debe tener al menos 8 caracteres.');
-    
-    if (!emailValido || !passwordValida) return;
+    if (!validEmail) setEmailError('Por favor, escribe un correo válido.');
+    if (!validPassword) setPasswordError('La contraseña debe tener al menos 5 caracteres.');
+
+    if (!validEmail || !validPassword) return;
     
     onSubmit(email, password);
   };
 
-  const botonDeshabilitado = email.trim() === '' || password.trim() === '' || emailError !== '' || passwordError !== '';
+  const disableButton = email.trim() === '' || password.trim() === '' || emailError !== '' || passwordError !== '';
   const errorVisibleEmail = apiError || emailError;
 
   return (
@@ -68,7 +68,7 @@ export default function Form({ onSubmit, apiError }: SearchProps) {
             name="Email"
             type="email"
             value={email}
-            onChange={manejarEmail}
+            onChange={handleEmail}
             placeholder="ejemplo@correo.com"
             className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
           />
@@ -86,7 +86,7 @@ export default function Form({ onSubmit, apiError }: SearchProps) {
             name="Password"
             type="password"
             value={password}
-            onChange={manejarPassword}
+            onChange={handlePassword}
             placeholder="•••••"
             className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
           />
@@ -97,7 +97,7 @@ export default function Form({ onSubmit, apiError }: SearchProps) {
 
         <button
           type="submit"
-          disabled={botonDeshabilitado}
+          disabled={disableButton}
           className="mt-2 w-full py-3 px-4 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold shadow-md transition-all duration-200 text-sm"
         >
           Registrar Usuario

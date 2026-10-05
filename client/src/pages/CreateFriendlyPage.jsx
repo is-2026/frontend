@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { createFriendlies } from "../services/friendlies";
 import { getPlayers } from "../services/club";
 import { getBehaviors } from "../services/behaviors";
-import PlayerSelection from "../components/PlayerSelection";
+import { PlayerSelection } from "../components/PlayerSelection";
 
-export default function CreateFriendlyPage() {
+export function CreateFriendlyPage() {
     const navigate = useNavigate();
 
     // estados del formulario, duración, pass y jugadores tit. y sup.

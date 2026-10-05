@@ -1,4 +1,4 @@
-import { WS_URL, FRIENDLY_LOBBY_WS_PATH } from "../config";
+import { wsUrl, FRIENDLY_LOBBY_WS_PATH } from "../config";
 import { useState, useEffect, useRef } from "react";
 
 
@@ -9,7 +9,7 @@ export function useInitFriendlySocket(friendlyId) {
     useEffect(() => {
         if (!friendlyId) return;
 
-        socketRef.current = new WebSocket(`${WS_URL}${FRIENDLY_LOBBY_WS_PATH(friendlyId)}`);
+        socketRef.current = new WebSocket(wsUrl(FRIENDLY_LOBBY_WS_PATH(friendlyId)));
         const socket = socketRef.current;
 
         socket.addEventListener("open", () => { console.log("CONNECTED"); });

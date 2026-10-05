@@ -16,6 +16,6 @@ export function createLeagues(data) {
   });
 }
 
-export async function getLeagues(leagueId) {
+export async function getLeague(leagueId) {
   return request(`/leagues/${leagueId}`);
 }

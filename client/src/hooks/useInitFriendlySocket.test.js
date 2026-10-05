@@ -2,15 +2,22 @@ import { renderHook, act } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useInitFriendlySocket } from './useInitFriendlySocket';
 
-vi.mock('../config', () => ({
-    WS_URL: 'ws://localhost:8080',
-    FRIENDLY_LOBBY_WS_PATH: (id) => `/ws/friendlies/${id}/lobby`
-}));
+vi.mock('../config', () => {
+    const WS_URL = 'ws://localhost:8000';
+    const FRIENDLY_LOBBY_WS_PATH = (id) => `/ws/friendlies/${id}/lobby`;
+    return {
+        WS_URL,
+        FRIENDLY_LOBBY_WS_PATH,
+        wsUrl: (path) => `${WS_URL}${path}?token=${encodeURIComponent(localStorage.getItem('token') ?? '')}`,
+    };
+});
 
 describe('useInitFriendlySocket', () => {
     let mockWebSocketInstance;
 
     beforeEach(() => {
+        localStorage.setItem('token', 'test-token-123');
+
         mockWebSocketInstance = {
             addEventListener: vi.fn(),
             close: vi.fn(),
@@ -26,6 +33,7 @@ describe('useInitFriendlySocket', () => {
     });
 
     afterEach(() => {
+        localStorage.clear();
         vi.clearAllMocks();
     });
 
@@ -39,7 +47,7 @@ describe('useInitFriendlySocket', () => {
     test('2. Instancia el WebSocket con la URL correcta', () => {
         renderHook(() => useInitFriendlySocket('456'));
 
-        expect(global.WebSocket).toHaveBeenCalledWith('ws://localhost:8080/ws/friendlies/456/lobby');
+        expect(global.WebSocket).toHaveBeenCalledWith('ws://localhost:8000/ws/friendlies/456/lobby?token=test-token-123');
         expect(mockWebSocketInstance.addEventListener).toHaveBeenCalledWith('message', expect.any(Function));
     });
 

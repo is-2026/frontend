@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as api from "./api"; 
 import { request } from "./api";
 import { createLeagues } from "./leagues";
-import { getLeagues } from "./leagues";
+import { getLeague } from "./leagues";
 
 vi.mock("./api", () => ({
   request: vi.fn(),
@@ -56,7 +56,7 @@ describe("leagues service", () => {
     });
   });
 
-  describe("getLeagues", () => {
+  describe("getLeague", () => {
     test("obtiene el detalle de la liga por el id consultado", async () => {
       const mockLeague = {
         id: "123",
@@ -66,7 +66,7 @@ describe("leagues service", () => {
       };
 
       request.mockResolvedValueOnce(mockLeague);
-      const result = await getLeagues("123");
+      const result = await getLeague("123");
 
       expect(request).toHaveBeenCalledWith("/leagues/123");
       expect(result).toEqual(mockLeague);
@@ -75,7 +75,7 @@ describe("leagues service", () => {
     test("da error si la liga no existe o la API falla", async () => {
       request.mockRejectedValueOnce(new Error("Liga no encontrada"));
 
-      await expect(getLeagues("999")).rejects.toThrow("Liga no encontrada");
+      await expect(getLeague("999")).rejects.toThrow("Liga no encontrada");
     });
   });
 });

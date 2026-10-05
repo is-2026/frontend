@@ -4,10 +4,10 @@ import { getPlayers } from "../services/club";
 
 export function PlayersPage() {
     const [players, setPlayers] = useState([]);
-    const [loading, setLoading] = useState(true); 
+    const [loading, setLoading] = useState(true); // Corregido: decía 'loadign'
     const [error, setError] = useState(null);
 
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchPlayers = async () => {
@@ -39,7 +39,6 @@ export function PlayersPage() {
         );
     }
 
-  if (loading) {
     return (
         <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 shadow-2xl w-full max-w-5xl mx-auto">
             {/* Encabezado */}

@@ -17,7 +17,7 @@ export const useLeagueLobbySocket = (leagueId, setLeague, setError) => {
                 const { type, data } = message;
 
                 switch (type) { // manejamos los eventos
-                    case "clubregistered": 
+                    case "clubRegistered": 
                         setLeague((prev) => {
                             if (!prev) return prev;
                             return {

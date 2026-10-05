@@ -31,7 +31,7 @@ vi.mock("react-router-dom", async () => {
 
 // mock del componente playerselection para facilitar la simulacion de selección
 vi.mock("../components/PlayerSelection", () => ({
-    default: ({ onChange }) => (
+    PlayerSelection: ({ onChange }) => (
         <div data-testid="mock-player-selection">
             <button
                 type="button"

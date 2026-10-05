@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as api from "./api"; 
-import { createLeagues, getLeagues } from "./leagues";
+import { createLeagues, getLeagues, getLeague } from "./leagues";
+import { request } from "./api";
+
+vi.mock("./api", () => ({
+  request: vi.fn(),
+}));
 
 describe("leagues service", () => {
   beforeEach(() => {
@@ -88,6 +93,29 @@ describe("leagues service", () => {
       // Verifica que el servicio rechace la promesa con el error esperado
       await expect(createLeagues({})).rejects.toThrow(mockError);
       await expect(createLeagues({})).rejects.toHaveProperty("status", 400);
+    });
+  });
+
+  describe("getLeague", () => {
+    test("obtiene el detalle de la liga por el id consultado", async () => {
+      const mockLeague = {
+        id: "123",
+        name: "Liga del ChiquiMafia",
+        max_clubs: 30,
+        registered_clubs: [],
+      };
+
+      request.mockResolvedValueOnce(mockLeague);
+      const result = await getLeague("123");
+
+      expect(request).toHaveBeenCalledWith("/leagues/123");
+      expect(result).toEqual(mockLeague);
+    });
+
+    test("da error si la liga no existe o la API falla", async () => {
+      request.mockRejectedValueOnce(new Error("Liga no encontrada"));
+
+      await expect(getLeagues("999")).rejects.toThrow("Liga no encontrada");
     });
   });
 });

@@ -24,3 +24,7 @@ export function createLeagues(data) {
     body: JSON.stringify(data),
   });
 }
+
+export async function getLeague(leagueId) {
+  return request(`/leagues/${leagueId}`);
+}

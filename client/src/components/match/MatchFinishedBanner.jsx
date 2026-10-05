@@ -1,4 +1,4 @@
-export function MatchFinishedBanner({ finished, onExit }) {
+export function MatchFinishedBanner({ finished, teams, onExit }) {
     if (!finished) return null;
 
     const home = teams?.home?.name ?? "Equipo Local";

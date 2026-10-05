@@ -112,10 +112,10 @@ export function CreateLeaguePage() {
         <h1 className="text-2xl font-bold">Crear liga</h1>
         <button
           type="button"
-          onClick={() => navigate("/club")}
+          onClick={() => navigate("/leagues")}
           className="text-sm text-white/60 hover:text-white underline"
         >
-          ← Volver al club
+          ← Volver a las ligas
         </button>
       </div>
 

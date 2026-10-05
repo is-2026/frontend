@@ -1,4 +1,13 @@
 import { request } from "./api";
+
+/**
+ * Devuelve la lista de ligas disponibles
+ */
+export function getLeagues() {
+  return request("/leagues", {
+    method: "GET",
+  });
+}
 /**
  * Crea lobby de una nueva liga
  * @param {Object} data - {name: string, 

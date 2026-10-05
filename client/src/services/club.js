@@ -82,5 +82,5 @@ export function getPlayers() {
 */
 
 export async function getPlayers() {
-  return request("/players");
+  return request("/club/players");
 }

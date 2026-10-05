@@ -13,6 +13,7 @@ import { CreatePlayerPage } from "./pages/CreatePlayerPage";
 import { PlayersPage } from "./pages/PlayersPage"; 
 import { ClubDashboardPage } from "./pages/ClubDashboardPage";
 import { BehaviorDetail } from "./pages/BehaviorDetail";
+import { LeagueLobbyPage } from "./pages/LeagueLobbyPage";
 
 //layout para vistas autenticadas / protegidas con Navbar
 function MainLayout() {
@@ -61,12 +62,12 @@ export default function App() {
         <Route path="/club/players/create" element={<CreatePlayerPage />} />
         <Route path="/club/behaviors" element={<BehaviorsPage />} />
         <Route path="/club/behaviors/:id" element={<BehaviorDetail />} />
-
         <Route path="/friendlies" element={<FriendliesPage />} />
         <Route path="/friendlies/create" element={<CreateFriendlyPage />} />
         <Route path="/friendlies/:friendlyId/join" element={<JoinFriendlyPage />} />
         <Route path="/friendlies/:friendlyId/lobby" element={<LobbyPage />} />
         <Route path="/match/:matchId" element={<MatchPage />} />
+        <Route path="/leagues/:leagueId/lobby" element={<LeagueLobbyPage />} />
       </Route>
     </Routes>
   );

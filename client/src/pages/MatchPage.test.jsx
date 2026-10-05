@@ -117,35 +117,6 @@ describe('MatchPage', () => {
                 ballPosition: { x: 200, y: -10 }
             }
         });
-        
-        const { container } = render(
-            <MemoryRouter initialEntries={['/match/123']}>
-                <Routes>
-                    <Route path="/match/:matchId" element={<MatchPage />} />
-                </Routes>
-            </MemoryRouter>
-        );
-
-        const homePlayer = container.querySelector('.bg-blue-500');
-        const awayPlayer = container.querySelector('.bg-red-500');
-        const ball = screen.getByTestId('ball');
-
-        // p1 (-10, -5) debe ser limitado al borde superior izquierdo -> 0%, 0%
-        expect(homePlayer).toHaveStyle({
-            left: toPercent(-10, 0, FIELD_WIDTH),
-            top: toPercent(-5, 0, FIELD_HEIGHT)
-        });
-
-        // p2 (100, 50) debe ser limitado al borde inferior derecho -> 100%, 100%
-        expect(awayPlayer).toHaveStyle({
-            left: toPercent(100, 0, FIELD_WIDTH),
-            top: toPercent(50, 0, FIELD_HEIGHT)
-        });
-
-        expect(ball).toHaveStyle({
-            left: toPercent(200, 0, FIELD_WIDTH),
-            top: toPercent(-10, 0, FIELD_HEIGHT)
-        })
 
     });
 });

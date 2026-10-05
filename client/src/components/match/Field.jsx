@@ -24,7 +24,7 @@ export function Field({ state, lineups }) {
   return (
     <div
       data-testid="field"
-      className="relative w-full aspect-[5/3] overflow-hidden border-4 border-white/70 bg-green-700"
+      className="relative w-full aspect-[2/1] overflow-hidden border-4 border-white/70 bg-green-700"
     >
       <div className="absolute bottom-0 left-1/2 top-0 w-px bg-white/50" />
 

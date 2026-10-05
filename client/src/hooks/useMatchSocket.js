@@ -1,4 +1,4 @@
-import { WS_URL, MATCH_WS_PATH } from "../config";
+import { MATCH_WS_PATH, wsUrl } from "../config";
 import { useState, useEffect, useRef } from "react";
 
 /*  
@@ -22,7 +22,7 @@ export function useMatchSocket(matchId) {
 	useEffect(() => {
 		if (!matchId) return;
 
-		socketRef.current = new WebSocket(`${WS_URL}${MATCH_WS_PATH(matchId)}`);
+		socketRef.current = new WebSocket(wsUrl(MATCH_WS_PATH(matchId)));
 		const ws = socketRef.current;
 
 		ws.addEventListener("open", () => { console.log("CONNECTED"); });

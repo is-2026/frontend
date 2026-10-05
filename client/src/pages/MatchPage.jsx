@@ -76,7 +76,7 @@ export function MatchPage() {
                         
 
                         {/* banner de fin de partido */}
-                        <MatchFinishedBanner finished={finished.matchEnd} />
+                        <MatchFinishedBanner finished={finished} />
 
                     </div>
 

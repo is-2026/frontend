@@ -61,7 +61,7 @@ export function PlayersPage() {
 
             {/* Cartel de error */}
             {error && (
-                <div className="mb-6 p-4 bg-red-900/40 border border-red-500/50 rounded text-red-300 text-sm">
+                <div className="mb-6 p-4 bg-red-900/40 border border-red-500/50 text-red-300 text-sm">
                     {error}
                 </div>
             )}

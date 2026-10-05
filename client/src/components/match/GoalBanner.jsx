@@ -24,7 +24,7 @@ export function GoalBanner({ goalInfo }) {
       <div className="text-center">
         <p className="text-5xl font-extrabold text-white-400">¡GOL!</p>
         <p className="mt-2 text-lg text-white">
-          {teamLabel} — minuto {goalInfo.minute}'
+          {teamLabel} - minuto {goalInfo.minute}'
         </p>
       </div>
     </div>

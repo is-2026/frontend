@@ -7,6 +7,7 @@ import { GoalBanner } from "../components/match/GoalBanner";
 /*
 
 // Mock para probar la vista:
+*/
 const mockScores = { home: 2, away: 1 };
   
   const mockLineups = {
@@ -40,7 +41,6 @@ const mockState = {
 };
 
 const mockGoalInfo = { tick: 150, minute: 23, playerId: "p2", team: "home" };
-*/
 
 
 export function MatchPage() {
@@ -53,36 +53,36 @@ export function MatchPage() {
             {/* Contenedor de cancha.*/}
             <div className="w-[1272px] mx-auto pb-8">
                 {/* Header: equipos , contador y score */}
-                <MatchHeader scores={scores} />
+                <MatchHeader scores={mockScores} />
 
                 {/*Contenedor de la cancha */}
                 <div className="flex gap-4">
                     <div className="min-w-0 flex-1 relative">
 
                         {/*cancha */}
-                        <Field state={state} lineups={lineups} />
+                        <Field state={mockState} lineups={mockLineups} />
 
                         {/*evento de gol */}
-                        <GoalBanner goalInfo={goalInfo} />
+                        <GoalBanner goalInfo={mockGoalInfo} />
                     </div>
 
                     <div className="flex flex-col gap-4 w-64 shrink-0">
                         { /*titulares*/ }
-                        <div className="bg-slate-900 border border-slate-700 p-4 rounded h-40">
+                        <div className="bg-slate-900 border border-slate-700 p-4 h-40">
                             <h3 className="text-sm text-slate-400 mb-2 uppercase font-bold">
                                 Equipo
                             </h3>
                         </div>
 
                         { /*suplentes*/ }
-                        <div className="bg-slate-900 border border-slate-700 p-4 rounded h-40">
+                        <div className="bg-slate-900 border border-slate-700 p-4 h-40">
                             <h3 className="text-sm text-slate-400 mb-2 uppercase font-bold">
                                 Suplentes
                             </h3>
                         </div>
 
                         { /*cambios*/ }
-                        <button className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-4 rounded border border-slate-600 transition-colors uppercase text-sm mt-auto">
+                        <button className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-4 border border-slate-600 transition-colors uppercase text-sm mt-auto">
                             Realizar Cambios
                         </button>
                     </div>

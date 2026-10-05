@@ -112,7 +112,7 @@ describe("useLeagueLobbySocket Hook", () => {
             socket.sendMessage({ type: "leagueStarted" });
         });
 
-        expect(mockNavigate).toHaveBeenCalledWith(`/leagues/${leagueId}`);
+        expect(mockNavigate).toHaveBeenCalledWith(`/leagues/${leagueId}/lobby`);
     });
 
     test("muestra el mensaje de error si llega el evento 'leagueCancelled'", () => {

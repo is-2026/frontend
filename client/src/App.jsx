@@ -73,7 +73,6 @@ export default function App() {
         <Route path="/leagues" element={<LeaguesPage />} />
         <Route path="/leagues/create" element={<CreateLeaguePage />} />
         <Route path="/leagues/:leagueId/join" element={<JoinLeaguePage />} />
-        <Route path="/leagues/:leagueId" element={<LeagueLobbyPage />} />
         <Route path="/leagues/:leagueId/lobby" element={<LeagueLobbyPage />} />
         </Route>
     </Routes>

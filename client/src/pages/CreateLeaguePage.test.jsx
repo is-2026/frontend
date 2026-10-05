@@ -1,13 +1,13 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import { CreateLiguePage } from "./CreateLiguePage";
-import { createLigues } from "../services/ligues";
+import { CreateLeaguePage } from "./CreateLeaguePage";
+import { createLeagues } from "../services/leagues";
 import { getPlayers } from "../services/club";
 import { getBehaviors } from "../services/behaviors";
 
-vi.mock("../services/ligues", () => ({
-    createLigues: vi.fn(),
+vi.mock("../services/leagues", () => ({
+    createLeagues: vi.fn(),
 }));
 
 vi.mock("../services/club", () => ({
@@ -70,7 +70,7 @@ vi.mock("../components/PlayerSelection", () => ({
     )
 }));
 
-describe("CreateLiguePage", () => {
+describe("CreateLeaguePage", () => {
     const mockPlayers = [
         { id: "p1", name: "Jugador 1" },
         { id: "p2", name: "Jugador 2" },
@@ -86,7 +86,7 @@ describe("CreateLiguePage", () => {
     test("muestra el estado de carga inicialmente y luego renderiza el formulario", async () => {
         render(
             <MemoryRouter>
-                <CreateLiguePage />
+                <CreateLeaguePage />
             </MemoryRouter>
         );
 
@@ -105,7 +105,7 @@ describe("CreateLiguePage", () => {
 
         render(
             <MemoryRouter>
-                <CreateLiguePage />
+                <CreateLeaguePage />
             </MemoryRouter>
         );
 
@@ -119,7 +119,7 @@ describe("CreateLiguePage", () => {
     test("mantiene el botón de confirmar deshabilitado si faltan datos obligatorios o la alineación no es válida", async () => {        
         render(
             <MemoryRouter>
-                <CreateLiguePage />
+                <CreateLeaguePage />
             </MemoryRouter>
         );
         
@@ -132,11 +132,11 @@ describe("CreateLiguePage", () => {
     });
 
     test("habilita el botón, envía el payload correcto y redirige al lobby exitosamente", async () => {
-        createLigues.mockResolvedValueOnce({ id: "liga-123" });
+        createLeagues.mockResolvedValueOnce({ id: "liga-123" });
 
         render(
             <MemoryRouter>
-                <CreateLiguePage />
+                <CreateLeaguePage />
             </MemoryRouter>
         );
 
@@ -166,7 +166,7 @@ describe("CreateLiguePage", () => {
         fireEvent.click(submitButton);
 
         await waitFor(() => {
-            expect(createLigues).toHaveBeenCalledWith({
+            expect(createLeagues).toHaveBeenCalledWith({
                 name: "Copa Libertadores",
                 password: "secreto123",
                 max_clubs: 16,
@@ -183,18 +183,18 @@ describe("CreateLiguePage", () => {
         });
 
         await waitFor(() => {
-            expect(mockNavigate).toHaveBeenCalledWith("/ligues/liga-123/lobby");
+            expect(mockNavigate).toHaveBeenCalledWith("/leagues/liga-123/lobby");
         });
     });
 
     test("muestra mensaje de error cuando la creación de la liga falla (Error 400)", async () => {
         const errorResponse = new Error("El club ya pertenece a una liga activa.");
         errorResponse.status = 400;
-        createLigues.mockRejectedValueOnce(errorResponse);
+        createLeagues.mockRejectedValueOnce(errorResponse);
 
         render(
             <MemoryRouter>
-                <CreateLiguePage />
+                <CreateLeaguePage />
             </MemoryRouter>
         );
 

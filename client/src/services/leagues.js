@@ -9,8 +9,8 @@ import { request } from "./api";
  * Requiere exactamente 6 jugadores (3 titulares y 3 suplentes).
  */
 
-export function createLigues(data) {
-  return request("/ligues", {
+export function createLeagues(data) {
+  return request("/leagues", {
     method: "POST",
     body: JSON.stringify(data),
   });

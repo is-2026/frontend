@@ -13,7 +13,7 @@ import { PlayersPage } from "./pages/PlayersPage";
 import { ClubDashboardPage } from "./pages/ClubDashboardPage";
 import { BehaviorDetail } from "./pages/BehaviorDetail";
 import { CreateFriendlyPage } from "./pages/CreateFriendlyPage";
-import { CreateLiguePage } from "./pages/CreateLiguePage";
+import { CreateLeaguePage } from "./pages/CreateLeaguePage";
 
 //layout para vistas autenticadas / protegidas con Navbar
 function MainLayout() {
@@ -68,7 +68,7 @@ export default function App() {
         <Route path="/friendlies/:friendlyId/join" element={<JoinFriendlyPage />} />
         <Route path="/friendlies/:friendlyId/lobby" element={<LobbyPage />} />
         <Route path="/match/:matchId" element={<MatchPage />} />
-        <Route path="/ligues/create" element={<CreateLiguePage />} />
+        <Route path="/leagues/create" element={<CreateLeaguePage />} />
       </Route>
     </Routes>
   );

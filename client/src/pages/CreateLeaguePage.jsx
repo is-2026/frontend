@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { createLigues } from "../services/ligues";
+import { createLeagues } from "../services/leagues";
 import { getPlayers } from "../services/club";
 import { getBehaviors } from "../services/behaviors";
 import {PlayerSelection} from "../components/PlayerSelection";
 
-export function CreateLiguePage() {
+export function CreateLeaguePage() {
     const navigate = useNavigate();
 
     // estados del formulario, duración, pass y jugadores tit. y sup.
@@ -79,12 +79,12 @@ export function CreateLiguePage() {
                 ],
             };
 
-            const newLigue = await createLigues(payload);
+            const newLeague = await createLeagues(payload);
 
-            if (newLigue?.id) {
-                navigate(`/ligues/${newLigue.id}/lobby`);
+            if (newLeague?.id) {
+                navigate(`/leagues/${newLeague.id}/lobby`);
             } else {
-                navigate("/ligues");
+                navigate("/leagues");
             }
         } catch (e) {
             if (e.status === 400 || e.response?.status === 400) {

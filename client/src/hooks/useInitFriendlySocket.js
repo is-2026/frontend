@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 
 export function useInitFriendlySocket(friendlyId) {
     const [matchId, setMatchId] = useState(null);
+    const [rival, setRival] = useState(null); // { id, name } del club que se unió
+    const [startsAt, setStartsAt] = useState(null); // Date en que arranca el partido
     const socketRef = useRef(null);
 
     useEffect(() => {
@@ -17,6 +19,10 @@ export function useInitFriendlySocket(friendlyId) {
         socket.addEventListener("message", (e) => {
             const message = JSON.parse(e.data);
             switch (message.type) {
+            case "friendlyClubRegistered":
+                setRival({ id: message.data.club_id, name: message.data.club_name });
+                setStartsAt(new Date(message.data.starts_at));
+                break;
             case "friendlyStart":
                 setMatchId(message.data.match_id);
                 socket.close();
@@ -33,5 +39,5 @@ export function useInitFriendlySocket(friendlyId) {
             }
         };
     }, [friendlyId]);
-    return { matchId };
+    return { matchId, rival, startsAt };
 }

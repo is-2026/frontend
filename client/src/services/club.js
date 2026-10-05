@@ -66,8 +66,7 @@ export function createPlayer(data) {
 }
 */
 
-/* MOCK para ver funcionamiento de crear amistoso.*/
-/*
+/* MOCK para ver funcionamiento de crear amistoso.
 export function getPlayers() {
   return Promise.resolve([
     { id: "p1", name: "Lionel Messi", number: 10, power: 95 },

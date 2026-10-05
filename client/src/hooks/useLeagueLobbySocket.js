@@ -43,7 +43,7 @@ export const useLeagueLobbySocket = (leagueId, setLeague, setError) => {
                         break;
 
                     case "leagueStarted":
-                        navigate(`/leagues/${leagueId}`); // cuando la liga empieza, redirigimos a la pantalla de la liga
+                        navigate(`/leagues/${leagueId}/lobby`); // cuando la liga empieza, redirigimos a la pantalla de la liga
                         break;
 
                     case "leagueCancelled":

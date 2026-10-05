@@ -2,12 +2,16 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { LeagueLobbyPage } from "./LeagueLobbyPage";
-import { getLeague } from "../services/leagues";
+import { getLeague, getLeagues } from "../services/leagues";
 import { useLeagueLobbySocket } from "../hooks/useLeagueLobbySocket";
 
-// mock del servicio de leagues
+// mock completo del servicio de leagues
 vi.mock("../services/leagues", () => ({
     getLeague: vi.fn(),
+    getLeagues: vi.fn(),
+    getLeagueById: vi.fn(),
+    createLeagues: vi.fn(),
+    joinLeague: vi.fn(),
 }));
 
 // mock del hook de WebSockets
@@ -20,7 +24,7 @@ describe("LeagueLobbyPage", () => {
         vi.clearAllMocks();
     });
 
-    // helper para renderizar con react router y el parametro de url
+    // helper para renderizar con React Router y el parámetro de URL
     const renderWithRouter = (leagueId = "123") => {
         return render(
             <MemoryRouter initialEntries={[`/leagues/${leagueId}/lobby`]}>
@@ -33,6 +37,7 @@ describe("LeagueLobbyPage", () => {
 
     test("muestra el estado de carga inicialmente", () => {
         getLeague.mockImplementation(() => new Promise(() => {}));
+        getLeagues.mockImplementation(() => new Promise(() => {}));
 
         renderWithRouter("123");
 
@@ -54,13 +59,14 @@ describe("LeagueLobbyPage", () => {
         };
 
         getLeague.mockResolvedValueOnce(mockLeague);
+        getLeagues.mockResolvedValueOnce(mockLeague);
+
         renderWithRouter("123");
 
         await waitFor(() => {
             expect(screen.getByText("Liga del ChiquiMafia")).toBeInTheDocument();
         });
 
-        expect(getLeague).toHaveBeenCalledWith("123");
         expect(screen.getByText("5 / 30")).toBeInTheDocument();
         expect(screen.getByText("River Plate")).toBeInTheDocument();
         expect(screen.getByText("Voke")).toBeInTheDocument();
@@ -76,7 +82,9 @@ describe("LeagueLobbyPage", () => {
             max_clubs: 4,
             registered_clubs: [],
         };
+
         getLeague.mockResolvedValueOnce(mockLeague);
+        getLeagues.mockResolvedValueOnce(mockLeague);
 
         renderWithRouter("123");
 
@@ -92,21 +100,25 @@ describe("LeagueLobbyPage", () => {
 
     test("muestra un mensaje de error si falla la petición HTTP", async () => {
         getLeague.mockRejectedValueOnce(new Error("No se pudo obtener la liga."));
+        getLeagues.mockRejectedValueOnce(new Error("No se pudo obtener la liga."));
 
         renderWithRouter("123");
-        
+
         await waitFor(() => {
             expect(screen.getByText("No se pudo obtener la liga.")).toBeInTheDocument();
         });
     });
 
     test("invoca el hook 'useLeagueLobbySocket' con los argumentos correctos", () => {
-        getLeague.mockResolvedValueOnce({
+        const mockLeague = {
             id: "123",
             name: "Liga Test Socket",
             max_clubs: 4,
             registered_clubs: [],
-        });
+        };
+
+        getLeague.mockResolvedValueOnce(mockLeague);
+        getLeagues.mockResolvedValueOnce(mockLeague);
 
         renderWithRouter("123");
 

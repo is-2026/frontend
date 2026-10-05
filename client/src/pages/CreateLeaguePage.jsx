@@ -65,7 +65,7 @@ export function CreateLeaguePage() {
                 name: name.trim(),
                 ...(password.trim() ? { password: password.trim() } : {}),
                 max_clubs: Number(maxClubs),
-                match_duration_minutes: Number(duration),
+                match_duration_minutes: 5,
                 players: [
                     ...selection.starters.map((starter) => ({
                         player_id: starter.player_id,
@@ -140,19 +140,15 @@ export function CreateLeaguePage() {
 
         {/* Duración */}
         <div>
-          <label htmlFor="duration" className="block text-sm font-medium mb-1">
+          <label className="block text-sm font-medium mb-1">
             Duración del partido (minutos)
           </label>
           <input
-            type="number"
-            id="duration"
-            min="1"
-            max="90"
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-            className="w-full border border-white/10 bg-slate-800 p-2 text-white focus:outline-none focus:border-white/30"
-            placeholder="Ej: 10"
-            required
+            type="text"
+            value="5 minutos"
+            disabled
+            readOnly
+            className="w-full border border-white/10 bg-slate-900/60 p-2 text-white/50 cursor-not-allowed select-none"
           />
         </div>
 

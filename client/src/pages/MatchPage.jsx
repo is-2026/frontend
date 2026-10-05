@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { MatchHeader } from "../components/match/MatchHeader";
 import { Field } from "../components/match/Field";
 import { useMatchSocket } from "../hooks/useMatchSocket";
@@ -49,7 +49,12 @@ const mockFinished = {
 
 export function MatchPage() {
     const { matchId } = useParams();
-    const { lineups, scores, state, goalInfo, finished } = useMatchSocket(matchId);
+    const { 
+        teams, lineups, scores, 
+        state, goalInfo, finished 
+    } = useMatchSocket(matchId);
+    
+    const navigate = useNavigate();
 
     return (
         // fixed para sobreescribir configuracion default de app
@@ -62,21 +67,24 @@ export function MatchPage() {
                     <div className="min-w-0 flex-1 relative">
 
                         {/*cronómetro y evento partido finalizado */}
-                        <MatchHeader 
-                            scores={scores} 
-                            tick={state?.tick} 
+                        <MatchHeader
+                            teams={teams}
+                            scores={scores}
+                            tick={finished?.tick ?? state?.tick}
                         />
 
                         {/*cancha */}
                         <Field state={state} lineups={lineups} />
 
                         {/*evento de gol */}
-                        <GoalBanner goalInfo={goalInfo} />                        
-
-                        
+                        <GoalBanner goalInfo={goalInfo} />
 
                         {/* banner de fin de partido */}
-                        <MatchFinishedBanner finished={finished} />
+                        <MatchFinishedBanner
+                            finished={finished}
+                            teams={teams}
+                            onExit={() => navigate("/friendlies")}
+                        />
 
                     </div>
 

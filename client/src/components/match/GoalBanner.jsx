@@ -11,13 +11,15 @@ export function GoalBanner({ goalInfo }) {
 
     setVisible(true);
     const timeout = setTimeout(() => setVisible(false), 2000);
-
+    
     return () => clearTimeout(timeout);
   }, [goalInfo]);
 
   if (!visible || !goalInfo) return null;
 
-  const teamLabel = goalInfo.team === "home" ? "Equipo Local" : "Equipo Rival";
+  const teamLabel = 
+    goalInfo.teamName ?? (goalInfo.team === "home" ?
+    "Equipo Local" : "Equipo Rival");
 
   return (
     <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/40">

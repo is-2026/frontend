@@ -15,7 +15,8 @@ export function useMatchSocket(matchId) {
 	const [goalInfo, setGoalInfo] = useState(null);
 	const [finished, setFinished] = useState(null);
 	const [closeCode, setCloseCode] = useState(null); 
-
+	const socketRef = useRef(null);
+	
 	useEffect(() => {
 		if (!matchId) return;
 
@@ -24,7 +25,7 @@ export function useMatchSocket(matchId) {
         let started = null;
         // Si el cierre lo pedimos nosotros (desmontaje, StrictMode), no es un error.
         let active = true;
-		const socketRef = useRef(null);
+		
 		socketRef.current = new WebSocket(wsUrl(MATCH_WS_PATH(matchId)));
 		const ws = socketRef.current;
 
@@ -106,6 +107,10 @@ export function useMatchSocket(matchId) {
 			case "matchFinished": {
 			  	const { tick, match_end, home_score, away_score } = msg.data;
 				//Se setea finished con estos valores, deja de ser null.
+				setScores({ 
+					home: home_score, 
+					away: away_score 
+				});
 				setFinished({
 					tick,
 				 	matchEnd: match_end,

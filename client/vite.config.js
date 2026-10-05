@@ -9,5 +9,12 @@ export default defineConfig({
     setupFiles: './src/setupTests.js',
     pool: 'threads',
     fileParallelism: false,
+    coverage: {
+      provider: 'v8',
+      include: ['src/'],
+      exclude: ['src/**/*.test.*', 'src/tests/**', 'src/main.jsx', 'src/setupTests.js'],
+      reporter: ['text', 'html'],
+      reportOnFailure: true,
+    },
   },
 });

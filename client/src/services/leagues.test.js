@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as api from "./api"; 
 import { request } from "./api";
-import { createLeagues } from "./leagues";
-import { getLeagues } from "./leagues";
+import { createLeagues, getLeagues, joinLeague } from "./leagues";
 
 vi.mock("./api", () => ({
   request: vi.fn(),
@@ -76,6 +75,44 @@ describe("leagues service", () => {
       request.mockRejectedValueOnce(new Error("Liga no encontrada"));
 
       await expect(getLeagues("999")).rejects.toThrow("Liga no encontrada");
+    });
+  });
+
+  describe("joinLeague", () => {
+    test("debe enviar el payload a /leagues/:id/join correctamente", async () => {
+      const leagueId = "liga-123";
+      const mockPayload = {
+        password: "secret"
+        players: [
+            { player_id: "p1", is_starter: true },
+            { player_id: "p2", is_starter: true },
+            { player_id: "p3", is_starter: true },
+            { player_id: "p4", is_starter: false },
+            { player_id: "p5", is_starter: false },
+            { player_id: "p6", is_starter: false }
+        ]
+      };
+      
+      const mockResponse = { message: "Club inscripto exitosamente" };
+      vi.spyOn(api, "request").mockResolvedValue(mockResponse);
+
+      const result = await joinLeague(leagueId, mockPayload);
+
+      expect(api.request).toHaveBeenCalledWith(`/leagues/${leagueId}/join`, {
+        method: "POST",
+        body: JSON.stringify(mockPayload),
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    test("debe propagar los errores de la API", async () => {
+      const mockError = new Error("El club ya esta inscripto en la liga");
+      mockError.status = 409;
+
+      vi.spyOn(api, "request").mockRejectedValue(mockError);
+      
+      await expect(joinLeague("liga-123", {})).rejects.toThrow("El club ya esta inscripto en la liga");
+      await expect(joinLeague("liga-123", {})).rejects.toHaveProperty("status", 409);
     });
   });
 });

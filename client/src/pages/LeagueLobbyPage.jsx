@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getLeague } from "../services/leagues";
+import { getLeagues } from "../services/leagues";
 import { useLeagueLobbySocket } from "../hooks/useLeagueLobbySocket";
 
 export function LeagueLobbyPage() {
@@ -15,7 +15,7 @@ export function LeagueLobbyPage() {
         const fetchLeague = async () => {
             try {
                 setLoading(true);
-                const data = await getLeague(leagueId);
+                const data = await getLeagues(leagueId);
                 setLeague(data);
             } catch (err) {
                 setError(err.message || "Error al cargar la liga.");

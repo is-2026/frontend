@@ -1,14 +1,16 @@
 import { request } from "./api"; 
 
+/*
 export const getBehaviors = async () => {
     const data = await request('/club/behaviors', {
         method: 'GET',
     });
     return data;
 };
+*/
 
 /* MOCK para ver funcionamiento de crear amistoso */
-/*
+
 export const getBehaviors = async () => {
   return [
     { id: "b1", name: "Ofensivo" },
@@ -17,14 +19,16 @@ export const getBehaviors = async () => {
     { id: "b4", name: "Presión Alta" },
   ];
 };
-*/
+
+/*
 export const getBehaviorById = async (id) => {
     return await request(`/club/behaviors/${id}`, { 
         method: 'GET' 
     });
 };
+*/
 
-/* export const getBehaviorById = async (id) => {
+export const getBehaviorById = async (id) => {
     // MOCK: Simula la base de datos para probar estilos y funcionalidad 
     const mockDb = {
         "1": { id: "1", name: "Comportamiento Defensivo", code: "defend()" },
@@ -41,4 +45,4 @@ export const getBehaviorById = async (id) => {
             }
         }, 500);
     });
-}; */
+};

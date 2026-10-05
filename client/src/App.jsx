@@ -14,7 +14,6 @@ import { PlayersPage } from "./pages/PlayersPage";
 import { ClubDashboardPage } from "./pages/ClubDashboardPage";
 import { BehaviorDetail } from "./pages/BehaviorDetail";
 import { LeagueLobbyPage } from "./pages/LeagueLobbyPage";
-import { CreateFriendlyPage } from "./pages/CreateFriendlyPage";
 import { CreateLeaguePage } from "./pages/CreateLeaguePage";
 
 //layout para vistas autenticadas / protegidas con Navbar

@@ -1,9 +1,25 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getMyTeamPlayers } from "../services/players";
+import { getPlayers } from "../services/club"; 
 import { getBehaviors } from "../services/behaviors";
 import { joinFriendly, getFriendlyById } from "../services/friendlies";
 import { PlayerSelection } from "../components/PlayerSelection";
+/*
+const PLAYERS_MOCK = [
+  { id: "j1", name: "Jugador 1" },
+  { id: "j2", name: "Jugador 2" },
+  { id: "j3", name: "Jugador 3" },
+  { id: "j4", name: "Jugador 4" },
+  { id: "j5", name: "Jugador 5" },
+  { id: "j6", name: "Jugador 6" },
+];
+
+const BEHAVIORS_MOCK = [
+  { id: "ofensivo", name: "Ofensivo" },
+  { id: "defensivo", name: "Defensivo" },
+  { id: "equilibrado", name: "Equilibrado" },
+];
+*/
 
 export function JoinFriendlyPage() {
   const { friendlyId } = useParams();
@@ -25,13 +41,13 @@ export function JoinFriendlyPage() {
   const [error, setError] = useState(null);
   const [sending, setSending] = useState(false);
 
-  // Carga inicial del partido y datos reales
+  // Carga inicial del partido
   useEffect(() => {
     async function fetchData() {
       try {
         const [friendly, playersData, behaviorsData] = await Promise.all([
           getFriendlyById(friendlyId),
-          getMyTeamPlayers(),
+          getPlayers(),
           getBehaviors(),
         ]);
 
@@ -40,10 +56,13 @@ export function JoinFriendlyPage() {
           return;
         }
 
+        // Guardar datos devueltos por los servicios
+        setAvailablePlayers(playersData || []);
+        setBehaviors(behaviorsData || []);
+
         setIsPrivate(friendly.is_private);
+        // Si NO es privado, ingresa directo (confirmedPassword = true)
         setConfirmedPassword(!friendly.is_private);
-        setAvailablePlayers(playersData ?? []);
-        setBehaviors(behaviorsData ?? []);
       } catch (e) {
         setNotFound(true);
       } finally {
@@ -51,19 +70,13 @@ export function JoinFriendlyPage() {
       }
     }
 
-    fetchData(); 
+    fetchData();
   }, [friendlyId]);
 
   const validSelection =
     selection.starters.length === 3 &&
     selection.starters.every((t) => t.behavior_id) &&
     selection.substitutes.length === 3;
-
-  // Habilita el paso a la alineación (la validación real la hace el backend en handleConfirm)
-  function handlePasswordSubmit() {
-    setError(null);
-    setConfirmedPassword(true);
-  }
 
   async function handleConfirm() {
     setError(null);
@@ -88,29 +101,39 @@ export function JoinFriendlyPage() {
       await joinFriendly(friendlyId, body);
       navigate(`/friendlies/${friendlyId}/lobby`);
     } catch (e) {
-      if (e.status === 400 || e.status === 401) {
-        if (isPrivate && e.message?.toLowerCase().includes("password")) {
-          setConfirmedPassword(false);
-        }
-        setError(e.message || "La contraseña es incorrecta o los datos son inválidos.");
-      } else if (e.status === 409) {
-        setError("Tu club ya está inscripto en este amistoso.");
-      } else if (e.status === 404) {
-        setError("El amistoso no fue encontrado.");
-      } else {
-        setError("Ocurrió un error inesperado.");
-      }
+      if (e.status === 400) setError(e.message);
+      else if (e.status === 409) setError("Tu club ya está inscripto en este amistoso.");
+      else if (e.status === 404) setError("El amistoso no fue encontrado.");
+      else setError("Ocurrió un error inesperado.");
     } finally {
       setSending(false);
     }
-  } 
+  }
+  // Validar contraseña antes de avanzar
+  async function handlePasswordSubmit() {
+    setError(null);
+    try {
+      const friendly = await getFriendlyById(friendlyId);
+
+    // Si tiene clave registrada en el mock y no coincide, no continua
+    if (friendly?.password && password !== friendly.password) {
+      setError("La contraseña es incorrecta.");
+      return;
+    }
+
+    // Si coincide, habilita el paso a la alineación
+      setConfirmedPassword(true);
+    } catch (e) {
+      setError("Error al verificar la contraseña.");
+  }
+  }
 
   // Cargando
   if (loading) {
-    return <div className="p-6 text-center text-white">Cargando datos del partido...</div>;
+    return <div className="p-6 text-center">Cargando datos del partido...</div>;
   }
 
-  // No encontrado
+  // Partido no encontrado
   if (notFound) {
     return <div className="p-6 text-center text-red-400">El amistoso no existe o fue cancelado.</div>;
   }
@@ -118,38 +141,38 @@ export function JoinFriendlyPage() {
   // Partido privado (solicitar clave antes de mostrar alineación)
   if (isPrivate && !confirmedPassword) {
     return (
-      <div className="mx-auto max-w-sm p-6 text-white">
+      <div className="mx-auto max-w-sm p-6">
         <h1 className="mb-4 text-xl font-bold">Amistoso privado</h1>
 
         <input
           type="password"
           placeholder="Contraseña"
-          className="mb-3 w-full bg-slate-800 p-2 rounded border border-slate-700"
+          className="mb-3 w-full bg-slate-800 p-2"
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
-            if (error) setError(null);
+            if (error) setError(null); // Limpia el mensaje al volver a tipear
           }}
         />
 
+        {/*mensaje de contraseña incorrecta definido en handlePasswordSubmit*/}
         {error && (
-          <div className="mt-2 p-2 bg-red-900/40 border border-red-500/50 text-red-300 text-sm flex items-center gap-2 rounded">
+          <div className="mt-2 p-2 bg-red-900/40 border border-red-500/50 text-red-300 text-sm flex items-center gap-2">
             <span>{error}</span> 
           </div>
         )}
-
         <div className="flex gap-2">
           <button
             type="button"
-            className="w-1/2 bg-slate-800 py-2 font-medium hover:bg-slate-700 rounded"
+            className="w-1/2 bg-slate-800 py-2 font-medium hover:bg-slate-700"
             onClick={() => navigate("/friendlies")}
           >
             Cancelar
           </button>
           <button
             type="button"
-            className="w-1/2 bg-emerald-600 py-2 font-medium hover:bg-emerald-500 disabled:opacity-40 rounded"
-            onClick={handlePasswordSubmit}
+            className="w-1/2 bg-emerald-600 py-2 font-medium hover:bg-emerald-500 disabled:opacity-40"
+            onClick={handlePasswordSubmit} //llamada a handlePasswordSubmit al hacer click para validar
             disabled={!password}
           >
             Continuar
@@ -161,7 +184,7 @@ export function JoinFriendlyPage() {
 
   // Selección de jugadores
   return (
-    <div className="mx-auto max-w-xl p-6 text-white">
+    <div className="mx-auto max-w-xl p-6">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-bold">Elegí tu alineación</h1>
         <button
@@ -173,15 +196,15 @@ export function JoinFriendlyPage() {
       </div>
 
       <PlayerSelection
-        availablePlayers={availablePlayers} 
-        behaviors={behaviors}               
+        availablePlayers={availablePlayers}
+        behaviors={behaviors}
         onChange={setSelection}
       />
 
       {error && <p className="mt-4 text-red-400 text-sm">{error}</p>}
 
       <button
-        className="mt-6 w-full bg-emerald-600 py-2 font-medium hover:bg-emerald-500 disabled:opacity-40 rounded"
+        className="mt-6 w-full bg-emerald-600 py-2 font-medium hover:bg-emerald-500 disabled:opacity-40"
         disabled={!validSelection || sending}
         onClick={handleConfirm}
       >

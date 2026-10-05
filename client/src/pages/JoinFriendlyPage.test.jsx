@@ -2,10 +2,12 @@
 import { render, screen, waitFor, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
-import { vi, describe, it, expect,afterEach, beforeEach } from "vitest";
+import { vi, describe, it, expect, afterEach, beforeEach } from "vitest";
 import * as matchers from "@testing-library/jest-dom/matchers";
 import { JoinFriendlyPage } from "./JoinFriendlyPage";
 import * as friendliesService from "../services/friendlies";
+import * as clubService from "../services/club";
+import * as behaviorsService from "../services/behaviors";
 
 expect.extend(matchers);
 
@@ -38,6 +40,8 @@ vi.mock("../components/PlayerSelection", () => ({
 // Mockeamos los servicios de la API
 vi.spyOn(friendliesService, "getFriendlyById");
 vi.spyOn(friendliesService, "joinFriendly");
+vi.spyOn(clubService, "getPlayers");
+vi.spyOn(behaviorsService, "getBehaviors");
 
 function renderWithRouter(initialEntry) {
   return render(
@@ -54,9 +58,22 @@ function renderWithRouter(initialEntry) {
 describe("JoinFriendlyPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Respuestas por defecto para los servicios auxiliares
+    clubService.getPlayers.mockResolvedValue([
+      { id: "j1", name: "Jugador 1" },
+      { id: "j2", name: "Jugador 2" },
+      { id: "j3", name: "Jugador 3" },
+      { id: "j4", name: "Jugador 4" },
+      { id: "j5", name: "Jugador 5" },
+      { id: "j6", name: "Jugador 6" },
+    ]);
+    behaviorsService.getBehaviors.mockResolvedValue([
+      { id: "ofensivo", name: "Ofensivo" },
+      { id: "defensivo", name: "Defensivo" },
+      { id: "equilibrado", name: "Equilibrado" },
+    ]);
   });
 
-  
   it("1. Muestra directamente la alineación si el partido es público", async () => {
     friendliesService.getFriendlyById.mockResolvedValue({
       id: "1",
@@ -70,7 +87,6 @@ describe("JoinFriendlyPage", () => {
       expect(screen.getByTestId("player-selection")).toBeInTheDocument();
     });
   });
-
 
   it("2. Pide contraseña en partido privado y muestra error si es incorrecta", async () => {
     friendliesService.getFriendlyById.mockResolvedValue({
@@ -98,7 +114,6 @@ describe("JoinFriendlyPage", () => {
     });
     expect(screen.queryByText("Elegí tu alineación")).not.toBeInTheDocument();
   });
-
 
   it("3. Permite avanzar y unirse correctamente si la contraseña es válida", async () => {
     friendliesService.getFriendlyById.mockResolvedValue({

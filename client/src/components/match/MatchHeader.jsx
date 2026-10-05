@@ -1,4 +1,5 @@
-export function MatchHeader({scores}) {
+import { formatMatchTime } from "./utils/utils"
+export function MatchHeader({scores, tick = 0, finished = null}) {
     return (
         <div className="flex justify-between items-center bg-slate-900 border border-slate-700 mb-4">
             <div className="flex items-center gap-4">
@@ -6,8 +7,9 @@ export function MatchHeader({scores}) {
                 <span className="text-3xl font-black bg-slate-800 px-4 py-1">{scores?.home ?? 0}</span>
             </div>
                     
-            <div className="text-2xl font-mono text-emerald-400 font-bold tracking-widest bg-slate-950 px-6 py-2 border border-slate-800">
-                00:00
+            {/* Cronómetro*/}
+            <div className="text-2xl font-mono text-emerald-400 font-bold tracking-widest bg-slate-950 px-6 py-2 border border-slate-800 rounded">
+                {formatMatchTime(tick)}
             </div>
                     
             <div className="flex items-center gap-4">

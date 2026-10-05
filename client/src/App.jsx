@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import { ClubPage } from "./pages/ClubPage";
+import { CreateFriendlyPage } from "./pages/CreateFriendlyPage";
 import { FriendliesPage } from "./pages/FriendliesPage";
 import { LoginPage } from "./pages/LoginPage";
 import { JoinFriendlyPage } from "./pages/JoinFriendlyPage";
@@ -13,6 +14,7 @@ import { CreatePlayerPage } from "./pages/CreatePlayerPage";
 import { PlayersPage } from "./pages/PlayersPage"; 
 import { ClubDashboardPage } from "./pages/ClubDashboardPage";
 import { BehaviorDetail } from "./pages/BehaviorDetail";
+import { LeagueLobbyPage } from "./pages/LeagueLobbyPage";
 import { CreateFriendlyPage } from "./pages/CreateFriendlyPage";
 import { CreateLeaguePage } from "./pages/CreateLeaguePage";
 
@@ -63,12 +65,12 @@ export default function App() {
         <Route path="/club/players/create" element={<CreatePlayerPage />} />
         <Route path="/club/behaviors" element={<BehaviorsPage />} />
         <Route path="/club/behaviors/:id" element={<BehaviorDetail />} />
-
         <Route path="/friendlies" element={<FriendliesPage />} />
         <Route path="/friendlies/create" element={<CreateFriendlyPage />} />
         <Route path="/friendlies/:friendlyId/join" element={<JoinFriendlyPage />} />
         <Route path="/friendlies/:friendlyId/lobby" element={<LobbyPage />} />
         <Route path="/match/:matchId" element={<MatchPage />} />
+        <Route path="/leagues/:leagueId/lobby" element={<LeagueLobbyPage />} />
         <Route path="/leagues/create" element={<CreateLeaguePage />} />
       </Route>
     </Routes>

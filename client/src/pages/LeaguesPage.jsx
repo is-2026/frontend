@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getLeagues } from "../services/leagues";
 import LeagueCard from "../components/LeagueCard";
 
-export default function LeaguesPage() {
+export function LeaguesPage() {
   const [leagues, setLeagues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

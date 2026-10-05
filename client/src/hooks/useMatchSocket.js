@@ -5,44 +5,54 @@ import { useState, useEffect, useRef } from "react";
   cada mensaje viene
   envuelto como { type, data }, con "type" como string constante
   ("matchState", "goal", etc.).*/
+const NORMAL_CLOSE = 1000;
 
 export function useMatchSocket(matchId) {
+	const [teams, setTeams] = useState(null); // { home: {id, name, avatar_url}, away: {...} }
 	const [lineups, setLineups] = useState(null); // home, away
 	const [scores, setScores] = useState(null); // home, away
 	const [state, setState] = useState(null); // match_id, tick, players, ball_position
 	const [goalInfo, setGoalInfo] = useState(null);
 	const [finished, setFinished] = useState(null);
-	const socketRef = useRef(null);
-	const lineupsRef = useRef(null);
-
-	useEffect(() => {
-	lineupsRef.current = lineups;
-	}, [lineups]);
-
+	const [closeCode, setCloseCode] = useState(null); 
+	
 	useEffect(() => {
 		if (!matchId) return;
+
+		// matchStarted llega una sola vez; lo guardamos acá para leerlo en los goal
+        // sin depender del estado de React (el listener se crea una sola vez).
+        let started = null;
+        // Si el cierre lo pedimos nosotros (desmontaje, StrictMode), no es un error.
+        let active = true;
 
 		socketRef.current = new WebSocket(wsUrl(MATCH_WS_PATH(matchId)));
 		const ws = socketRef.current;
 
 		ws.addEventListener("open", () => { console.log("CONNECTED"); });
 		ws.addEventListener("error", () => { console.error(`ERROR`); });
-		ws.addEventListener("close", () => { console.log("DISCONNECTED"); });
-
+		ws.addEventListener("close", (e) => {
+            if (!active || e.code === NORMAL_CLOSE) return;
+            setCloseCode(e.code);
+        });
+		
 		ws.addEventListener("message", (e) => {
 			const msg = JSON.parse(e.data);
 			switch (msg.type) {
 
 			//caso de inicio de partido
 			case "matchStarted": {
-			  	const { home_lineup, away_lineup, home_score, away_score } = msg.data;
-			  	setLineups({
-					home: home_lineup ?? [],
-					away: away_lineup ?? [],
+			  	started = msg.data; // { home_lineup, away_lineup, home_score, away_score, home_club, away_club } 
+			  	setTeams({ 
+					home: started.home_club, 
+					away: started.away_club 
+				});
+				setLineups({
+					home: started.home_lineup ?? [],
+					away: started.away_lineup ?? [],
 			  	});
 			  	setScores({
-					home: home_score ?? 0,
-					away: away_score ?? 0,
+					home: started.home_score ?? 0,
+					away: started.away_score ?? 0,
 			  	});
 			  	break;
 			}
@@ -73,30 +83,31 @@ export function useMatchSocket(matchId) {
 
 			//Caso gol
 			case "goal": {
-			  	const { player_id, minute, tick } = msg.data;
-			  	const isHomeGoal = lineupsRef.current?.home?.some(
-					(h) => h.player_id === player_id,
-			  	);
+			  	const { player_id, minute, tick, 
+						team_id, home_score, away_score } = msg.data;
 
-			  	setScores((prev) => ({
-					home: isHomeGoal ? prev.home + 1 : prev.home, //Si el gol es de home, +1 a score.home
-					away: !isHomeGoal ? prev.away + 1 : prev.away, //Si es de away, +1 en score.away
-			  	}));
-
+			  	setScores({
+					home: home_score,
+					away: away_score, 
+			  	});
+				
+				const team = team_id === started?.home_club?.id ? "home" : "away";
 			  	setGoalInfo({
 					tick: tick,
 					minute: minute,
 					playerId: player_id,
-					team: isHomeGoal ? "home" : "away",
+					team: team,
+					teamName: started?.[`${team}_club`]?.name,
 			  	});
 			  	break;
 			}
 			
 			//Caso finalización del partido
 			case "matchFinished": {
-			  	const { match_end, home_score, away_score } = msg.data;
+			  	const { tick, match_end, home_score, away_score } = msg.data;
 				//Se setea finished con estos valores, deja de ser null.
 				setFinished({
+					tick,
 				 	matchEnd: match_end,
 				 	homeScore: home_score ?? 0,
 				 	awayScore: away_score ?? 0,
@@ -111,10 +122,11 @@ export function useMatchSocket(matchId) {
 	});
 
 		return () => {
+			active = false;
 			if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
 				ws.close();
 			}
 		};
 	}, [matchId]);
-	return { lineups , scores , state, goalInfo, finished };
+	return { teams, lineups , scores , state, goalInfo, finished, closeCode };
 }

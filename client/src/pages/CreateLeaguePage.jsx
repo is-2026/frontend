@@ -3,11 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { createLeagues } from "../services/leagues";
 import { getPlayers } from "../services/club";
 import { getBehaviors } from "../services/behaviors";
-<<<<<<< HEAD
-import { PlayerSelection } from "../components/PlayerSelection";
-=======
 import {PlayerSelection} from "../components/PlayerSelection";
->>>>>>> origin/develop
 
 export function CreateLeaguePage() {
     const navigate = useNavigate();

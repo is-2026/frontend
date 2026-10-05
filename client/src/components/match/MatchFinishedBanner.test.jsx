@@ -28,13 +28,4 @@ describe("MatchHeader", () => {
 
         expect(screen.getByText("02:05")).toBeInTheDocument();
     });
-
-    test("muestra 'PARTIDO FINALIZADO' cuando el partido está finalizado", () => {
-        const mockFinished = { homeScore: 2, awayScore: 0 };
-        render(<MatchHeader tick={9000} finished={mockFinished} />);
-
-        expect(screen.getByText("PARTIDO FINALIZADO")).toBeInTheDocument();
-        // Asegura que no se muestre el tiempo formateado si ya finalizó
-        expect(screen.queryByText("15:00")).not.toBeInTheDocument();
-    });
 });

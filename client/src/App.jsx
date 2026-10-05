@@ -71,10 +71,11 @@ export default function App() {
         <Route path="/friendlies/:friendlyId/lobby" element={<LobbyPage />} />
         <Route path="/match/:matchId" element={<MatchPage />} />
         <Route path="/leagues" element={<LeaguesPage />} />
-        <Route path="/leagues/:leagueId/lobby" element={<LeagueLobbyPage />} />
         <Route path="/leagues/create" element={<CreateLeaguePage />} />
         <Route path="/leagues/:leagueId/join" element={<JoinLeaguePage />} />
-      </Route>
+        <Route path="/leagues/:leagueId" element={<LeagueLobbyPage />} />
+        <Route path="/leagues/:leagueId/lobby" element={<LeagueLobbyPage />} />
+        </Route>
     </Routes>
   );
 }

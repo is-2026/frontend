@@ -56,6 +56,7 @@ export function createFriendlies(data) {
 */
 export async function getFriendlyById(id) {
   const friendlies = await getFriendlies();
+  if (!Array.isArray(friendlies)) return undefined;
   return friendlies.find((f) => String(f.id) === String(id));
 }
 

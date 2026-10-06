@@ -1,11 +1,16 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { MatchPage } from './MatchPage';
 import { useMatchSocket } from '../hooks/useMatchSocket';
+import { getPlayers } from '../services/club';
 
 vi.mock('../hooks/useMatchSocket', () => ({
     useMatchSocket: vi.fn()
+}));
+
+vi.mock('../services/club', () => ({
+    getPlayers: vi.fn().mockResolvedValue([])
 }));
 
 describe('MatchPage', () => {
@@ -211,5 +216,39 @@ describe('MatchPage', () => {
 
         // Verifica que el nuevo valor '1' se muestre en pantalla
         expect(screen.getByText('1')).toBeInTheDocument();
+    });
+
+    test('6. Los paneles muestran mi equipo (aunque sea el visitante) y cada ficha tiene su número', async () => {
+        const lineup = (prefix, firstNumber) => [
+            { player_id: `${prefix}1`, number: firstNumber, name: `${prefix}-tit-1`, is_starter: true, behavior_name: 'Atacante' },
+            { player_id: `${prefix}2`, number: firstNumber + 1, name: `${prefix}-tit-2`, is_starter: true, behavior_name: 'Defensor' },
+            { player_id: `${prefix}3`, number: firstNumber + 2, name: `${prefix}-sup-1`, is_starter: false },
+        ];
+        useMatchSocket.mockReturnValue({
+            teams: { home: { id: 'h', name: 'Local' }, away: { id: 'a', name: 'Visita' } },
+            lineups: { home: lineup('h', 1), away: lineup('a', 7) },
+            scores: { home: 0, away: 0 },
+            state: { matchId: '123', tick: 0, players: [{ playerId: 'a1', x: 5, y: 0 }], ballPosition: { x: 0, y: 0 } },
+            goalInfo: null,
+            finished: null,
+        });
+        // mis jugadores son los del visitante
+        getPlayers.mockResolvedValue([{ id: 'a1' }, { id: 'a2' }, { id: 'a3' }]);
+
+        render(
+            <MemoryRouter initialEntries={['/match/123']}>
+                <Routes>
+                    <Route path="/match/:matchId" element={<MatchPage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        expect(await screen.findByText('a-tit-1')).toBeInTheDocument();
+        expect(screen.getByText('a-tit-2')).toBeInTheDocument();
+        expect(screen.getByText('Atacante')).toBeInTheDocument();
+        expect(screen.getByText('a-sup-1')).toBeInTheDocument();
+        expect(screen.queryByText('h-tit-1')).not.toBeInTheDocument();
+        // la ficha del jugador a1 muestra su número
+        expect(screen.getByTestId('player-a1')).toHaveTextContent('7');
     });
 });

@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { getLeagues } from "../services/leagues";
+import { useParams , useNavigate } from "react-router-dom";
+import { getLeagues, leaveLeague } from "../services/leagues";
 import { useLeagueLobbySocket } from "../hooks/useLeagueLobbySocket";
 
 export function LeagueLobbyPage() {
     const { leagueId } = useParams();
+    const navigate = useNavigate();
     
     const [ league, setLeague ] =  useState(null);
     const [ loading, setLoading ] = useState(true);
     const [ error, setError ] = useState(null);
+    const [ abandonError, setAbandonError ] = useState(null);
 
     // carga inicial via HTTP GET 
     useEffect(() => {
@@ -52,6 +54,18 @@ export function LeagueLobbyPage() {
     const registeredClubs = league?.registered_clubs || [];
     const registeredCount = registeredClubs.length;
     const maxClubs = league?.max_clubs || 0;
+
+    const handleAbandonLeague = async () => {
+        try {
+            setAbandonError(null);
+            await leaveLeague(leagueId);
+            navigate("/leagues");
+        } catch (err) {
+            console.error("Error al abandonar la liga:", err);
+            setAbandonError("Ocurrió un error al intentar abandonar la liga.");
+        }
+        return
+    }
     
     return (
         <div className="w-full max-w-3xl mx-auto flex flex-col gap-6 p-4">
@@ -83,6 +97,13 @@ export function LeagueLobbyPage() {
                     <h2 className="text-lg font-bold text-slate-200">
                         Clubes Inscriptos
                     </h2>
+                    {abandonError && ( <p className="text-red-400 text-xs font-semibold">{abandonError}</p>) }
+                    <button
+                        onClick={handleAbandonLeague}
+                        className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 font-bold text-sm tracking-wider uppercase transition-colors text-center"
+                    >
+                        Abandonar Liga
+                    </button>
                 </div>
 
                 {registeredClubs.length > 0 ? (

@@ -1,4 +1,3 @@
-
 import { PlayerCard } from "./PlayerCard";
 import {toLeft, toTop} from "./utils/utils";
 
@@ -32,12 +31,18 @@ export function Field({ state, lineups }) {
                 const isHome = lineups?.home?.some(
                     (h) => h.player_id === p.playerId,
                 );
+                // datos del jugador en la alineación (número y nombre)
+                const info = [...(lineups?.home ?? []), ...(lineups?.away ?? [])].find(
+                    (l) => l.player_id === p.playerId,
+                );
 
                 return (
                     <PlayerCard
                         key={p.playerId}
                         player={p}
                         team={isHome ? "home" : "away"}
+                        number={info?.number}
+                        name={info?.name}
                         left={toLeft(p.x)}
                         top={toTop(p.y)}
                     />

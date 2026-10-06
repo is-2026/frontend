@@ -1,51 +1,12 @@
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { MatchHeader } from "../components/match/MatchHeader";
 import { Field } from "../components/match/Field";
 import { useMatchSocket } from "../hooks/useMatchSocket";
 import { GoalBanner } from "../components/match/GoalBanner";
 import { MatchFinishedBanner } from "../components/match/MatchFinishedBanner";
-/*
-
-// Mock para probar la vista:
-const mockScores = { home: 2, away: 1 };
-  
-  const mockLineups = {
-  home: [
-    { player_id: "p1" },
-    { player_id: "p2" },
-    { player_id: "p3" },
-  ],
-  away: [
-    { player_id: "p4" },
-    { player_id: "p5" },
-    { player_id: "p6" },
-  ],
-};
-
-
-const mockState = {
-    tick: 150,
-    ballPosition: { x: 3, y: 3 }, // Pelota en el centro de la cancha
-    players: [
-        // Equipo Local (lado izquierdo: X de -20 a 0)
-        { playerId: "p1", x: -18, y: 0 },  // Arquero Local (cerca del arco izq)
-        { playerId: "p2", x: -10, y: 5 },  // Defensor Local (arriba)
-        { playerId: "p3", x: -2, y: -2 },  // Mediocampista Local (centro)
-
-        // Equipo Visitante (lado derecho: X de 0 a 20)
-        { playerId: "p4", x: 2, y: 3 },    // Mediocampista Visitante (centro)
-        { playerId: "p5", x: 10, y: -5 },  // Defensor Visitante (abajo)
-        { playerId: "p6", x: 18, y: 0 },   // Arquero Visitante (cerca del arco der)
-    ],
-};
-const mockGoalInfo = { tick: 150, minute: 23, playerId: "p2", team: "home" };
-
-const mockFinished = {
-        matchEnd: false,
-        homeScore: 3,
-        awayScore: 1
-    };
-*/
+import { LineupPanel } from "../components/match/LineupPanel";
+import { getPlayers } from "../services/club";
+import { useEffect, useState } from "react";
 
 export function MatchPage() {
     const { matchId } = useParams();
@@ -55,6 +16,19 @@ export function MatchPage() {
     } = useMatchSocket(matchId);
     
     const navigate = useNavigate();
+
+    // ids de los jugadores de mi club, para saber cuál de las dos alineaciones es la mía
+    const [myPlayerIds, setMyPlayerIds] = useState(new Set());
+    useEffect(() => {
+        getPlayers()
+            .then((players) => setMyPlayerIds(new Set((players ?? []).map((p) => p.id))))
+            .catch(() => setMyPlayerIds(new Set())); // si falla, se muestra el local
+    }, []);
+
+    const mySide = lineups?.away?.some((p) => myPlayerIds.has(p.player_id)) ? "away" : "home";
+    const myLineup = lineups?.[mySide] ?? [];
+    const starters = myLineup.filter((p) => p.is_starter);
+    const substitutes = myLineup.filter((p) => !p.is_starter);
 
     return (
         // fixed para sobreescribir configuracion default de app
@@ -89,15 +63,11 @@ export function MatchPage() {
                     </div>
 
                     <div className="flex flex-col gap-4 w-64 shrink-0">
-                        <div className="bg-slate-900 border border-slate-700 p-4 h-40">
-                            { /*titulares*/ }
-                            <h3 className="text-sm text-slate-400 mb-2 uppercase font-bold">Equipo</h3>
-                        </div>
+                        { /*titulares*/ }
+                        <LineupPanel title="Equipo" players={starters} showBehavior />
 
-                        <div className="bg-slate-900 border border-slate-700 p-4 h-40">
-                            { /*suplentes*/ }
-                            <h3 className="text-sm text-slate-400 mb-2 uppercase font-bold">Suplentes</h3>
-                        </div>
+                        { /*suplentes*/ }
+                        <LineupPanel title="Suplentes" players={substitutes} />
                         { /*cambios*/ }
                         <button className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-4 border border-slate-600 transition-colors uppercase text-sm mt-auto">
                             Realizar Cambios
@@ -108,5 +78,3 @@ export function MatchPage() {
         </div>
     );
 }
-
-

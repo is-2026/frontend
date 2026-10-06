@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { createClub } from "../services/club";
 
 
-export default function ClubPage() {
+export function ClubPage() {
     const [clubName, setClubName] = useState("");
     const [avatar, setAvatar] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    
+    const [isRedirecting, setIsRedirecting] = useState(false);
+
     const navigate = useNavigate();
 
     // Si el nombre esta vacio o  si esta cargandose, el botón estará deshabilitado.
@@ -16,7 +17,7 @@ export default function ClubPage() {
 
    const handleSubmit = async (e) => {
     e.preventDefault(); 
-    setError("") // borra carteles de errores anteriores.
+    setError(""); // borra carteles de errores anteriores.
     
     if(avatar && !avatar.endsWith('.png')) {
         setError("La URL del avatar debe terminar en (.png)");
@@ -31,8 +32,14 @@ export default function ClubPage() {
             club_name: clubName,
             avatar_url: avatar,
         });
-        // Si la respuesta es 201 exitosa, redirigimos a la vista del club.
+        // Muestra el mensaje de éxito y redirección
+        setLoading(false);
+        setIsRedirecting(true);
+
+         // Espera 1.5 segundos para que el usuario lea el mensaje y luego navega
+        setTimeout(() => {
         navigate("/club");
+        }, 1500);
     } catch (err) {
         // Capturamos el error 409 si el club ya esta creado.
         if (err.status === 409){
@@ -45,11 +52,27 @@ export default function ClubPage() {
     }
    };
 
+   // pantalla de redirección a crear juagadores.
+   if (isRedirecting) {
+    return (
+        <div className="bg-slate-900 border border-slate-800 p-8 shadow-2xl w-full text-center flex flex-col items-center justify-center gap-4">
+            {/* Spinner animado */}
+            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <h2 className="text-2xl font-bold text-emerald-400">
+            ¡Club Creado con Éxito!
+            </h2>
+            <p className="text-slate-300 text-sm">
+            Redirigiendo a la vista de tu Club...
+            </p>
+        </div>
+        );
+    }
+
    return (
     <div className="bg-slate-900 border border-slate-800 p-8 shadow-2xl w-full">
         {/* Encabezado centrado, grande y con degradado */}
         <div className="text-center mb-8">
-         <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-indigo-500 tracking-tight">
+         <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
         Creación de Club
          </h2>
           <p className="text-slate-400 text-sm mt-2">

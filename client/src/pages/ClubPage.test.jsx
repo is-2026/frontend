@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import ClubPage from './ClubPage';
+import { ClubPage } from './ClubPage';
 import * as clubService from '../services/club';
 
 // Mock para react route (useNavigate)
@@ -74,7 +74,7 @@ describe('ClubPage Component', () => {
                 avatar_url : '',
             });
             expect(mockNavigate).toHaveBeenCalledWith('/club');
-        });
+        }, { timeout:2500 }); // timeout de espera para la redireccion
     });
 
     test('muestra mensaje de error si el backend devuelve conflicto 409 (club ya creado)', async () => {

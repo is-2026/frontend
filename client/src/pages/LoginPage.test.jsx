@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import LoginPage from './LoginPage';
+import { LoginPage } from './LoginPage';
 import { loginUser } from '../services/auth';
 
 // Mock del servicio de autenticación
@@ -32,7 +32,7 @@ describe('LoginPage Component', () => {
             </MemoryRouter>,
         );
 
-        const inputEmail = screen.getByLabelText(/correo electrónico/i);
+        const inputEmail = screen.getByLabelText(/email/i);
         const inputPassword = screen.getByLabelText(/contraseña/i);
         const submitBtn = screen.getByRole('button', { name: /iniciar sesión/i});
 
@@ -41,24 +41,24 @@ describe('LoginPage Component', () => {
         expect(submitBtn).toBeDisabled();
     });
 
-    test('habilita el botón si se ingreso correctamente el email y la pass tiene >= 8 caracteres', () => {
+    test('habilita el botón si se ingreso correctamente el email y la pass tiene >= 5 caracteres', () => {
         render(
         <MemoryRouter>
         <LoginPage />
         </MemoryRouter>
         );
 
-        const inputEmail = screen.getByLabelText(/correo electrónico/i);
+        const inputEmail = screen.getByLabelText(/email/i);
         const inputPassword = screen.getByLabelText(/contraseña/i);
         const submitBtn = screen.getByRole('button', { name: /iniciar sesión/i});
 
-        // Si la pass tiene 7 caracteres seguira deshabilitada.
+        // Si la pass tiene 4 caracteres seguira deshabilitada.
         fireEvent.change(inputEmail, { target: { value: 'usuario@ejemplo.com'}});
-        fireEvent.change(inputPassword, { target: { value: '1234567'}});
+        fireEvent.change(inputPassword, { target: { value: '1234'}});
         expect(submitBtn).toBeDisabled();
 
-        // Al llegar a los 8 carac. se habilita
-        fireEvent.change(inputPassword, { target: { value: '12345678'}});
+        // Al llegar a los 5 carac. se habilita
+        fireEvent.change(inputPassword, { target: { value: '12345'}});
         expect(submitBtn).not.toBeDisabled();
     });
 
@@ -70,7 +70,7 @@ describe('LoginPage Component', () => {
             </MemoryRouter>
         );
 
-        const inputEmail = screen.getByLabelText(/correo electrónico/i);
+        const inputEmail = screen.getByLabelText(/email/i);
         const inputPassword = screen.getByLabelText(/contraseña/i);
         const submitBtn = screen.getByRole('button', { name: /iniciar sesión/i});
 
@@ -98,7 +98,7 @@ describe('LoginPage Component', () => {
             </MemoryRouter>
         );
 
-        const inputEmail = screen.getByLabelText(/correo electrónico/i);
+        const inputEmail = screen.getByLabelText(/email/i);
         const inputPassword = screen.getByLabelText(/contraseña/i);
         const submitBtn = screen.getByRole('button', { name: /iniciar sesión/i});
 

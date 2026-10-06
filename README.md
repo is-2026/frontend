@@ -3,7 +3,7 @@
 Cliente web para el simulador de partidos Bot-ines. Desarrollado con React, Vite y Tailwind CSS v3.
 
 ## Prerrequisitos
-* Node.js (versión 18 o superior)
+* Node.js (versión 20 o superior)
 * Git
 
 ## Instalación y ejecución

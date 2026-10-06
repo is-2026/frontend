@@ -1,6 +1,6 @@
 import { describe, test, it, expect, vi, beforeEach } from "vitest";
 import { request } from "./api";
-import { createLeagues, getLeagues, getLeagueById, joinLeague } from "./leagues";
+import { createLeagues, getLeagues, getLeagueById, joinLeague , leaveLeague} from "./leagues";
 
 vi.mock("./api", () => ({
   request: vi.fn(),
@@ -160,6 +160,30 @@ describe("leagues service", () => {
       request.mockRejectedValueOnce(mockError);
       
       await expect(joinLeague("liga-123", {})).rejects.toThrow("El club ya esta inscripto en la liga");
+    });
+  });
+
+  describe("leaveLeague", () => {
+    it("debe enviar la petición a /leagues/:id/join con método DELETE exitosamente", async () => {
+      const leagueId = "liga-123";
+      const mockResponse = { message: "Inscripción eliminada" };
+      request.mockResolvedValueOnce(mockResponse);
+
+      const result = await leaveLeague(leagueId);
+
+      expect(request).toHaveBeenCalledWith(`/leagues/${leagueId}/join`, {
+        method: "DELETE",
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it("debe propagar los errores si la API falla", async () => {
+      const mockError = new Error("La liga indicada no existe, o el club no está inscripto en ella");
+      mockError.status = 404;
+
+      request.mockRejectedValueOnce(mockError);
+
+      await expect(leaveLeague("liga-123")).rejects.toThrow("La liga indicada no existe, o el club no está inscripto en ella");
     });
   });
 });

@@ -38,3 +38,9 @@ export function joinLeague(leagueId, data) {
         body: JSON.stringify(data),
     });
 }
+
+export function leaveLeague(leagueId) {
+    return request(`/leagues/${leagueId}/join`, {
+        method: "DELETE",
+    });
+}

@@ -1,8 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { MemoryRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { LeagueLobbyPage } from "./LeagueLobbyPage";
-import { getLeague, getLeagues } from "../services/leagues";
+import { getLeague, getLeagues, leaveLeague } from "../services/leagues";
 import { useLeagueLobbySocket } from "../hooks/useLeagueLobbySocket";
 
 // mock completo del servicio de leagues
@@ -12,6 +12,7 @@ vi.mock("../services/leagues", () => ({
     getLeagueById: vi.fn(),
     createLeagues: vi.fn(),
     joinLeague: vi.fn(),
+    leaveLeague: vi.fn(),
 }));
 
 // mock del hook de WebSockets
@@ -127,5 +128,28 @@ describe("LeagueLobbyPage", () => {
             expect.any(Function),
             expect.any(Function)
         );
+    });
+
+    test("muestra un mensaje de error si falla al intentar abandonar la liga", async () => {
+        getLeagues.mockResolvedValueOnce({
+            id: "123",
+            name: "Liga Test",
+            max_clubs: 10,
+            registered_clubs: [],
+        });
+        
+        leaveLeague.mockRejectedValueOnce(new Error("La liga indicada no existe, o el club no está inscripto en ella"));
+
+        renderWithRouter("123");
+
+        await waitFor(() => {
+            expect(screen.getByText("Liga Test")).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByText("Abandonar Liga"));
+
+        await waitFor(() => {
+            expect(screen.getByText("Ocurrió un error al intentar abandonar la liga.")).toBeInTheDocument();
+        });
     });
 });

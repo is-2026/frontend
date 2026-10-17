@@ -7,6 +7,15 @@ import { useState, useEffect, useRef } from "react";
   ("matchState", "goal", etc.).*/
 const NORMAL_CLOSE = 1000;
 
+function behaviorUpdate (players, player_id, behavior_id, behavior_name) { //en players llega el conjunto o lineup de jugadores de home o de away
+	return players.map((p)=>{
+		if (p.player_id == player_id)  //Si es el jugador buscado
+			return {...p, behavior_id, behavior_name }; //devuelve ese jugador y el behavior_id
+		else 
+			return p; //Si no es el jugador que busco, no hace nada
+	});
+}
+
 export function useMatchSocket(matchId) {
 	const [teams, setTeams] = useState(null); // { home: {id, name, avatar_url}, away: {...} }
 	const [lineups, setLineups] = useState(null); // home, away
@@ -15,6 +24,7 @@ export function useMatchSocket(matchId) {
 	const [goalInfo, setGoalInfo] = useState(null);
 	const [finished, setFinished] = useState(null);
 	const [closeCode, setCloseCode] = useState(null); 
+
 	const socketRef = useRef(null);
 	
 	useEffect(() => {
@@ -117,6 +127,18 @@ export function useMatchSocket(matchId) {
 				 	homeScore: home_score ?? 0,
 				 	awayScore: away_score ?? 0,
 				 	})
+				break;
+			}
+
+			//Caso cambio de comportamiento en vivo
+			case "behaviorChanged": {
+				const {player_id, behavior_id, behavior_name} = msg.data;
+				setLineups((prev) => {
+					return {
+						home: behaviorUpdate(prev.home, player_id, behavior_id, behavior_name),
+						away: behaviorUpdate(prev.away, player_id, behavior_id, behavior_name)
+					};
+				});
 				break;
 			}
 

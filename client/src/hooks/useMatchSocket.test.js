@@ -168,4 +168,47 @@ describe('useMatchSocket', () => {
         });
     });
 
+    test('7. Procesa el evento "behaviorChanged" y actualiza solo al jugador indicado', () => {
+        const { result } = renderHook(() => useMatchSocket('123'));
+
+        const messageCallback = mockWebSocketInstance.addEventListener.mock.calls.find(
+            (call) => call[0] === 'message'
+        )[1];
+
+        act(() => {
+            messageCallback({
+                data: JSON.stringify({
+                    type: 'matchStarted',
+                    data: {
+                        home_lineup: [
+                            { player_id: 'p1', behavior_id: 'b1', behavior_name: 'Atacante' },
+                            { player_id: 'p2', behavior_id: 'b1', behavior_name: 'Atacante' },
+                        ],
+                        away_lineup: [
+                            { player_id: 'p3', behavior_id: 'b1', behavior_name: 'Atacante' },
+                        ],
+                        home_score: 0,
+                        away_score: 0,
+                    },
+                }),
+            });
+        });
+
+        act(() => {
+            messageCallback({
+                data: JSON.stringify({
+                    type: 'behaviorChanged',
+                    data: { player_id: 'p1', behavior_id: 'b2', behavior_name: 'Defensor' },
+                }),
+            });
+        });
+
+        expect(result.current.lineups.home[0]).toEqual({
+            player_id: 'p1', behavior_id: 'b2', behavior_name: 'Defensor',
+        });
+        // los demás jugadores no cambian
+        expect(result.current.lineups.home[1].behavior_id).toBe('b1');
+        expect(result.current.lineups.away[0].behavior_id).toBe('b1');
+    });
+
 });

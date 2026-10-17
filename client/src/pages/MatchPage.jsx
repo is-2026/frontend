@@ -7,6 +7,8 @@ import { MatchFinishedBanner } from "../components/match/MatchFinishedBanner";
 import { LineupPanel } from "../components/match/LineupPanel";
 import { getPlayers } from "../services/club";
 import { useEffect, useState } from "react";
+import { changeLiveBehavior } from "../services/matches";
+import { getBehaviors } from "../services/behaviors";
 
 export function MatchPage() {
     const { matchId } = useParams();
@@ -14,7 +16,8 @@ export function MatchPage() {
         teams, lineups, scores, 
         state, goalInfo, finished 
     } = useMatchSocket(matchId);
-    
+    const [behaviors, setBehaviors] = useState([]);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     // ids de los jugadores de mi club, para saber cuál de las dos alineaciones es la mía
@@ -23,12 +26,33 @@ export function MatchPage() {
         getPlayers()
             .then((players) => setMyPlayerIds(new Set((players ?? []).map((p) => p.id))))
             .catch(() => setMyPlayerIds(new Set())); // si falla, se muestra el local
+        getBehaviors()
+            .then((b) => setBehaviors(b || []))
+            .catch(() => setBehaviors([]));
     }, []);
 
     const mySide = lineups?.away?.some((p) => myPlayerIds.has(p.player_id)) ? "away" : "home";
     const myLineup = lineups?.[mySide] ?? [];
     const starters = myLineup.filter((p) => p.is_starter);
     const substitutes = myLineup.filter((p) => !p.is_starter);
+
+    //Verifica si el partido pertenece a quien cambiará el comportamiento
+    const isOwnMatch = (
+        (lineups!= null) && 
+        [...lineups.home, ...lineups.away].some((p) =>
+            myPlayerIds.has(p.player_id))
+    );
+
+    const canChange = isOwnMatch && !finished;    
+
+    async function handleBehaviorChange(player_id, behavior_id) {
+        setError(null);
+        try {
+            await changeLiveBehavior(matchId, player_id, behavior_id); //Espera la respuesta del service matches
+        } catch (e) {
+            setError(e.message);
+        }
+    }
 
     return (
         // fixed para sobreescribir configuracion default de app
@@ -64,7 +88,17 @@ export function MatchPage() {
 
                     <div className="flex flex-col gap-4 w-64 shrink-0">
                         { /*titulares*/ }
-                        <LineupPanel title="Equipo" players={starters} showBehavior />
+                        <LineupPanel 
+                            title="Equipo" 
+                            players={starters} 
+                            showBehavior
+                            canChange={canChange}
+                            behaviors={behaviors}
+                            onChangeBehavior={handleBehaviorChange} 
+                        />
+
+                        { /*error al cambiar comportamiento en partido*/ }
+                        {error && <p className="text-red-400 text-sm">{error}</p>}
 
                         { /*suplentes*/ }
                         <LineupPanel title="Suplentes" players={substitutes} />

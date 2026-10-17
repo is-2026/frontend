@@ -315,6 +315,27 @@ describe('MatchPage', () => {
         expect(screen.queryByText('Atacante')).not.toBeInTheDocument();
     });
 
-    
+    test('9. Con el partido terminado no hay selector', async () => {
+        getPlayers.mockResolvedValue([{ id: 'h1' }]);
+        getBehaviors.mockResolvedValue(behaviorsMock);
+        mockMatch({ finished: { matchEnd: true, tick: 5400, homeScore: 0, awayScore: 0 } });
+        await renderMatch();
+        expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+        expect(screen.getByText('Atacante')).toBeInTheDocument();
+    });
+
+    test('10. Cambio rechazado por backend, se muestra mensaje de error y se mantiene el comportamiento anterior', async () => {
+    getPlayers.mockResolvedValue([{ id: 'h1' }]);
+    getBehaviors.mockResolvedValue(behaviorsMock);
+    changeLiveBehavior.mockRejectedValue(
+        Object.assign(new Error('El comportamiento seleccionado fue eliminado o es inválido'), { status: 400 })
+    );
+    mockMatch();
+    await renderMatch();
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'b2' } });
+    expect(await screen.findByText('El comportamiento seleccionado fue eliminado o es inválido')).toBeInTheDocument();
+    expect(changeLiveBehavior).toHaveBeenCalledWith('123', 'h1', 'b2');
+    expect(screen.getByRole('combobox')).toHaveDisplayValue('Atacante');
+    });
 
 });

@@ -1,16 +1,26 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { MemoryRouter, Routes, Route, useMatch } from 'react-router-dom';
 import { MatchPage } from './MatchPage';
 import { useMatchSocket } from '../hooks/useMatchSocket';
 import { getPlayers } from '../services/club';
+import { changeLiveBehavior } from "../services/matches";
+import { getBehaviors } from "../services/behaviors";
 
 vi.mock('../hooks/useMatchSocket', () => ({
-    useMatchSocket: vi.fn()
+    useMatchSocket: vi.fn() //vi.fn es función espía de esta función
 }));
 
 vi.mock('../services/club', () => ({
     getPlayers: vi.fn().mockResolvedValue([])
+}));
+
+vi.mock('../services/behaviors', () => ({
+    getBehaviors: vi.fn().mockResolvedValue([])
+}));
+
+vi.mock('../services/matches', () => ({
+    changeLiveBehavior: vi.fn()
 }));
 
 describe('MatchPage', () => {
@@ -21,16 +31,16 @@ describe('MatchPage', () => {
     test('1. El inicio del partido renderiza la interfaz completa, la cancha, jugadores y pelota', () => {
         useMatchSocket.mockReturnValue({
             lineups: {
-                home: [{ player_id: 'p1' }], 
-                away: [{ player_id: 'p3' }]  
+                home: [{ player_id: 'p1' }],
+                away: [{ player_id: 'p3' }]
             },
             scores: { home: 0, away: 0 },
             state: {
                 matchId: '123',
                 tick: 0,
                 players: [
-                    { playerId: 'p1', x: -10, y: -5 }, 
-                    { playerId: 'p3', x: 10, y: 5 }  
+                    { playerId: 'p1', x: -10, y: -5 },
+                    { playerId: 'p3', x: 10, y: 5 }
                 ],
                 ballPosition: { x: 0, y: 0 }
             },
@@ -65,11 +75,11 @@ describe('MatchPage', () => {
         expect(screen.getByTestId('ball')).toBeInTheDocument();
     });
 
-    test('2. Renderiza correctamente el banner de gol cuando goalInfo no es null', () => {
+    test('2. Renderiza correctamente el banner de gol cuando recibe data en goalInfo', () => {
         useMatchSocket.mockReturnValue({
             lineups: {
-                home: [{ player_id: 'p1' }], 
-                away: [{ player_id: 'p2' }]  
+                home: [{ player_id: 'p1' }],
+                away: [{ player_id: 'p2' }]
             },
             scores: { home: 1, away: 0 },
             state: {
@@ -102,8 +112,8 @@ describe('MatchPage', () => {
     test('3. Muestra el resultado final y banner al finalizar el partido (finished.matchEnd = true)', () => {
         useMatchSocket.mockReturnValue({
             lineups: {
-                home: [{ player_id: 'p1' }], 
-                away: [{ player_id: 'p2' }]  
+                home: [{ player_id: 'p1' }],
+                away: [{ player_id: 'p2' }]
             },
             scores: { home: 2, away: 1 },
             state: {
@@ -118,22 +128,22 @@ describe('MatchPage', () => {
                 homeScore: 2,
                 awayScore: 1
             }
+        });
+
+        render(
+            <MemoryRouter initialEntries={['/match/123']}>
+                <Routes>
+                    <Route path="/match/:matchId" element={<MatchPage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        // Verifica el título del banner
+        expect(screen.getByText(/PARTIDO FINALIZADO/i)).toBeInTheDocument();
+
+        // Busca el texto "2 - 1"
+        expect(screen.getByText('Equipo Local 2 - 1 Equipo Rival')).toBeInTheDocument();
     });
-
-    render(
-        <MemoryRouter initialEntries={['/match/123']}>
-            <Routes>
-                <Route path="/match/:matchId" element={<MatchPage />} />
-            </Routes>
-        </MemoryRouter>
-    );
-
-    // Verifica el título del banner
-    expect(screen.getByText(/PARTIDO FINALIZADO/i)).toBeInTheDocument();
-
-    // Busca el texto "2 - 1"
-    expect(screen.getByText('Equipo Local 2 - 1 Equipo Rival')).toBeInTheDocument();
-});
 
     test('4. Tolera coordenadas fuera de rango en la simulación sin romper el componente', () => {
         useMatchSocket.mockReturnValue({
@@ -218,7 +228,7 @@ describe('MatchPage', () => {
         expect(screen.getByText('1')).toBeInTheDocument();
     });
 
-    test('6. Los paneles muestran mi equipo (aunque sea el visitante) y cada ficha tiene su número', async () => {
+    test('6. Los paneles muestran mi equipo y cada ficha tiene su número', async () => {
         const lineup = (prefix, firstNumber) => [
             { player_id: `${prefix}1`, number: firstNumber, name: `${prefix}-tit-1`, is_starter: true, behavior_name: 'Atacante' },
             { player_id: `${prefix}2`, number: firstNumber + 1, name: `${prefix}-tit-2`, is_starter: true, behavior_name: 'Defensor' },
@@ -245,10 +255,66 @@ describe('MatchPage', () => {
 
         expect(await screen.findByText('a-tit-1')).toBeInTheDocument();
         expect(screen.getByText('a-tit-2')).toBeInTheDocument();
-        expect(screen.getByText('Atacante')).toBeInTheDocument();
+        expect(screen.getAllByRole('combobox')).toHaveLength(2); //como ahora es select, verifica que sea cuadro desplegable de longitud 2
         expect(screen.getByText('a-sup-1')).toBeInTheDocument();
         expect(screen.queryByText('h-tit-1')).not.toBeInTheDocument();
         // la ficha del jugador a1 muestra su número
         expect(screen.getByTestId('player-a1')).toHaveTextContent('7');
     });
+
+    // --- Cambio de comportamiento en vivo ---
+
+    const behaviorsMock = [
+        { id: 'b1', name: 'Atacante' },
+        { id: 'b2', name: 'Defensor' },
+    ];
+
+    //Testeo para interacción durante el match
+    //el finished = null es si es undefined, vale null, 
+    // y el = {} indica que la función se puede llamar sin pasar argumentos
+    function mockMatch({ finished = null } = {}) {
+        useMatchSocket.mockReturnValue({
+            teams: {home: {id:'h', name:'Local'}, away:{id:'a', name:'Visitante'}},
+            lineups: {
+                home: [ {player_id: 'h1', number:1, name: 'h-tit-1', is_starter:true, behavior_id: 'b1', behavior_name: 'Atacante'}],
+                away: [ {player_id: 'a1', number:4, name: 'a-tit-1', is_starter:true, behavior_id: 'b2', behavior_name: 'Defensor'}],
+            },
+            scores: { home:0, away:0},
+            state: {matchId:'123', tick:0, players: [], ballPosition: {x:0, y:0}},
+            goalInfo: null,
+            finished,
+        });
+    }
+
+    async function renderMatch() {
+        await act(async () => {
+            render(
+                <MemoryRouter initialEntries={['/match/123']}>
+                    <Routes>
+                        <Route path="/match/:matchId" element={<MatchPage />} />
+                    </Routes>
+                </MemoryRouter>
+            );
+        });
+    }
+
+    test('7. Aparece selector de comportamientos con comportamiento actual durante el partido', async () => {
+        getPlayers.mockResolvedValue([{id: 'h1'}]);
+        getBehaviors.mockResolvedValue([{id: 'b1', name: 'Atacante'}]);
+        mockMatch();
+        await renderMatch();
+        expect(await screen.findByRole('combobox')).toHaveDisplayValue('Atacante');
+    });
+
+    test('8. Un espectador no puede modificar comportamientos del partido', async () => {
+        getPlayers.mockResolvedValue([{id: 'otro-club'}]);
+        getBehaviors.mockResolvedValue(behaviorsMock);
+        mockMatch();
+        await renderMatch();
+        expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+        expect(screen.queryByText('Atacante')).not.toBeInTheDocument();
+    });
+
+    
+
 });

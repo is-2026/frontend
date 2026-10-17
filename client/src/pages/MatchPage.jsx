@@ -91,7 +91,7 @@ export function MatchPage() {
                         <LineupPanel 
                             title="Equipo" 
                             players={starters} 
-                            showBehavior
+                            showBehavior = {isOwnMatch}
                             canChange={canChange}
                             behaviors={behaviors}
                             onChangeBehavior={handleBehaviorChange} 

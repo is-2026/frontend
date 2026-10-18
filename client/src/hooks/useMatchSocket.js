@@ -13,6 +13,7 @@ export function useMatchSocket(matchId) {
 	const [scores, setScores] = useState(null); // home, away
 	const [state, setState] = useState(null); // match_id, tick, players, ball_position
 	const [goalInfo, setGoalInfo] = useState(null);
+	const [pause, setPause] = useState(null);
 	const [finished, setFinished] = useState(null);
 	const [closeCode, setCloseCode] = useState(null); 
 	const socketRef = useRef(null);
@@ -119,6 +120,28 @@ export function useMatchSocket(matchId) {
 				 	})
 				break;
 			}
+			/* coolingBreakStart, halftimeStart y matchResumed, y la pausa que llega en matchStarted */
+			case "coolingBreakStart": {
+				const {cooling_break_number, cooling_break_start} = msg.data;
+				setPause({
+					type: cooling_break_number == 1 ? "cooling_break_1" : "cooling_break_2", //identifica qué cooling break es
+					startedAt: cooling_break_start,
+				});
+				break;
+			}
+
+			case "halftimeStart": {
+				setPause({
+					type: "halftime",
+					startedAt: msg.data.halftime_start,
+				});
+				break;
+			}
+
+			case "matchResumed": {
+    			setPause(null);
+    			break;
+			}
 
 			//error
 			default:
@@ -133,5 +156,5 @@ export function useMatchSocket(matchId) {
 			}
 		};
 	}, [matchId]);
-	return { teams, lineups , scores , state, goalInfo, finished, closeCode };
+	return { teams, lineups , scores , state, goalInfo, finished, closeCode, pause };
 }

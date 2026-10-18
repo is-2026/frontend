@@ -46,17 +46,7 @@ export function leaveLeague(leagueId) {
 }
 
 export async function startLeague(leagueId) {
-    const response = await fetch(`${API_URL}/leagues/{leagueId}/start`, {
+    return await request(`/leagues/{leagueId}/start`, {
         method: "POST",
-        headers: getAuthHeaders(),
     });
-
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const error = new Error(errorData.message || "Error al iniciar la liga.");
-        error.status = response.status;
-        throw Error;
-    }
-
-    return await response.json().catch(() => ({}));
 }

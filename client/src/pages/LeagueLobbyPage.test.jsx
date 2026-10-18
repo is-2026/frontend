@@ -2,7 +2,7 @@ import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { LeagueLobbyPage } from "./LeagueLobbyPage";
-import { getLeague, getLeagues, leaveLeague } from "../services/leagues";
+import { getLeague, getLeagues, leaveLeague, startLeague } from "../services/leagues";
 import { useLeagueLobbySocket } from "../hooks/useLeagueLobbySocket";
 
 // mock completo del servicio de leagues
@@ -13,6 +13,7 @@ vi.mock("../services/leagues", () => ({
     createLeagues: vi.fn(),
     joinLeague: vi.fn(),
     leaveLeague: vi.fn(),
+    startLeague: vi.fn(),
 }));
 
 // mock del hook de WebSockets
@@ -150,6 +151,111 @@ describe("LeagueLobbyPage", () => {
 
         await waitFor(() => {
             expect(screen.getByText("Ocurrió un error al intentar abandonar la liga.")).toBeInTheDocument();
+        });
+    });
+
+    test("no muestra el botón de iniciar liga si el usuario no es el creador", async () => {
+        getLeagues.mockResolvedValueOnce({
+            id: "123",
+            name: "Liga Test",
+            max_clubs: 10,
+            is_creator: false,
+            registered_clubs: [
+                { club_id: "c1", club_name: "Club 1" },
+                { club_id: "c2", club_name: "Club 2" },
+                { club_id: "c3", club_name: "Club 3" },
+            ],
+        });
+
+        renderWithRouter("123");
+
+        await waitFor(() => {
+            expect(screen.getByText("Liga Test")).toBeInTheDocument();
+        });
+
+        expect(screen.queryByRole("button", { name: /iniciar liga/i })).not.toBeInTheDocument();
+    });
+
+    test("muestra el botón deshabilitado y advertencia si hay menos de 3 clubes inscriptos", async () => {
+        getLeagues.mockResolvedValueOnce({
+            id: "123",
+            name: "Liga Test",
+            max_clubs: 10,
+            is_creator: true,
+            registered_clubs: [
+                { club_id: "c1", club_name: "Club 1" },
+                { club_id: "c2", club_name: "Club 2" },
+            ],
+        });
+
+        renderWithRouter("123");
+
+        await waitFor(() => {
+            expect(screen.getByText("Liga Test")).toBeInTheDocument();
+        });
+
+        const startButton = screen.getByRole("button", { name: /iniciar liga/i });
+        expect(startButton).toBeDisabled();
+        expect(
+            screen.getByText("Se necesitan al menos 3 clubes inscriptos para poder iniciar la liga.")
+        ).toBeInTheDocument();
+    });
+
+    test("abre el modal de confirmación al hacer clic en 'Iniciar liga'", async () => {
+        getLeagues.mockResolvedValueOnce({
+            id: "123",
+            name: "Liga Test",
+            max_clubs: 10,
+            is_creator: true,
+            registered_clubs: [
+                { club_id: "c1", club_name: "Club 1" },
+                { club_id: "c2", club_name: "Club 2" },
+                { club_id: "c3", club_name: "Club 3" },
+            ],
+        });
+
+        renderWithRouter("123");
+
+        await waitFor(() => {
+            expect(screen.getByText("Liga Test")).toBeInTheDocument();
+        });
+
+        const startButton = screen.getByRole("button", { name: /iniciar liga/i });
+        fireEvent.click(startButton);
+
+        expect(screen.getByText("Confirmar inicio de liga")).toBeInTheDocument();
+        expect(
+            screen.getByText("¿Estás seguro de que deseas iniciar la liga? Una vez iniciada no podrán unirse más clubes.")
+        ).toBeInTheDocument();
+    });
+
+    test("inicia la liga correctamente al confirmar en el modal", async () => {
+        getLeagues.mockResolvedValueOnce({
+            id: "123",
+            name: "Liga Test",
+            max_clubs: 10,
+            is_creator: true,
+            registered_clubs: [
+                { club_id: "c1", club_name: "Club 1" },
+                { club_id: "c2", club_name: "Club 2" },
+                { club_id: "c3", club_name: "Club 3" },
+            ],
+        });
+
+        startLeague.mockResolvedValueOnce({ id: "123", status: "started", is_started: true });
+
+        renderWithRouter("123");
+
+        await waitFor(() => {
+            expect(screen.getByText("Liga Test")).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByRole("button", { name: /iniciar liga/i }));
+        fireEvent.click(screen.getByRole("button", { name: /confirmar e iniciar/i }));
+
+        await waitFor(() => {
+            expect(startLeague).toHaveBeenCalledWith("123");
+            expect(screen.queryByRole("button", { name: /iniciar liga/i })).not.toBeInTheDocument();
         });
     });
 });

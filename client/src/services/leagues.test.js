@@ -1,6 +1,6 @@
 import { describe, test, it, expect, vi, beforeEach } from "vitest";
 import { request } from "./api";
-import { createLeagues, getLeagues, getLeagueById, joinLeague , leaveLeague} from "./leagues";
+import { createLeagues, getLeagues, getLeagueById, joinLeague , leaveLeague, startLeague } from "./leagues";
 
 vi.mock("./api", () => ({
   request: vi.fn(),
@@ -12,7 +12,7 @@ describe("leagues service", () => {
   });
 
   describe("getLeagues", () => {
-    it("debe retornar la lista de ligas cuando la petición es exitosa", async () => {
+    test("debe retornar la lista de ligas cuando la petición es exitosa", async () => {
       const mockLeagues = [
         { 
           id: "1", 
@@ -41,7 +41,7 @@ describe("leagues service", () => {
       expect(result.length).toBe(2);
     });
 
-    it("debe lanzar un error cuando el backend responde con error", async () => {
+    test("debe lanzar un error cuando el backend responde con error", async () => {
       const errorMessage = "Error 400: Bad Request";
       request.mockRejectedValueOnce(new Error(errorMessage));
 
@@ -50,7 +50,7 @@ describe("leagues service", () => {
   });
   
   describe("createLeagues", () => {
-    it("ante una respuesta 201, debe enviar el payload a /leagues y retornar la liga creada", async () => {
+    test("ante una respuesta 201, debe enviar el payload a /leagues y retornar la liga creada", async () => {
       const mockData = {
         name: "Liga de Prueba",
         password: "123",
@@ -78,7 +78,7 @@ describe("leagues service", () => {
       expect(result).toEqual(mockResponse);
     });
 
-    it("ante una respuesta 400, debe lanzar un error con el status correspondiente", async () => {
+    test("ante una respuesta 400, debe lanzar un error con el status correspondiente", async () => {
       const mockError = new Error("Datos inválidos");
       mockError.status = 400;
       
@@ -164,7 +164,7 @@ describe("leagues service", () => {
   });
 
   describe("leaveLeague", () => {
-    it("debe enviar la petición a /leagues/:id/join con método DELETE exitosamente", async () => {
+    test("debe enviar la petición a /leagues/:id/join con método DELETE exitosamente", async () => {
       const leagueId = "liga-123";
       const mockResponse = { message: "Inscripción eliminada" };
       request.mockResolvedValueOnce(mockResponse);
@@ -177,13 +177,34 @@ describe("leagues service", () => {
       expect(result).toEqual(mockResponse);
     });
 
-    it("debe propagar los errores si la API falla", async () => {
+    test("debe propagar los errores si la API falla", async () => {
       const mockError = new Error("La liga indicada no existe, o el club no está inscripto en ella");
       mockError.status = 404;
 
       request.mockRejectedValueOnce(mockError);
 
       await expect(leaveLeague("liga-123")).rejects.toThrow("La liga indicada no existe, o el club no está inscripto en ella");
+    });
+  });
+
+  describe("startLeague", () => {
+    test("debe enviar la peticion POST correctamente a /leagues/:id/start", async () => {
+      const leagueId = "liga-123";
+      const mockResponse = { id: "liga-123", status: "started", is_started: true };
+      request.mockResolvedValueOnce(mockResponse);
+
+      const result = await startLeague(leagueId);
+      
+      expect(result).toEqual(mockResponse);
+    });
+
+    test("debe propagar los errores si la API falla", async () => {
+      const mockError = new Error("Se necesitan al menos 3 clubes para iniciar la liga");
+      mockError.status = 400;
+
+      request.mockRejectedValueOnce(mockError);
+
+      await expect(startLeague("Liga-123")).rejects.toThrow("Se necesitan al menos 3 clubes para iniciar la liga");
     });
   });
 });

@@ -339,12 +339,17 @@ describe('MatchPage', () => {
         expect(screen.getByRole('combobox')).toHaveDisplayValue('Atacante');
     });
 
-    test('11. Se ve cartel de pausa en una pausa', async () => {
-        mockMatch({ pause: { type: 'halftime', startedAt: 'x' } });
+    test.each([
+    ['cooling_break_1', 'Primera pausa de hidratación'],
+    ['halftime', 'Entretiempo'],
+    ['cooling_break_2', 'Segunda pausa de hidratación'],
+    ])('11. Se ve cartel de pausa en una pausa, y se muestra el nombre de %s', async (type, name) => {
+        mockMatch({ pause: { type, startedAt: 'x' } });
         await renderMatch();
         
-        expect(screen.getByText('Entretiempo')).toBeInTheDocument();
+        expect(screen.getByText(name)).toBeInTheDocument();
         expect(screen.getByTestId('countdown')).toHaveTextContent('15');
+        
     });
 
     test('12. Sin pausa no se muestra el cartel', async () => {

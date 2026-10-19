@@ -23,11 +23,11 @@ describe('useMatchSocket', () => {
             close: vi.fn(),
             readyState: 1,
         };
-        
-        global.WebSocket = vi.fn(function() {
+
+        global.WebSocket = vi.fn(function () {
             return mockWebSocketInstance;
         });
-        
+
         global.WebSocket.OPEN = 1;
         global.WebSocket.CONNECTING = 0;
     });
@@ -39,7 +39,7 @@ describe('useMatchSocket', () => {
 
     test('1. Retorna nulos y no abre conexión si matchId no existe', () => {
         const { result } = renderHook(() => useMatchSocket(null));
-        
+
         expect(global.WebSocket).not.toHaveBeenCalled();
         expect(result.current.lineups).toBeNull();
         expect(result.current.scores).toBeNull();
@@ -48,14 +48,14 @@ describe('useMatchSocket', () => {
 
     test('2. Instancia el WebSocket con la URL correcta', () => {
         renderHook(() => useMatchSocket('123'));
-        
+
         expect(global.WebSocket).toHaveBeenCalledWith('ws://localhost:8000/ws/matches/123?token=test-token-123');
         expect(mockWebSocketInstance.addEventListener).toHaveBeenCalledWith('message', expect.any(Function));
     });
 
     test('3. Procesa el evento "matchStarted" y actualiza alineaciones y puntajes', () => {
         const { result } = renderHook(() => useMatchSocket('123'));
-        
+
         const messageCallback = mockWebSocketInstance.addEventListener.mock.calls.find(
             (call) => call[0] === 'message'
         )[1];
@@ -83,7 +83,7 @@ describe('useMatchSocket', () => {
 
     test('4. Procesa el evento "matchState" y actualiza posiciones en cada tick', () => {
         const { result } = renderHook(() => useMatchSocket('123'));
-        
+
         const messageCallback = mockWebSocketInstance.addEventListener.mock.calls.find(
             (call) => call[0] === 'message'
         )[1];
@@ -95,7 +95,7 @@ describe('useMatchSocket', () => {
                     data: {
                         match_id: '123',
                         tick: 4,
-                        players: [{ player_id: 'p1', position: { x: 4, y: 4 }}],
+                        players: [{ player_id: 'p1', position: { x: 4, y: 4 } }],
                         ball_position: { x: 20, y: 10 }
                     }
                 })
@@ -110,9 +110,9 @@ describe('useMatchSocket', () => {
 
     test('5. Cierra el WebSocket correctamente al desmontar el componente', () => {
         const { unmount } = renderHook(() => useMatchSocket('123'));
-        
+
         unmount();
-        
+
         expect(mockWebSocketInstance.close).toHaveBeenCalledTimes(1);
     });
 
@@ -157,7 +157,7 @@ describe('useMatchSocket', () => {
                 }),
             });
         });
-        
+
         expect(result.current.scores).toEqual({ home: 1, away: 0 });
         expect(result.current.goalInfo).toEqual({
             tick: 120,
@@ -166,6 +166,49 @@ describe('useMatchSocket', () => {
             team: "home",
             teamName: 'River',
         });
+    });
+
+    test('7. Procesa el evento "behaviorChanged" y actualiza solo al jugador indicado', () => {
+        const { result } = renderHook(() => useMatchSocket('123'));
+
+        const messageCallback = mockWebSocketInstance.addEventListener.mock.calls.find(
+            (call) => call[0] === 'message'
+        )[1];
+
+        act(() => {
+            messageCallback({
+                data: JSON.stringify({
+                    type: 'matchStarted',
+                    data: {
+                        home_lineup: [
+                            { player_id: 'p1', behavior_id: 'b1', behavior_name: 'Atacante' },
+                            { player_id: 'p2', behavior_id: 'b1', behavior_name: 'Atacante' },
+                        ],
+                        away_lineup: [
+                            { player_id: 'p3', behavior_id: 'b1', behavior_name: 'Atacante' },
+                        ],
+                        home_score: 0,
+                        away_score: 0,
+                    },
+                }),
+            });
+        });
+
+        act(() => {
+            messageCallback({
+                data: JSON.stringify({
+                    type: 'behaviorChanged',
+                    data: { player_id: 'p1', behavior_id: 'b2', behavior_name: 'Defensor' },
+                }),
+            });
+        });
+
+        expect(result.current.lineups.home[0]).toEqual({
+            player_id: 'p1', behavior_id: 'b2', behavior_name: 'Defensor',
+        });
+        // los demás jugadores no cambian
+        expect(result.current.lineups.home[1].behavior_id).toBe('b1');
+        expect(result.current.lineups.away[0].behavior_id).toBe('b1');
     });
 
 });

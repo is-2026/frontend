@@ -9,7 +9,7 @@ export function BehaviorCard({ behavior }) {
       <h2 className="text-xl font-bold text-indigo-400 mb-3 truncate" title={behavior.name}>
         {behavior.name}
       </h2>
-      
+
       {/* Contenedor flexible, restringe altura y permite scroll */}
       <div className="bg-slate-950 p-3 rounded-md border border-slate-700/50 flex-grow overflow-y-auto max-h-48 scrollbar-thin scrollbar-thumb-slate-700">
         <code className="text-sm text-green-400 font-mono whitespace-pre-wrap break-words">

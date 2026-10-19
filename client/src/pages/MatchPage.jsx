@@ -7,14 +7,17 @@ import { MatchFinishedBanner } from "../components/match/MatchFinishedBanner";
 import { LineupPanel } from "../components/match/LineupPanel";
 import { getPlayers } from "../services/club";
 import { useEffect, useState } from "react";
+import { changeLiveBehavior } from "../services/matches";
+import { getBehaviors } from "../services/behaviors";
 
 export function MatchPage() {
     const { matchId } = useParams();
-    const { 
-        teams, lineups, scores, 
-        state, goalInfo, finished 
+    const {
+        teams, lineups, scores,
+        state, goalInfo, finished
     } = useMatchSocket(matchId);
-    
+    const [behaviors, setBehaviors] = useState([]);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     // ids de los jugadores de mi club, para saber cuál de las dos alineaciones es la mía
@@ -23,6 +26,9 @@ export function MatchPage() {
         getPlayers()
             .then((players) => setMyPlayerIds(new Set((players ?? []).map((p) => p.id))))
             .catch(() => setMyPlayerIds(new Set())); // si falla, se muestra el local
+        getBehaviors()
+            .then((b) => setBehaviors(b || []))
+            .catch(() => setBehaviors([]));
     }, []);
 
     const mySide = lineups?.away?.some((p) => myPlayerIds.has(p.player_id)) ? "away" : "home";
@@ -30,10 +36,28 @@ export function MatchPage() {
     const starters = myLineup.filter((p) => p.is_starter);
     const substitutes = myLineup.filter((p) => !p.is_starter);
 
+    //Verifica si el partido pertenece a quien cambiará el comportamiento
+    const isOwnMatch = (
+        (lineups != null) &&
+        [...lineups.home, ...lineups.away].some((p) =>
+            myPlayerIds.has(p.player_id))
+    );
+
+    const canChange = isOwnMatch && !finished;
+
+    async function handleBehaviorChange(player_id, behavior_id) {
+        setError(null);
+        try {
+            await changeLiveBehavior(matchId, player_id, behavior_id); //Espera la respuesta del service matches
+        } catch (e) {
+            setError(e.message);
+        }
+    }
+
     return (
         // fixed para sobreescribir configuracion default de app
         <div className="fixed inset-0 bg-slate-950 p-8 text-white overflow-auto z-50">
-            
+
             {/* Contenedor de cancha.*/}
             <div className="w-[1272px] mx-auto pb-8">
 
@@ -63,12 +87,22 @@ export function MatchPage() {
                     </div>
 
                     <div className="flex flex-col gap-4 w-64 shrink-0">
-                        { /*titulares*/ }
-                        <LineupPanel title="Equipo" players={starters} showBehavior />
+                        { /*titulares*/}
+                        <LineupPanel
+                            title="Equipo"
+                            players={starters}
+                            showBehavior={isOwnMatch}
+                            canChange={canChange}
+                            behaviors={behaviors}
+                            onChangeBehavior={handleBehaviorChange}
+                        />
 
-                        { /*suplentes*/ }
+                        { /*error al cambiar comportamiento en partido*/}
+                        {error && <p className="text-red-400 text-sm">{error}</p>}
+
+                        { /*suplentes*/}
                         <LineupPanel title="Suplentes" players={substitutes} />
-                        { /*cambios*/ }
+                        { /*cambios*/}
                         <button className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-4 border border-slate-600 transition-colors uppercase text-sm mt-auto">
                             Realizar Cambios
                         </button>

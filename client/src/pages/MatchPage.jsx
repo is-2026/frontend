@@ -12,9 +12,9 @@ import { getBehaviors } from "../services/behaviors";
 
 export function MatchPage() {
     const { matchId } = useParams();
-    const { 
-        teams, lineups, scores, 
-        state, goalInfo, finished 
+    const {
+        teams, lineups, scores,
+        state, goalInfo, finished
     } = useMatchSocket(matchId);
     const [behaviors, setBehaviors] = useState([]);
     const [error, setError] = useState(null);
@@ -38,12 +38,12 @@ export function MatchPage() {
 
     //Verifica si el partido pertenece a quien cambiará el comportamiento
     const isOwnMatch = (
-        (lineups!= null) && 
+        (lineups != null) &&
         [...lineups.home, ...lineups.away].some((p) =>
             myPlayerIds.has(p.player_id))
     );
 
-    const canChange = isOwnMatch && !finished;    
+    const canChange = isOwnMatch && !finished;
 
     async function handleBehaviorChange(player_id, behavior_id) {
         setError(null);
@@ -57,7 +57,7 @@ export function MatchPage() {
     return (
         // fixed para sobreescribir configuracion default de app
         <div className="fixed inset-0 bg-slate-950 p-8 text-white overflow-auto z-50">
-            
+
             {/* Contenedor de cancha.*/}
             <div className="w-[1272px] mx-auto pb-8">
 
@@ -87,22 +87,22 @@ export function MatchPage() {
                     </div>
 
                     <div className="flex flex-col gap-4 w-64 shrink-0">
-                        { /*titulares*/ }
-                        <LineupPanel 
-                            title="Equipo" 
-                            players={starters} 
-                            showBehavior = {isOwnMatch}
+                        { /*titulares*/}
+                        <LineupPanel
+                            title="Equipo"
+                            players={starters}
+                            showBehavior={isOwnMatch}
                             canChange={canChange}
                             behaviors={behaviors}
-                            onChangeBehavior={handleBehaviorChange} 
+                            onChangeBehavior={handleBehaviorChange}
                         />
 
-                        { /*error al cambiar comportamiento en partido*/ }
+                        { /*error al cambiar comportamiento en partido*/}
                         {error && <p className="text-red-400 text-sm">{error}</p>}
 
-                        { /*suplentes*/ }
+                        { /*suplentes*/}
                         <LineupPanel title="Suplentes" players={substitutes} />
-                        { /*cambios*/ }
+                        { /*cambios*/}
                         <button className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-4 border border-slate-600 transition-colors uppercase text-sm mt-auto">
                             Realizar Cambios
                         </button>

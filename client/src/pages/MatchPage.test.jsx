@@ -274,13 +274,13 @@ describe('MatchPage', () => {
     // y el = {} indica que la función se puede llamar sin pasar argumentos
     function mockMatch({ finished = null } = {}) {
         useMatchSocket.mockReturnValue({
-            teams: {home: {id:'h', name:'Local'}, away:{id:'a', name:'Visitante'}},
+            teams: { home: { id: 'h', name: 'Local' }, away: { id: 'a', name: 'Visitante' } },
             lineups: {
-                home: [ {player_id: 'h1', number:1, name: 'h-tit-1', is_starter:true, behavior_id: 'b1', behavior_name: 'Atacante'}],
-                away: [ {player_id: 'a1', number:4, name: 'a-tit-1', is_starter:true, behavior_id: 'b2', behavior_name: 'Defensor'}],
+                home: [{ player_id: 'h1', number: 1, name: 'h-tit-1', is_starter: true, behavior_id: 'b1', behavior_name: 'Atacante' }],
+                away: [{ player_id: 'a1', number: 4, name: 'a-tit-1', is_starter: true, behavior_id: 'b2', behavior_name: 'Defensor' }],
             },
-            scores: { home:0, away:0},
-            state: {matchId:'123', tick:0, players: [], ballPosition: {x:0, y:0}},
+            scores: { home: 0, away: 0 },
+            state: { matchId: '123', tick: 0, players: [], ballPosition: { x: 0, y: 0 } },
             goalInfo: null,
             finished,
         });
@@ -299,15 +299,15 @@ describe('MatchPage', () => {
     }
 
     test('7. Aparece selector de comportamientos con comportamiento actual durante el partido', async () => {
-        getPlayers.mockResolvedValue([{id: 'h1'}]);
-        getBehaviors.mockResolvedValue([{id: 'b1', name: 'Atacante'}]);
+        getPlayers.mockResolvedValue([{ id: 'h1' }]);
+        getBehaviors.mockResolvedValue([{ id: 'b1', name: 'Atacante' }]);
         mockMatch();
         await renderMatch();
         expect(await screen.findByRole('combobox')).toHaveDisplayValue('Atacante');
     });
 
     test('8. Un espectador no puede modificar comportamientos del partido', async () => {
-        getPlayers.mockResolvedValue([{id: 'otro-club'}]);
+        getPlayers.mockResolvedValue([{ id: 'otro-club' }]);
         getBehaviors.mockResolvedValue(behaviorsMock);
         mockMatch();
         await renderMatch();
@@ -325,17 +325,17 @@ describe('MatchPage', () => {
     });
 
     test('10. Cambio rechazado por backend, se muestra mensaje de error y se mantiene el comportamiento anterior', async () => {
-    getPlayers.mockResolvedValue([{ id: 'h1' }]);
-    getBehaviors.mockResolvedValue(behaviorsMock);
-    changeLiveBehavior.mockRejectedValue(
-        Object.assign(new Error('El comportamiento seleccionado fue eliminado o es inválido'), { status: 400 })
-    );
-    mockMatch();
-    await renderMatch();
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'b2' } });
-    expect(await screen.findByText('El comportamiento seleccionado fue eliminado o es inválido')).toBeInTheDocument();
-    expect(changeLiveBehavior).toHaveBeenCalledWith('123', 'h1', 'b2');
-    expect(screen.getByRole('combobox')).toHaveDisplayValue('Atacante');
+        getPlayers.mockResolvedValue([{ id: 'h1' }]);
+        getBehaviors.mockResolvedValue(behaviorsMock);
+        changeLiveBehavior.mockRejectedValue(
+            Object.assign(new Error('El comportamiento seleccionado fue eliminado o es inválido'), { status: 400 })
+        );
+        mockMatch();
+        await renderMatch();
+        fireEvent.change(screen.getByRole('combobox'), { target: { value: 'b2' } });
+        expect(await screen.findByText('El comportamiento seleccionado fue eliminado o es inválido')).toBeInTheDocument();
+        expect(changeLiveBehavior).toHaveBeenCalledWith('123', 'h1', 'b2');
+        expect(screen.getByRole('combobox')).toHaveDisplayValue('Atacante');
     });
 
 });

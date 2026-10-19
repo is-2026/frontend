@@ -272,7 +272,7 @@ describe('MatchPage', () => {
     //Testeo para interacción durante el match
     //el finished = null es si es undefined, vale null, 
     // y el = {} indica que la función se puede llamar sin pasar argumentos
-    function mockMatch({ finished = null } = {}) {
+    function mockMatch({ finished = null, pause = null } = {}) {
         useMatchSocket.mockReturnValue({
             teams: { home: { id: 'h', name: 'Local' }, away: { id: 'a', name: 'Visitante' } },
             lineups: {
@@ -283,6 +283,7 @@ describe('MatchPage', () => {
             state: { matchId: '123', tick: 0, players: [], ballPosition: { x: 0, y: 0 } },
             goalInfo: null,
             finished,
+            pause,
         });
     }
 
@@ -338,4 +339,18 @@ describe('MatchPage', () => {
         expect(screen.getByRole('combobox')).toHaveDisplayValue('Atacante');
     });
 
+    test('11. Se ve cartel de pausa en una pausa', async () => {
+        mockMatch({ pause: { type: 'halftime', startedAt: 'x' } });
+        await renderMatch();
+        
+        expect(screen.getByText('Entretiempo')).toBeInTheDocument();
+        expect(screen.getByTestId('countdown')).toHaveTextContent('15');
+    });
+
+    test('12. Sin pausa no se muestra el cartel', async () => {
+        mockMatch();
+        await renderMatch();
+
+        expect(screen.queryByTestId('countdown')).not.toBeInTheDocument();
+    });
 });

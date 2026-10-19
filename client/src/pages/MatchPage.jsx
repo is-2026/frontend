@@ -7,12 +7,14 @@ import { MatchFinishedBanner } from "../components/match/MatchFinishedBanner";
 import { LineupPanel } from "../components/match/LineupPanel";
 import { getPlayers } from "../services/club";
 import { useEffect, useState } from "react";
+import { PauseBanner } from "../components/match/PauseBanner";
 
 export function MatchPage() {
     const { matchId } = useParams();
     const { 
         teams, lineups, scores, 
-        state, goalInfo, finished 
+        state, goalInfo, finished,
+        pause
     } = useMatchSocket(matchId);
     
     const navigate = useNavigate();
@@ -53,13 +55,16 @@ export function MatchPage() {
                         {/*evento de gol */}
                         <GoalBanner goalInfo={goalInfo} />
 
+                        {/* banner de pausa */}
+                        <PauseBanner pause={pause}/>
+
                         {/* banner de fin de partido */}
                         <MatchFinishedBanner
                             finished={finished}
                             teams={teams}
                             onExit={() => navigate("/friendlies")}
                         />
-
+                        
                     </div>
 
                     <div className="flex flex-col gap-4 w-64 shrink-0">

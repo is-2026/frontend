@@ -79,7 +79,7 @@ export function JoinLeaguePage() {
             };
 
             await joinLeague(leagueId, body);
-            navigate(`/leagues/${leagueId}`);
+            navigate(`/leagues/${leagueId}/lobby`);
         } catch (e) {
             if (e.status === 400) setError(e.message || "Datos de inscripción inválidos.");
             else if (e.status === 409) setError("Tu club ya está inscripto en esta liga.");

@@ -44,3 +44,9 @@ export function leaveLeague(leagueId) {
         method: "DELETE",
     });
 }
+
+export async function startLeague(leagueId) {
+    return await request(`/leagues/{leagueId}/start`, {
+        method: "POST",
+    });
+}

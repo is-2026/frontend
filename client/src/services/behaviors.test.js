@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from 'vitest';
-import { getBehaviors, getBehaviorById } from './behaviors';
+import { getBehaviors, getBehaviorById, createBehavior, updateBehavior } from './behaviors';
 import * as api from './api';
 
 describe('Behaviors service', () => {
@@ -31,3 +31,33 @@ test('getBehaviorById hace un GET al endpoint del id', async () => {
         });
         expect(result).toEqual(mockData);
     });
+
+test('createBehavior hace un POST a /club/behaviors con los datos enviados', async () => {
+        const payload = { name: 'Nuevo', code: 'test()' };
+        const mockResponse = { id: '2', ...payload };
+        
+        vi.spyOn(api, 'request').mockResolvedValueOnce(mockResponse);
+
+        const result = await createBehavior(payload);
+
+        expect(api.request).toHaveBeenCalledWith('/club/behaviors', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        expect(result).toEqual(mockResponse);
+    });
+
+test('updateBehavior hace un PUT a /club/behaviors/:id con los datos actualizados', async () => {
+    const payload = { name: 'Editado', code: 'test2()' };
+    const mockResponse = { id: '1', ...payload };
+    
+    vi.spyOn(api, 'request').mockResolvedValueOnce(mockResponse);
+
+    const result = await updateBehavior('1', payload);
+
+    expect(api.request).toHaveBeenCalledWith('/club/behaviors/1', {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+    });
+    expect(result).toEqual(mockResponse);
+});

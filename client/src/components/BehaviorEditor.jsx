@@ -7,7 +7,7 @@ import EditorModule from 'react-simple-code-editor'
 import { createBehavior, updateBehavior } from '../services/behaviors'
 import {useNavigate} from 'react-router-dom'
 
-const Editor = EditorModule.default
+const Editor = EditorModule.default || EditorModule;
 
 // Detectar llamadas a funciones (ej: attack() o mover() sin def en prism)
 Prism.languages.insertBefore('python', 'keyword', {

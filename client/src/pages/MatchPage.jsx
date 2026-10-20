@@ -18,7 +18,7 @@ export function MatchPage() {
         state, goalInfo, finished,
         pause
     } = useMatchSocket(matchId);
-    console.log("pause:", pause);
+
     const [behaviors, setBehaviors] = useState([]);
     const [error, setError] = useState(null);
     const navigate = useNavigate();

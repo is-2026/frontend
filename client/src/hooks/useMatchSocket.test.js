@@ -1,6 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useMatchSocket } from './useMatchSocket';
+import { useMatch } from 'react-router-dom';
 
 vi.mock('../config', () => {
     const WS_URL = 'ws://localhost:8000';
@@ -11,6 +12,9 @@ vi.mock('../config', () => {
         wsUrl: (path) => `${WS_URL}${path}?token=${encodeURIComponent(localStorage.getItem('token') ?? '')}`,
     };
 });
+
+
+
 describe('useMatchSocket', () => {
     let mockWebSocketInstance;
 
@@ -36,6 +40,20 @@ describe('useMatchSocket', () => {
         localStorage.clear();
         vi.clearAllMocks();
     });
+
+    function setupHook() {
+        const { result } = renderHook(() => useMatchSocket('123'));
+        const messageCallback = mockWebSocketInstance.addEventListener.mock.calls.find(
+            (call) => call[0] == 'message' 
+        )[1]; //Esto extrae el segundo elemento, que sería lo que devuelve el eventListener de 'message'
+              //Es decir, los case de los distintos mensages
+        function send(type, data) { //simula mensage emitido por sv del ws hacia el cliente
+            act(() => {
+                messageCallback({ data: JSON.stringify({ type, data }) });
+            });
+        }
+        return {result, send};
+    }
 
     test('1. Retorna nulos y no abre conexión si matchId no existe', () => {
         const { result } = renderHook(() => useMatchSocket(null));
@@ -210,5 +228,46 @@ describe('useMatchSocket', () => {
         expect(result.current.lineups.home[1].behavior_id).toBe('b1');
         expect(result.current.lineups.away[0].behavior_id).toBe('b1');
     });
+
+    test.each([
+        [
+            'coolingBreakStart', 
+            { cooling_break_number: 1, cooling_break_start: 't' }, 
+            { type: 'cooling_break_1', startedAt: 't' }
+        ],
+
+        [
+            'coolingBreakStart', 
+            { cooling_break_number: 2, cooling_break_start: 't' }, 
+            { type: 'cooling_break_2', startedAt: 't' }
+        ],
+        [
+            'halftimeStart', 
+            { halftime_start: 't' }, 
+            { type: 'halftime', startedAt: 't' }
+        ],
+    ])('8. "%s" activa la pausa correspondiente', (type, data, expected) => { 
+        //type es el string, data es el tipo e inicio de pausa,
+        //expected son los datos que devuelve el ws de esa pausa.
+        const { result, send } = setupHook();
+        expect(result.current.pause).toBeNull();
+
+        send(type, data);
+
+        expect(result.current.pause).toEqual(expected); //acá debería estar la respuesta del ws con los datos de pause,
+                                                        //que sería el 3er elemento de cada arreglo
+    });
+
+    test('9. "matchResumed" termina la pausa', () => {
+        const { result, send } = setupHook();
+
+        send('halftimeStart', { halftime_start: 't' });
+        expect(result.current.pause).not.toBeNull();
+
+        send('matchResumed', {});
+        expect(result.current.pause).toBeNull();
+    });
+
+
 
 });

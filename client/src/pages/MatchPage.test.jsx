@@ -340,9 +340,9 @@ describe('MatchPage', () => {
     });
 
     test.each([
-    ['cooling_break_1', 'Primera pausa de hidratación'],
-    ['halftime', 'Entretiempo'],
-    ['cooling_break_2', 'Segunda pausa de hidratación'],
+        ['cooling_break_1', 'Primera pausa de hidratación'],
+        ['halftime', 'Entretiempo'],
+        ['cooling_break_2', 'Segunda pausa de hidratación'],
     ])('11. Se ve cartel de pausa en una pausa, y se muestra el nombre de %s', async (type, name) => {
         mockMatch({ pause: { type, startedAt: 'x' } });
         await renderMatch();

@@ -98,20 +98,20 @@ export function useMatchSocket(matchId) {
 					const { player_id, minute, tick,
 						team_id, home_score, away_score } = msg.data;
 
-			  	setScores({
-					home: home_score,
-					away: away_score, 
-			  	});
-				
-				const team = team_id === started?.home_club?.id ? "home" : "away";
-			  	setGoalInfo({
-					tick: tick,
-					minute: minute,
-					playerId: player_id,
-					team: team,
-					teamName: started?.[`${team}_club`]?.name,
-			  	});
-			  	break;
+					setScores({
+						home: home_score,
+						away: away_score, 
+					});
+					
+					const team = team_id === started?.home_club?.id ? "home" : "away";
+					setGoalInfo({
+						tick: tick,
+						minute: minute,
+						playerId: player_id,
+						team: team,
+						teamName: started?.[`${team}_club`]?.name,
+					});
+					break;
 				
 				}
 			

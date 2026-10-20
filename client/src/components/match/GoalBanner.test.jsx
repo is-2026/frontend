@@ -27,7 +27,10 @@ describe("GoalBanner", () => {
 
         render(<GoalBanner goalInfo={goalInfo} />);
 
-        expect(screen.getByText("¡GOL!")).toBeInTheDocument();
+        expect(
+            screen.getByText("¡GOL!")
+        ).toBeInTheDocument();
+        
         expect(
             screen.getByText("Equipo Local - minuto 1'"),
         ).toBeInTheDocument();

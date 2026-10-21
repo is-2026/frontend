@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams , useNavigate } from "react-router-dom";
 import { getLeagues, leaveLeague, startLeague } from "../services/leagues";
 import { useLeagueLobbySocket } from "../hooks/useLeagueLobbySocket";
+import { LeagueInProgress } from "../components/LeagueInProgress";
 
 export function LeagueLobbyPage() {
     const { leagueId } = useParams();
@@ -54,6 +55,10 @@ export function LeagueLobbyPage() {
             {error}
         </div>
         );
+    }
+
+    if (league?.status && league.status !== "not_started") {
+        return <LeagueInProgress league={league} />;
     }
 
     const registeredClubs = league?.registered_clubs || [];

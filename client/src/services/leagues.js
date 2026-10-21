@@ -46,7 +46,21 @@ export function leaveLeague(leagueId) {
 }
 
 export async function startLeague(leagueId) {
-    return await request(`/leagues/{leagueId}/start`, {
+    return await request(`/leagues/${leagueId}/start`, {
         method: "POST",
+    });
+}
+
+// funcion que devuelve partidos de la liga
+export function getLeagueMatches(leagueId) {
+    return request(`/leagues/${leagueId}/matches`, { 
+        method: "GET",
+    });
+}
+
+// funcion que devuelve las posiciones de la liga, un array de la tabla
+export function getStandings(leagueId) {
+    return request(`/leagues/${leagueId}/standings`, {
+        method: "GET",
     });
 }

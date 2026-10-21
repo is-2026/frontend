@@ -49,8 +49,9 @@ export const useLeagueLobbySocket = (leagueId, setLeague, setError) => {
                                 ...prev,
                                 is_started: true, // cuando la liga inicie marcarmos como iniciada, en tiempo real
                                 status: "started",
-                            }
-                        })
+                            };
+                        });
+                        break;
 
                     case "leagueCancelled":
                         setError("La liga fue cancelada por el creador."); // guardamos el mensaje de error para mostrar al usuario

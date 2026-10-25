@@ -83,3 +83,7 @@ export function getPlayers() {
 export async function getPlayers() {
   return request("/club/players");
 }
+
+export function getMyClub() {
+    return request("/club");
+}

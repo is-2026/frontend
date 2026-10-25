@@ -1,6 +1,6 @@
 import { describe, test, it, expect, vi, beforeEach } from "vitest";
 import { request } from "./api";
-import { createLeagues, getLeagues, getLeagueById, joinLeague , leaveLeague, startLeague } from "./leagues";
+import { createLeagues, getLeagues, getLeagueById, joinLeague , leaveLeague, startLeague, getLeagueMatches, getStandings } from "./leagues";
 
 vi.mock("./api", () => ({
   request: vi.fn(),
@@ -205,6 +205,52 @@ describe("leagues service", () => {
       request.mockRejectedValueOnce(mockError);
 
       await expect(startLeague("Liga-123")).rejects.toThrow("Se necesitan al menos 3 clubes para iniciar la liga");
+    });
+  });
+
+  describe("getLeagueMatches", () => {
+    test("debe pedir los partidos a /leagues/:id/matches y retornarlos", async () => {
+      const mockMatches = [
+        { id: "m1", home_club_id: "c1", away_club_id: "c2", status: "finished", home_score: 2, away_score: 1 },
+        { id: "m2", home_club_id: "c3", away_club_id: "c1", status: "scheduled", home_score: null, away_score: null },
+      ];
+      request.mockResolvedValueOnce(mockMatches);
+
+      const result = await getLeagueMatches("liga-123");
+
+      expect(request).toHaveBeenCalledWith("/leagues/liga-123/matches", { method: "GET"});
+      expect(result).toEqual(mockMatches);
+    });
+
+    test("debe propagar el error si la liga aun no fue iniciada", async () => {
+      const mockError = new Error("La liga aún no fue iniciada");
+      mockError.status = 409;
+      request.mockRejectedValueOnce(mockError);
+
+      await expect(getLeagueMatches("liga-123")).rejects.toThrow("La liga aún no fue iniciada");
+    });
+  });
+
+  describe("getStandings", () => {
+    test("debe pedir la tabla a /leagues/:id/standings y retornarla", async () => {
+      const mockStandings = [
+        { club_id: "c1", club_name: "Club 1", points: 6, matches_played: 2, won: 2, drawn: 0, lost: 0, goals_for: 4, goals_against: 1 },
+        { club_id: "c2", club_name: "Club 2", points: 0, matches_played: 2, won: 0, drawn: 0, lost: 2, goals_for: 1, goals_against: 4 },
+      ];
+      request.mockResolvedValueOnce(mockStandings);
+
+      const result = await getStandings("liga-123");
+
+      expect(request).toHaveBeenCalledWith("/leagues/liga-123/standings", { method: "GET"});
+      expect(result).toEqual(mockStandings);
+    });
+    
+    test("debe propagar el error si la liga no existe", async () => {
+      const mockError = new Error("La liga no existe");
+      mockError.status = 404;
+      request.mockRejectedValueOnce(mockError);
+
+      await expect(getStandings("liga-123")).rejects.toThrow("La liga no existe");
     });
   });
 });

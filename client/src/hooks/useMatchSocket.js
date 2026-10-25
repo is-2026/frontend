@@ -22,6 +22,7 @@ export function useMatchSocket(matchId) {
 	const [scores, setScores] = useState(null); // home, away
 	const [state, setState] = useState(null); // match_id, tick, players, ball_position
 	const [goalInfo, setGoalInfo] = useState(null);
+	const [pause, setPause] = useState(null);
 	const [finished, setFinished] = useState(null);
 	const [closeCode, setCloseCode] = useState(null);
 
@@ -35,10 +36,18 @@ export function useMatchSocket(matchId) {
 		let started = null;
 		// Si el cierre lo pedimos nosotros (desmontaje, StrictMode), no es un error.
 		let active = true;
-
+		
 		socketRef.current = new WebSocket(wsUrl(MATCH_WS_PATH(matchId)));
 		const ws = socketRef.current;
-
+		/*
+		const ws = new WebSocket(wsUrl(MATCH_WS_PATH(matchId)));
+		socketRef.current = ws;
+		window.__TEST_WS__ = socketRef.current; // Exponer para pruebas
+		if (typeof window !== "undefined") {
+			window.__TEST_WS__ = ws;
+    	}
+		
+		*/
 		ws.addEventListener("open", () => { console.log("CONNECTED"); });
 		ws.addEventListener("error", () => { console.error(`ERROR`); });
 		ws.addEventListener("close", (e) => {
@@ -99,9 +108,9 @@ export function useMatchSocket(matchId) {
 
 					setScores({
 						home: home_score,
-						away: away_score,
+						away: away_score, 
 					});
-
+					
 					const team = team_id === started?.home_club?.id ? "home" : "away";
 					setGoalInfo({
 						tick: tick,
@@ -111,22 +120,45 @@ export function useMatchSocket(matchId) {
 						teamName: started?.[`${team}_club`]?.name,
 					});
 					break;
+				
 				}
-
+			
 				//Caso finalización del partido
 				case "matchFinished": {
 					const { tick, match_end, home_score, away_score } = msg.data;
 					//Se setea finished con estos valores, deja de ser null.
-					setScores({
-						home: home_score,
-						away: away_score
+					setScores({ 
+						home: home_score, 
+						away: away_score 
 					});
 					setFinished({
 						tick,
 						matchEnd: match_end,
 						homeScore: home_score ?? 0,
 						awayScore: away_score ?? 0,
-					})
+						})
+					break;
+				}
+
+				case "coolingBreakStart": {
+					const {cooling_break_number, cooling_break_start} = msg.data;
+					setPause({
+						type: cooling_break_number == 1 ? "cooling_break_1" : "cooling_break_2", //identifica qué cooling break es
+						startedAt: cooling_break_start,
+					});
+					break;
+				}
+
+				case "halftimeStart": {
+					setPause({
+						type: "halftime",
+						startedAt: msg.data.halftime_start,
+					});
+					break;
+				}
+
+				case "matchResumed": {
+					setPause(null);
 					break;
 				}
 
@@ -155,5 +187,5 @@ export function useMatchSocket(matchId) {
 			}
 		};
 	}, [matchId]);
-	return { teams, lineups, scores, state, goalInfo, finished, closeCode };
+	return { teams, lineups , scores , state, goalInfo, finished, closeCode, pause };
 }

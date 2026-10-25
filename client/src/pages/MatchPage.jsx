@@ -9,13 +9,16 @@ import { getPlayers } from "../services/club";
 import { useEffect, useState } from "react";
 import { changeLiveBehavior } from "../services/matches";
 import { getBehaviors } from "../services/behaviors";
+import { PauseBanner } from "../components/match/PauseBanner";
 
 export function MatchPage() {
     const { matchId } = useParams();
-    const {
-        teams, lineups, scores,
-        state, goalInfo, finished
+    const { 
+        teams, lineups, scores, 
+        state, goalInfo, finished,
+        pause
     } = useMatchSocket(matchId);
+
     const [behaviors, setBehaviors] = useState([]);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -30,6 +33,7 @@ export function MatchPage() {
             .then((b) => setBehaviors(b || []))
             .catch(() => setBehaviors([]));
     }, []);
+    
 
     const mySide = lineups?.away?.some((p) => myPlayerIds.has(p.player_id)) ? "away" : "home";
     const myLineup = lineups?.[mySide] ?? [];
@@ -77,13 +81,16 @@ export function MatchPage() {
                         {/*evento de gol */}
                         <GoalBanner goalInfo={goalInfo} />
 
+                        {/* banner de pausa */}
+                        <PauseBanner pause={pause}/>
+
                         {/* banner de fin de partido */}
                         <MatchFinishedBanner
                             finished={finished}
                             teams={teams}
                             onExit={() => navigate("/friendlies")}
                         />
-
+                        
                     </div>
 
                     <div className="flex flex-col gap-4 w-64 shrink-0">

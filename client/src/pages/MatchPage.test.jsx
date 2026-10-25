@@ -272,7 +272,7 @@ describe('MatchPage', () => {
     //Testeo para interacción durante el match
     //el finished = null es si es undefined, vale null, 
     // y el = {} indica que la función se puede llamar sin pasar argumentos
-    function mockMatch({ finished = null } = {}) {
+    function mockMatch({ finished = null, pause = null } = {}) {
         useMatchSocket.mockReturnValue({
             teams: { home: { id: 'h', name: 'Local' }, away: { id: 'a', name: 'Visitante' } },
             lineups: {
@@ -283,6 +283,7 @@ describe('MatchPage', () => {
             state: { matchId: '123', tick: 0, players: [], ballPosition: { x: 0, y: 0 } },
             goalInfo: null,
             finished,
+            pause,
         });
     }
 
@@ -336,6 +337,27 @@ describe('MatchPage', () => {
         expect(await screen.findByText('El comportamiento seleccionado fue eliminado o es inválido')).toBeInTheDocument();
         expect(changeLiveBehavior).toHaveBeenCalledWith('123', 'h1', 'b2');
         expect(screen.getByRole('combobox')).toHaveDisplayValue('Atacante');
+    });
+
+    test.each([
+        ['cooling_break_1', 'Primera pausa de hidratación'],
+        ['halftime', 'Entretiempo'],
+        ['cooling_break_2', 'Segunda pausa de hidratación'],
+    ])('11. Se ve cartel de pausa en una pausa, y se muestra el nombre de %s', async (type, name) => {
+        const startTime = new Date().toISOString()
+        mockMatch({ pause: { type, startedAt: startTime } });
+        await renderMatch();
+        
+        expect(screen.getByText(name)).toBeInTheDocument();
+        expect(screen.getByTestId('countdown')).toHaveTextContent('15');
+        
+    });
+
+    test('12. Sin pausa no se muestra el cartel', async () => {
+        mockMatch();
+        await renderMatch();
+
+        expect(screen.queryByTestId('countdown')).not.toBeInTheDocument();
     });
 
 });

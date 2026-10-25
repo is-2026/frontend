@@ -10,7 +10,14 @@ const NAMES = {
 
 
 export function PauseBanner({pause}) {
-    const [left, setLeft] = useState(15); //renderizado inicial para que no aparezca cualquier cosa
+    const [left, setLeft] = useState(() => {
+        if (!pause?.startedAt) return 15;
+        const startTime = new Date(pause.startedAt).getTime();
+        const elapsedSeconds = Math.floor((Date.now() - startTime) /1000);
+        //fecha actual - fecha de inicio me da milisegundos, divido por 1000 y tengo cantidad de segundos transcurridos
+        const remaining = 15 - elapsedSeconds;
+        return Math.max(0, remaining);
+    });
 
     useEffect(() => {
         if (!pause) return;

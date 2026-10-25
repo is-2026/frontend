@@ -36,10 +36,18 @@ export function useMatchSocket(matchId) {
 		let started = null;
 		// Si el cierre lo pedimos nosotros (desmontaje, StrictMode), no es un error.
 		let active = true;
-
+		
 		socketRef.current = new WebSocket(wsUrl(MATCH_WS_PATH(matchId)));
 		const ws = socketRef.current;
-
+		/*
+		const ws = new WebSocket(wsUrl(MATCH_WS_PATH(matchId)));
+		socketRef.current = ws;
+		window.__TEST_WS__ = socketRef.current; // Exponer para pruebas
+		if (typeof window !== "undefined") {
+			window.__TEST_WS__ = ws;
+    	}
+		
+		*/
 		ws.addEventListener("open", () => { console.log("CONNECTED"); });
 		ws.addEventListener("error", () => { console.error(`ERROR`); });
 		ws.addEventListener("close", (e) => {
@@ -131,7 +139,7 @@ export function useMatchSocket(matchId) {
 						})
 					break;
 				}
-				/* coolingBreakStart, halftimeStart y matchResumed, y la pausa que llega en matchStarted */
+
 				case "coolingBreakStart": {
 					const {cooling_break_number, cooling_break_start} = msg.data;
 					setPause({

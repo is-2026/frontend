@@ -16,6 +16,18 @@ function behaviorUpdate(players, player_id, behavior_id, behavior_name) { //en p
 	});
 }
 
+function substitutionUpdate(players, player_in_id, player_out_id) {
+	return players.map((p)=> {
+		if (p.player_id == player_out_id) {
+			return {...p, is_starter: false};
+		}
+		if (p.player_id == player_in_id) {
+			return {...p, is_starter: true};
+		}
+		return p;
+	})
+}
+
 export function useMatchSocket(matchId) {
 	const [teams, setTeams] = useState(null); // { home: {id, name, avatar_url}, away: {...} }
 	const [lineups, setLineups] = useState(null); // home, away
@@ -164,6 +176,17 @@ export function useMatchSocket(matchId) {
 						};
 					});
 					break;
+				}
+
+				case "substitutionMade": {
+					const { player_in_id, player_out_id } = msg.data;
+					setLineups((prev) => {
+						return {
+							home: substitutionUpdate(prev.home, player_in_id, player_out_id),
+							away: substitutionUpdate(prev.away, player_in_id, player_out_id),
+						}
+					});
+					break;	
 				}
 
 				//error

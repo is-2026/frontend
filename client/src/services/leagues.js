@@ -66,14 +66,14 @@ export function getStandings(leagueId) {
 }
 
 // devuelve mi alinación vigente en la liga
-export function getLineup(LeagueId) {
+export function getLineup(leagueId) {
     return request(`/leagues/${leagueId}/lineup`, {
         method: "GET",
     });
 }
 
 // guarda mi alineación en la liga
-export function updateLineup(LeagueId) {
+export function updateLineup(leagueId) {
     return request(`/leagues/${leagueId}/lineup`, {
         method: "PUT",
     });

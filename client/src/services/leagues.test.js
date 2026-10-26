@@ -1,6 +1,6 @@
 import { describe, test, it, expect, vi, beforeEach } from "vitest";
 import { request } from "./api";
-import { createLeagues, getLeagues, getLeagueById, joinLeague , leaveLeague, startLeague, getLeagueMatches, getStandings } from "./leagues";
+import { createLeagues, getLeagues, getLeagueById, joinLeague , leaveLeague, startLeague, getLeagueMatches, getStandings, getLineup, updateLineup } from "./leagues";
 
 vi.mock("./api", () => ({
   request: vi.fn(),
@@ -251,6 +251,32 @@ describe("leagues service", () => {
       request.mockRejectedValueOnce(mockError);
 
       await expect(getStandings("liga-123")).rejects.toThrow("La liga no existe");
+    });
+  });
+
+  describe("getLineup", () => {
+    test("debe pedir GET /leagues/:id/lineup y retornar la alineación", async () => {
+      const mockLineup = { formation: "TRIANGLE", players: []};
+      request.mockResolvedValueOnce(mockLineup);
+
+      const result = await getLineup("L1");
+
+      expect(request).toHaveBeenCalledWith("/leagues/L1/lineup", { method: "GET" });
+      expect(result).toEqual(mockLineup);
+    });
+  });
+
+  describe("updateLineup", () => {
+    test("debe enviar PUT /leagues/:id/lineup con el body", async () => {
+      const data = { formation: "TRIANGLE", players: [] };
+      request.mockResolvedValueOnce(data);
+
+      await updateLineup("l1", data);
+
+      expect(request).toHaveBeenCalledWith("/leagues/l1/lineup", {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
     });
   });
 });

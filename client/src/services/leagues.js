@@ -73,8 +73,9 @@ export function getLineup(leagueId) {
 }
 
 // guarda mi alineación en la liga
-export function updateLineup(leagueId) {
+export function updateLineup(leagueId, data) {
     return request(`/leagues/${leagueId}/lineup`, {
         method: "PUT",
+        body: JSON.stringify(data),
     });
 }

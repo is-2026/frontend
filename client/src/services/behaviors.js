@@ -61,3 +61,9 @@ export const updateBehavior = async (id, data) => {
         body: JSON.stringify(data)
     });
 };
+
+export const deleteBehavior = async (id) => {
+    return await request(`/club/behaviors/${id}`, {
+        method: 'DELETE'
+    });
+};

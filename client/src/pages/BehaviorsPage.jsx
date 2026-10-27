@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { getBehaviors } from "../services/behaviors";
 import { BehaviorCard } from "../components/BehaviorsCard";
 import { BehaviorEditor } from "../components/BehaviorEditor";
+import { useLocation } from "react-router-dom";
 
 export function BehaviorsPage() {
   const [behaviors, setBehaviors] = useState([]); // Acá se guarda la lista de comportamientos disponibles
   const [loading, setLoading] = useState(true);     // Inicia en true para mostrar msj cargando
   const [error, setError] = useState(null);         // Acá se guarda el mensaje de error
   const [isOpen, setIsOpen] = useState(false); // Estado para controlar la apertura del modal
+  const location = useLocation();
+  const successMessage = location.state?.successMessage; //manejo de estado de éxito al eliminar un comportamiento
 
   useEffect(() => {
     getBehaviors()
@@ -37,6 +40,11 @@ export function BehaviorsPage() {
 
         {loading && <p className="text-slate-400">Cargando...</p>}
         {error && <p className="text-red-400">{error}</p>}
+        {successMessage && (
+            <div className="mb-4 p-3 bg-green-800 text-green-100 rounded-md">
+                {successMessage}
+            </div>
+        )}
         {!loading && !error && behaviors.length === 0 && (
             <p className="text-white/60">No se encontraron comportamientos.</p>
         )}

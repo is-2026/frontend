@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getBehaviorById } from "../services/behaviors";
+import { getBehaviorById, deleteBehavior } from "../services/behaviors";
 import { BehaviorEditor } from "../components/BehaviorEditor";
 
 export function BehaviorDetail() {
@@ -9,6 +9,7 @@ export function BehaviorDetail() {
     const [behavior, setBehavior] = useState(null);
     const [error, setError] = useState(null);
     const [isOpen, setIsOpen] = useState(false);
+    const [deleteError, setDeleteError] = useState(null);
 
     useEffect(() => {
         getBehaviorById(id)
@@ -23,6 +24,26 @@ export function BehaviorDetail() {
                 }
             });
     }, [id, navigate]);
+
+    const handleDelete = async () => {
+        const isConfirmed = window.confirm("¿Estás seguro de que querés eliminar este comportamiento? Esta acción no se puede deshacer.");
+        if (!isConfirmed) return;
+
+        try {
+            setDeleteError(null);
+            await deleteBehavior(id);
+            navigate("/club/behaviors", { state: { successMessage: "Comportamiento eliminado con éxito." } });
+        } catch (err) {
+            const status = err.status || err.response?.status;
+            const message = err.message || err.response?.data?.message || "Error al eliminar";
+        
+            if (status === 409) {
+                setDeleteError(message);
+            } else {
+                setDeleteError("Ocurrió un error inesperado al intentar eliminar.");
+            }
+        }
+    };
 
     if (error) return (
         <div className="mx-auto max-w-3xl p-6">
@@ -50,7 +71,14 @@ export function BehaviorDetail() {
                 >
                 Editar comportamiento
                 </button>
+                <button 
+                        onClick={handleDelete}
+                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-semibold transition-colors"
+                >
+                Eliminar
+                </button>
             </div>
+            {deleteError && ( <p className="text-red-400 mt-4 font-semibold">{deleteError}</p> )}
             <BehaviorEditor 
                 isOpen={isOpen} 
                 onClose={() => {

@@ -55,7 +55,9 @@ export function BehaviorDetail() {
                 isOpen={isOpen} 
                 onClose={() => {
                     setIsOpen(false);
-                    getBehaviorById(id).then(setBehavior); // Refetch the behavior after closing the editor to get the latest data
+                    getBehaviorById(id)
+                        .then(setBehavior)
+                        .catch(() => setError("Error al recargar el comportamiento actualizado.")); // Refetch the behavior after closing the editor to get the latest data
                 }} 
                 initialBehavior={behavior} 
                 />

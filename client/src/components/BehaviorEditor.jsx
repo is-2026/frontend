@@ -1,4 +1,3 @@
-//import Editor from 'react-simple-code-editor'
 import Prism from 'prismjs'
 import 'prismjs/components/prism-python'
 import 'prismjs/themes/prism-tomorrow.css'
@@ -53,7 +52,7 @@ export function BehaviorEditor({ isOpen, onClose, initialBehavior }) {
             if (initialBehavior) {
                 // PUT: update existing behavior
                 await updateBehavior(initialBehavior.id, { name, code });
-                onClose(); // ask if redirect to detail page or just close the editor
+                onClose(); 
             } else {
                 // POST: create new behavior
                 const res = await createBehavior({ name, code });
@@ -105,15 +104,15 @@ export function BehaviorEditor({ isOpen, onClose, initialBehavior }) {
                 {/* Error message for backend validation */}
                 {errorResponse && <p className="text-red-500 text-xs mt-1">{errorResponse}</p>}
                 <div className="flex justify-end gap-2 mt-4">
-                    <button onClick={onClose} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                        Cerrar
-                    </button>
                     <button 
                         onClick={handleSave}
                         disabled={isInvalid}
-                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded"
+                        className="bg-blue-700 hover:bg-blue-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded"
                     >
                         {initialBehavior ? "Actualizar" : "Crear"}
+                    </button>
+                    <button onClick={onClose} className="bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+                        Cerrar
                     </button>
                 </div>
             </div>

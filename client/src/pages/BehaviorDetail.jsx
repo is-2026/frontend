@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getBehaviorById } from "../services/behaviors";
+import { BehaviorEditor } from "../components/BehaviorEditor";
 
 export function BehaviorDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [behavior, setBehavior] = useState(null);
     const [error, setError] = useState(null);
+    const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
         getBehaviorById(id)
@@ -43,12 +45,22 @@ export function BehaviorDetail() {
                 Volver a comportamientos
                 </button>
 
-                <button disabled
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-md font-semibold opacity-50 cursor-not-allowed"
+                <button onClick={() => setIsOpen(true)}
+                        className="px-4 py-2 bg-indigo-600 text-white rounded-md font-semibold hover:opacity-80 transition-opacity"
                 >
                 Editar comportamiento
                 </button>
             </div>
+            <BehaviorEditor 
+                isOpen={isOpen} 
+                onClose={() => {
+                    setIsOpen(false);
+                    getBehaviorById(id)
+                        .then(setBehavior)
+                        .catch(() => setError("Error al recargar el comportamiento actualizado.")); // Refetch the behavior after closing the editor to get the latest data
+                }} 
+                initialBehavior={behavior} 
+                />
         </div>
     );
 }

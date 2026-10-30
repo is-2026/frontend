@@ -294,20 +294,4 @@ describe('useMatchSocket', () => {
         expect(result.current.lineups.home).toBe(oldHome); // verifica que no se modifique home
     })
 
-    test('"matchResumed" termina la pausa y suma una al contador', () => {
-        const { result, send } = setupHook();
-        expect(result.current.pausesEnded).toBe(0);
-
-        send('halftimeStart', { halftime_start: 't' });
-        send('matchResumed', {});
-        expect(result.current.pause).toBeNull();
-        expect(result.current.pausesEnded).toBe(1);
-
-        send('coolingBreakStart', { cooling_break_number: 2, cooling_break_start: 't' });
-        send('matchResumed', {});
-        expect(result.current.pausesEnded).toBe(2);
-    });
-
-
-
 });

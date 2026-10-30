@@ -1,0 +1,89 @@
+import { useState } from "react";
+
+const SELECT_CLASS = "w-full border border-white/20 bg-slate-800 px-2 py-1 text-sm text-white";
+export function SubstitutionForm({
+    starters = [], substitutes = [], behaviors = [], 
+    pause, pending, error, sending = false, 
+    onSubmit, onCancel,
+}) {
+    const [playerOut, setPlayerOut] = useState("");
+    const [playerIn, setPlayerIn] = useState("");
+    const [behavior, setBehavior] = useState("");
+    const [notice, setNotice] = useState(null);
+
+    const complete = playerOut && playerIn && behavior;
+
+    async function handleSubmit() {
+        const ok = await onSubmit({
+            player_out_id: playerOut,
+            player_in_id: playerIn,
+            substitution_behavior_id: behavior,
+        });
+        if (ok) {
+            setPlayerOut("");
+            setPlayerIn("");
+            setBehavior("");
+            setNotice("Cambio planificado para la próxima pausa")
+        }
+    }
+    // nombres del cambio pendiente (el que sale está en titulares y el que entra en el banco)
+    const outName = starters.find((p) => p.player_id == pending?.player_out_id)?.name; 
+    const inName = substitutes.find((p) => p.player_id == pending?.player_in_id)?.name;
+    const behaviorName = behaviors.find((b) => b.id == pending?.substitution_behavior_id)?.name;
+    //el operador ?. impide que siga leyendo lo que sigue si el parametro previo a ?. es null o no está definido, devolviendo undefined 
+
+
+    return (
+        <div className="bg-slate-900 border border-slate-700 p-4 space-y-2 test-sm">
+            <h3 className="text-sm text-slate-400 uppercase font-bold">Cambio de jugador</h3>
+            
+            {!pause && (
+                <p className="text-slate-300">
+                    Se hará en la próxima pausa
+                </p> 
+            )}
+            
+            {pending && (
+                <div className="border border-emerald-700 p-2">
+                    <p>Pendiente: sale {outName}, entra {inName} ({behaviorName})</p>
+                    <button onClick={onCancel} className="underline text-slate-400 hover:text-red-400">
+                        Cancelar cambio
+                    </button>
+                </div>
+            )}
+
+            {/* Value es el jugador seleccionado, al seleccionar uno nuevo se cambia value por el nuevo*/}
+            <select className={SELECT_CLASS} value={playerOut} onChange={(e) => setPlayerOut(e.target.value)}> 
+                <option value="">Quién sale...</option> {/* Valor por defecto, todavía no se seleccionó a nadie*/}
+                {starters.map((p) => ( //Muestra numero y name de cada jugador como opciones
+                    <option key={p.player_id} value={p.player_id}>#{p.number} {p.name}</option>
+                ))}
+            </select>
+            
+            <select className={SELECT_CLASS} value={playerIn} onChange={(e) => setPlayerIn(e.target.value)}>
+                <option value="">Quién entra...</option>
+                {substitutes.map((p) => (
+                    <option key={p.player_id} value={p.player_id}>#{p.number} {p.name}</option>
+                ))}
+            </select>
+
+            <select className={SELECT_CLASS} value={playerIn} onChange={(e) => setBehavior(e.target.value)}>
+                <option value="">Qué comportamiento tendrá</option>
+                {behaviors.map((b) => (
+                    <option key={b.behavior_id} value={b.behavior_id}>{b.behavior_name}</option>
+                ))}
+            </select>
+
+            {notice && <p className="text-emerald-400">{notice}</p>}
+            {error && <p className="text-red-400">{error}</p>}
+
+            <button
+                onClick={handleSubmit}
+                disabled={!complete || Boolean(pending) || sending} /* sending es para que no se puedan reenviar  */
+                className="w-full bg-emerald-600 py-2 font-medium hover:bg-emerald-500 disabled:opacity-40"
+            >
+                Confirmar cambio
+            </button>
+        </div>
+    )
+}

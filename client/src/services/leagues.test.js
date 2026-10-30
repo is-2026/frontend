@@ -1,6 +1,6 @@
 import { describe, test, it, expect, vi, beforeEach } from "vitest";
 import { request } from "./api";
-import { createLeagues, getLeagues, getLeagueById, joinLeague , leaveLeague, startLeague, getLeagueMatches, getStandings } from "./leagues";
+import { createLeagues, getLeagues, getLeagueById, joinLeague , leaveLeague, startLeague, getLeagueMatches, getStandings, getMyLeagues } from "./leagues";
 
 vi.mock("./api", () => ({
   request: vi.fn(),
@@ -251,6 +251,18 @@ describe("leagues service", () => {
       request.mockRejectedValueOnce(mockError);
 
       await expect(getStandings("liga-123")).rejects.toThrow("La liga no existe");
+    });
+  });
+
+  describe("getMyLeagues", () => {
+    test("debe pedir mis ligas y retornarlas", async () => {
+      const mockLeagues = [{ id: "1", name: "Liga A", status: "started" }];
+      request.mockResolvedValueOnce(mockLeagues);
+
+      const result = await getMyLeagues();
+      
+      expect(request).toHaveBeenCalledWith("/leagues/me", { method: "GET" });
+      expect(result).toEqual(mockLeagues);
     });
   });
 });

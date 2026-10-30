@@ -64,3 +64,10 @@ export function getStandings(leagueId) {
         method: "GET",
     });
 }
+
+// devuelve las ligas en las que participa mi club
+export function getMyLeagues() {
+    return request("/leagues/me", {
+        method: "GET",
+    });
+}

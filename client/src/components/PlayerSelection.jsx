@@ -10,8 +10,8 @@ export function PlayerSelection({
   initialSelection, 
   onChange,
 }) {
-  const [starters, setStarters] = useState(initialSelection ?? []); // si viene initialSelection arrancamos con eso, sino vacío
-  const [substitutes, setSubstitutes] = useState(initialSelection ?? []);
+  const [starters, setStarters] = useState(initialSelection?.starters ?? []); // si viene initialSelection arrancamos con eso, sino vacío
+  const [substitutes, setSubstitutes] = useState(initialSelection?.substitutes ?? []);
 
   function emitSelection(newStarters, newSubstitutes) {
     if (typeof onChange === "function") {

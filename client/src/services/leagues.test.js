@@ -15,21 +15,20 @@ import { describe, test, it, expect, vi, beforeEach } from "vitest";
           test("debe retornar la lista de ligas cuando la petición es exitosa", async () => {
               const mockLeagues = [
                   {
-                      id: "1",
-                      name: "Liga A",
-                      is_private: false,
-                      max_clubs: 10,
-                      status: "not_started",
-                      registered_clubs: [{ club_id: "c1", club_name: "Club 1" }]
+                        id: "1",
+                        name: "Liga A",
+                        is_private: false,
+                        max_clubs: 10,
+                        status: "not_started",
+                        registered_clubs: [{ club_id: "c1", club_name: "Club 1" }]
                   },
                   {
-                      id: "2",
-                      name: "Liga B",
-                      is_private: true,
-                      max_clubs: 15,
-                      status: "not_started",
-                      registered_clubs: [{ club_id: "c2", club_name: "Club 2" }, { club_id: "c3", club_name: "Club 3" }]
-                    registered_clubs: [{ club_id: "c2", club_name: "Club 2" }, { club_id: "c3", club_name: "Club 3" }]
+                        id: "2",
+                        name: "Liga B",
+                        is_private: true,
+                        max_clubs: 15,
+                        status: "not_started",
+                        registered_clubs: [{ club_id: "c2", club_name: "Club 2" }, { club_id: "c3", club_name: "Club 3" }],
                 },
             ];
 

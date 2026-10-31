@@ -157,6 +157,7 @@ export function useMatchSocket(matchId) {
 					break;
 				}
 
+				//Caso pausa de hidratación
 				case "coolingBreakStart": {
 					const {cooling_break_number, cooling_break_start} = msg.data;
 					setPause({
@@ -166,6 +167,7 @@ export function useMatchSocket(matchId) {
 					break;
 				}
 
+				//Caso pausa de medio tiempo
 				case "halftimeStart": {
 					setPause({
 						type: "halftime",
@@ -174,6 +176,7 @@ export function useMatchSocket(matchId) {
 					break;
 				}
 
+				//Caso partido resumido
 				case "matchResumed": {
 					setPause(null);
 					setPausesEnded((n) => (n+1));

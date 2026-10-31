@@ -1,15 +1,17 @@
 import { useState } from "react";
 
 const SELECT_CLASS = "w-full border border-white/20 bg-slate-800 px-2 py-1 text-sm text-white";
+const TOTAL_PAUSES_NUMBER = 3;
 export function SubstitutionForm({
     starters = [], substitutes = [], behaviors = [], 
     pause, pending, error, sending = false, 
-    onSubmit, onCancel,
+    onSubmit, onCancel, pausesEnded
 }) {
     const [playerOut, setPlayerOut] = useState("");
     const [playerIn, setPlayerIn] = useState("");
     const [behavior, setBehavior] = useState("");
     const [notice, setNotice] = useState(null);
+
 
     const complete = playerOut && playerIn && behavior;
 
@@ -37,11 +39,19 @@ export function SubstitutionForm({
         <div className="bg-slate-900 border border-slate-700 p-4 space-y-2 test-sm">
             <h3 className="text-sm text-slate-400 uppercase font-bold">Cambio de jugador</h3>
             
-            {!pause && (
+            {!pause && (pausesEnded < TOTAL_PAUSES_NUMBER) && (
                 <p className="text-slate-300">
                     Se hará en la próxima pausa
                 </p> 
             )}
+
+            {/* Aviso si no hay más pausas disponibles */}
+            {(pausesEnded >= TOTAL_PAUSES_NUMBER) && (
+                <p className="text-slate-400 text-xs">
+                    Ya se han alcanzado las {TOTAL_PAUSES_NUMBER} pausas permitidas. No se pueden realizar más cambios.
+                </p>
+            )
+            }
             
             {pending && (
                 <div className="border border-emerald-700 p-2">
@@ -67,7 +77,7 @@ export function SubstitutionForm({
                 ))}
             </select>
 
-            <select className={SELECT_CLASS} value={playerIn} onChange={(e) => setBehavior(e.target.value)}>
+            <select className={SELECT_CLASS} value={behavior} onChange={(e) => setBehavior(e.target.value)}>
                 <option value="">Qué comportamiento tendrá</option>
                 {behaviors.map((b) => (
                     <option key={b.behavior_id} value={b.behavior_id}>{b.behavior_name}</option>
@@ -79,7 +89,7 @@ export function SubstitutionForm({
 
             <button
                 onClick={handleSubmit}
-                disabled={!complete || Boolean(pending) || sending} /* sending es para que no se puedan reenviar  */
+                disabled={!complete || Boolean(pending) || sending || (pausesEnded >= TOTAL_PAUSES_NUMBER)} /* sending es para que no se puedan reenviar  */
                 className="w-full bg-emerald-600 py-2 font-medium hover:bg-emerald-500 disabled:opacity-40"
             >
                 Confirmar cambio

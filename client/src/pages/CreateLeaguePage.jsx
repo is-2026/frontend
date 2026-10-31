@@ -13,6 +13,7 @@ export function CreateLeaguePage() {
     const [maxClubs, setMaxClubs] = useState(8);
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
+    const [noDraws, setNoDraws] = useState(false);
     const [selection, setSelection] = useState({ starters: [], substitutes: []});
     
     // estados de los datos
@@ -66,6 +67,7 @@ export function CreateLeaguePage() {
                 ...(password.trim() ? { password: password.trim() } : {}),
                 max_clubs: Number(maxClubs),
                 match_duration_minutes: 5,
+                allows_draws: noDraws,
                 players: [
                     ...selection.starters.map((starter) => ({
                         player_id: starter.player_id,
@@ -186,6 +188,19 @@ export function CreateLeaguePage() {
             placeholder="Ej: 10"
             required
           />
+        </div>
+
+        {/* Sin empates */}
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="noDraws"
+            checked={noDraws}
+            onChange={(e) => setNoDraws(e.target.checked)}
+          />
+          <label htmlFor="noDraws" className="text-sm font-medium">
+            Sin empates
+          </label>
         </div>
 
         {/* Selección de Jugadores */}

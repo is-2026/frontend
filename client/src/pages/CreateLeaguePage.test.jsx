@@ -235,8 +235,8 @@ describe("CreateLeaguePage", () => {
         fireEvent.click(screen.getByRole("button", { name: "Confirmar y Crear Liga" }));
 
         await waitFor(() => {
-            expect(createLeagues).toHaveBeenCalledTimes(
-                expect.objectContaining({ allows_draws: true });
+            expect(createLeagues).toHaveBeenCalledWith(
+                expect.objectContaining({ allows_draws: true }),
             );
         });
     });

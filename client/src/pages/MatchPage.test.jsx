@@ -344,7 +344,8 @@ describe('MatchPage', () => {
         ['halftime', 'Entretiempo'],
         ['cooling_break_2', 'Segunda pausa de hidratación'],
     ])('11. Se ve cartel de pausa en una pausa, y se muestra el nombre de %s', async (type, name) => {
-        mockMatch({ pause: { type, startedAt: 'x' } });
+        const startTime = new Date().toISOString()
+        mockMatch({ pause: { type, startedAt: startTime } });
         await renderMatch();
         
         expect(screen.getByText(name)).toBeInTheDocument();
@@ -358,4 +359,5 @@ describe('MatchPage', () => {
 
         expect(screen.queryByTestId('countdown')).not.toBeInTheDocument();
     });
+
 });

@@ -1,33 +1,63 @@
 import { useState } from "react";
+import { scheduleSubstitution, cancelSubstitution } from "../../services/matches";
 
 const SELECT_CLASS = "w-full border border-white/20 bg-slate-800 px-2 py-1 text-sm text-white";
 const TOTAL_PAUSES_NUMBER = 3;
-export function SubstitutionForm({
-    starters = [], substitutes = [], behaviors = [], 
-    pause, pending, error, sending = false, 
-    onSubmit, onCancel, pausesEnded
+export function SubstitutionPanel({
+    matchId, starters = [], substitutes = [], behaviors = [], 
+    pause, pausesEnded
 }) {
     const [playerOut, setPlayerOut] = useState("");
     const [playerIn, setPlayerIn] = useState("");
     const [behavior, setBehavior] = useState("");
     const [notice, setNotice] = useState(null);
-
+    const [scheduled, setScheduled] = useState(null);
+    const [error, setError] = useState(null);
+    const [sending, setSending] = useState(false);
 
     const complete = playerOut && playerIn && behavior;
 
+     const pending =
+        scheduled && substitutes.some((p) => p.player_id == scheduled.player_in_id)
+            ? scheduled
+            : null;
+    const executed = scheduled && !pending; // el hook ya lo pasó a titular
+
     async function handleSubmit() {
-        const ok = await onSubmit({
-            player_out_id: playerOut,
-            player_in_id: playerIn,
-            substitution_behavior_id: behavior,
-        });
-        if (ok) {
+        setError(null);
+        setNotice(null);    
+        setSending(true);
+        setScheduled(null);
+        try {
+            const res = await scheduleSubstitution(matchId, playerOut, playerIn, behavior);
+            if (res.status == "pending"){
+                setScheduled({...res, substitution_behavior_id: behavior});
+                setNotice("Cambio planificado para la próxima pausa");
+            } else {
+                setScheduled(null);
+                setNotice("Cambio realizado");
+            }
             setPlayerOut("");
             setPlayerIn("");
             setBehavior("");
-            setNotice("Cambio planificado para la próxima pausa")
+        } catch(e) {
+            setError(e.message);
+        } finally {
+            setSending(false);
         }
     }
+
+    async function handleCancel() {
+        setError(null);
+        try {
+            await cancelSubstitution(matchId);
+            setScheduled(null);
+            setNotice("Cambio cancelado");
+        } catch(e) {
+            setError(e.message)
+        }
+    }
+
     // nombres del cambio pendiente (el que sale está en titulares y el que entra en el banco)
     const outName = starters.find((p) => p.player_id == pending?.player_out_id)?.name; 
     const inName = substitutes.find((p) => p.player_id == pending?.player_in_id)?.name;
@@ -39,9 +69,9 @@ export function SubstitutionForm({
         <div className="bg-slate-900 border border-slate-700 p-4 space-y-2 test-sm">
             <h3 className="text-sm text-slate-400 uppercase font-bold">Cambio de jugador</h3>
             
-            {!pause && (pausesEnded < TOTAL_PAUSES_NUMBER) && (
+            {(pausesEnded < TOTAL_PAUSES_NUMBER) && (
                 <p className="text-slate-300">
-                    Se hará en la próxima pausa
+                    {pause ? "Se hará ahora" : "Se hará en la próxima pausa"}
                 </p> 
             )}
 
@@ -53,10 +83,11 @@ export function SubstitutionForm({
             )
             }
             
+            {/* Aviso de quién sale y quién entra y boton cancelar */}
             {pending && (
                 <div className="border border-emerald-700 p-2">
                     <p>Pendiente: sale {outName}, entra {inName} ({behaviorName})</p>
-                    <button onClick={onCancel} className="underline text-slate-400 hover:text-red-400">
+                    <button onClick={handleCancel} className="underline text-slate-400 hover:text-red-400">
                         Cancelar cambio
                     </button>
                 </div>
@@ -80,11 +111,15 @@ export function SubstitutionForm({
             <select className={SELECT_CLASS} value={behavior} onChange={(e) => setBehavior(e.target.value)}>
                 <option value="">Qué comportamiento tendrá</option>
                 {behaviors.map((b) => (
-                    <option key={b.behavior_id} value={b.behavior_id}>{b.behavior_name}</option>
+                    <option key={b.id} value={b.id}>{b.name}</option>
                 ))}
             </select>
 
-            {notice && <p className="text-emerald-400">{notice}</p>}
+            {/* Anuncia la realización del cambio o no. Acá notice no viene del ws sino del servicio,
+                por eso se toma como caso aparte */}
+            {(executed || notice) && (
+                <p className="text-emerald-400">{executed ? "Cambio realizado": notice}</p>
+            )}
             {error && <p className="text-red-400">{error}</p>}
 
             <button

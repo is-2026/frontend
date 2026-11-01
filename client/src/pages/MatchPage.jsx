@@ -10,19 +10,25 @@ import { useEffect, useState } from "react";
 import { changeLiveBehavior } from "../services/matches";
 import { getBehaviors } from "../services/behaviors";
 import { PauseBanner } from "../components/match/PauseBanner";
+import { SubstitutionPanel } from "../components/match/SubstitutionPanel";
+
 
 export function MatchPage() {
     const { matchId } = useParams();
     const { 
         teams, lineups, scores, 
         state, goalInfo, finished,
-        pause
+        pause, pausesEnded
     } = useMatchSocket(matchId);
 
+    //Variables para cambio de behaviors
     const [behaviors, setBehaviors] = useState([]);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
+    //Variable para mostrar formulario de sustitución
+    const [showForm, setShowForm] = useState(false);
+    
     // ids de los jugadores de mi club, para saber cuál de las dos alineaciones es la mía
     const [myPlayerIds, setMyPlayerIds] = useState(new Set());
     useEffect(() => {
@@ -33,7 +39,6 @@ export function MatchPage() {
             .then((b) => setBehaviors(b || []))
             .catch(() => setBehaviors([]));
     }, []);
-    
 
     const mySide = lineups?.away?.some((p) => myPlayerIds.has(p.player_id)) ? "away" : "home";
     const myLineup = lineups?.[mySide] ?? [];
@@ -84,6 +89,7 @@ export function MatchPage() {
                         {/* banner de pausa */}
                         <PauseBanner pause={pause}/>
 
+
                         {/* banner de fin de partido */}
                         <MatchFinishedBanner
                             finished={finished}
@@ -109,10 +115,28 @@ export function MatchPage() {
 
                         { /*suplentes*/}
                         <LineupPanel title="Suplentes" players={substitutes} />
+                        
                         { /*cambios*/}
-                        <button className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-4 border border-slate-600 transition-colors uppercase text-sm mt-auto">
-                            Realizar Cambios
-                        </button>
+                        {canChange && (
+                            <>
+                                <div hidden={!showForm}>
+                                {/* Panel de sustituciones */}
+                                <SubstitutionPanel
+                                    matchId={matchId}
+                                    starters={starters}
+                                    substitutes={substitutes}
+                                    behaviors={behaviors}
+                                    pause={pause}
+                                    pausesEnded={pausesEnded}
+                                />
+                                </div>
+                                <button 
+                                    onClick={() => setShowForm(!showForm)}
+                                    className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-4 border border-slate-600 transition-colors uppercase text-sm mt-auto">
+                                    Realizar cambios
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

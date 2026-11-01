@@ -393,7 +393,7 @@ describe('MatchPage', () => {
         expect(await screen.findByText('Cambio planificado para la próxima pausa')).toBeInTheDocument();
     });
 
-    test('14. Muestra el cartel de cambio realizado durante una pausa activa', async () => {
+    test('14. Permite realizar cambios durante una pausa activa', async () => {
         getPlayers.mockResolvedValue([{ id: 'h1' }]);
         getBehaviors.mockResolvedValue(behaviorsMock);
     
@@ -421,7 +421,7 @@ describe('MatchPage', () => {
         expect(await screen.findByText('Cambio realizado')).toBeInTheDocument();
     });
 
-    test('15. No se pueden Realizar cambios con pausesEnded == 3 y muestra su respectivo cartel', async () => {
+    test('15. No se pueden Realizar cambios con pausesEnded == 3', async () => {
         getPlayers.mockResolvedValue([{ id: 'h1' }]);
         getBehaviors.mockResolvedValue(behaviorsMock);
         
@@ -434,5 +434,6 @@ describe('MatchPage', () => {
         expect(await screen.findByText(/ya se han alcanzado las 3 pausas permitidas/i)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Confirmar cambio/i })).toBeDisabled();
     });
+
 
 });

@@ -54,17 +54,31 @@ export function useMatchSocket(matchId) {
 		// Si el cierre lo pedimos nosotros (desmontaje, StrictMode), no es un error.
 		let active = true;
 		
-		socketRef.current = new WebSocket(wsUrl(MATCH_WS_PATH(matchId)));
-		const ws = socketRef.current;
 		/*
 		const ws = new WebSocket(wsUrl(MATCH_WS_PATH(matchId)));
 		socketRef.current = ws;
 		window.__TEST_WS__ = socketRef.current; // Exponer para pruebas
 		if (typeof window !== "undefined") {
-			window.__TEST_WS__ = ws;
-    	}
-		
+			
+			// Simular pausa (ej: 'halftime', 'cooling_break_1', etc.)
+			window.testPause = (type = "halftime") => {
+				setPause({
+					type: type,
+					startedAt: new Date().toISOString(),
+				});
+			};
+
+			// 4. Simular fin de pausa / incrementar pausas terminadas (para probar pausesEnded == 3)
+			window.testResume = (incrementPauses = true) => {
+				setPause(null);
+				if (incrementPauses) {
+					setPausesEnded((n) => n + 1);
+				}
+			};
+		}
 		*/
+		socketRef.current = new WebSocket(wsUrl(MATCH_WS_PATH(matchId)));
+		const ws = socketRef.current;
 		ws.addEventListener("open", () => { console.log("CONNECTED"); });
 		ws.addEventListener("error", () => { console.error(`ERROR`); });
 		ws.addEventListener("close", (e) => {
@@ -156,7 +170,7 @@ export function useMatchSocket(matchId) {
 						})
 					break;
 				}
-
+				
 				//Caso pausa de hidratación
 				case "coolingBreakStart": {
 					const {cooling_break_number, cooling_break_start} = msg.data;

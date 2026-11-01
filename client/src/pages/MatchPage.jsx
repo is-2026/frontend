@@ -70,7 +70,7 @@ export function MatchPage() {
             {/* Contenedor de cancha.*/}
             <div className="w-[1272px] mx-auto pb-8">
 
-                <div className="flex gap-4">
+                <div className="flex gap-4 items-start">
                     <div className="min-w-0 flex-1 relative">
 
                         {/*cronómetro y evento partido finalizado */}
@@ -116,8 +116,8 @@ export function MatchPage() {
                         { /*suplentes*/}
                         <LineupPanel title="Suplentes" players={substitutes} />
                         
-                        { /*cambios*/}
-                        {canChange && (
+                        { /*Planificar cambios durante el partido*/}
+                        {canChange && !pause && (
                             <>
                                 <div hidden={!showForm}>
                                 {/* Panel de sustituciones */}
@@ -136,6 +136,30 @@ export function MatchPage() {
                                     Realizar cambios
                                 </button>
                             </>
+                        )}
+
+                        {/* Cambios durante pausas */}
+                        {pause && (
+                            <div className="bg-slate-900 border border-slate-700 p-4 mt-2 rounded shadow-lg">
+                                <button 
+                                    onClick={() => setShowForm(!showForm)}
+                                    className="bg-emerald-600 hover:bg-emerald-400 text-white font-bold py-2 px-4 ring-2 ring-gray-300 animate-bounce transition-colors uppercase text-[19px]">
+                                    {showForm ? "Ocultar" : "Realizar cambios"}
+                                </button>
+
+                                {showForm && (
+                                    <div className="mt-4">
+                                        <SubstitutionPanel
+                                            matchId={matchId}
+                                            starters={starters}
+                                            substitutes={substitutes}
+                                            behaviors={behaviors}
+                                            pause={pause}
+                                            pausesEnded={pausesEnded}
+                                        />
+                                    </div>
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>

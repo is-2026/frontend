@@ -40,6 +40,13 @@ export function MatchPage() {
             .catch(() => setBehaviors([]));
     }, []);
 
+    //Cierra formulario de cambio en pausas luego de que acaba la pausa.
+    useEffect(() => {
+        if (!pause) {
+            setShowForm(false);
+        }
+    }, [pause]);
+
     const mySide = lineups?.away?.some((p) => myPlayerIds.has(p.player_id)) ? "away" : "home";
     const myLineup = lineups?.[mySide] ?? [];
     const starters = myLineup.filter((p) => p.is_starter);
@@ -139,7 +146,7 @@ export function MatchPage() {
                         )}
 
                         {/* Cambios durante pausas */}
-                        {pause && (
+                        {pause && canChange && (
                             <div className="bg-slate-900 border border-slate-700 p-4 mt-2 rounded shadow-lg">
                                 <button 
                                     onClick={() => setShowForm(!showForm)}

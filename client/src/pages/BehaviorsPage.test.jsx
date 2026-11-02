@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
 import { BehaviorsPage } from './BehaviorsPage';
 import * as behaviorsService from '../services/behaviors';
@@ -74,5 +74,24 @@ describe('BehaviorsPage Component', () => {
         await waitFor(() => {
             expect(screen.getByText('No se encontraron comportamientos.')).toBeInTheDocument();
         });
+    });
+    
+    test('5. abre el editor de comportamiento al hacer clic en Crear Comportamiento +', async () => {
+        behaviorsService.getBehaviors.mockResolvedValueOnce([]);
+        render(
+            <MemoryRouter>
+                <BehaviorsPage />
+            </MemoryRouter>
+        );
+
+        await waitFor(() => {
+            expect(screen.getByText('Crear Comportamiento +')).toBeInTheDocument();
+        });
+
+        // Hacemos clic en el botón
+        fireEvent.click(screen.getByText('Crear Comportamiento +'));
+
+        // Verificamos que el modal se abrió mostrando el título del editor
+        expect(screen.getByText('Editor de Comportamiento')).toBeInTheDocument();
     });
 });

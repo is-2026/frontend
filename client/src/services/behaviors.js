@@ -47,3 +47,17 @@ export const getBehaviorById = async (id) => {
     });
 };
 */
+
+export const createBehavior = async (data) => {
+    return await request('/club/behaviors', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    });
+};
+
+export const updateBehavior = async (id, data) => {
+    return await request(`/club/behaviors/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data)
+    });
+};

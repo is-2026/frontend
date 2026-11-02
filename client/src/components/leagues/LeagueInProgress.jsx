@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { getLeagueMatches, getStandings } from "../../services/leagues";
 import { getMyClub } from "../../services/club";
 import { NextMatchCard } from "./NextMatchCard";
@@ -48,6 +49,12 @@ export function LeagueInProgress({ league }) {
                 <h1 className="text-2xl sm:text-3xl font-black text-white mt-1">
                     {league.name}
                 </h1>
+                <Link
+                    to={`/leagues/${league.id}/lineup`}
+                    className="inline-block mt-3 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 font-semibold text-sm"
+                >
+                    Mi alineación
+                </Link>
             </div>
 
             {loading && (

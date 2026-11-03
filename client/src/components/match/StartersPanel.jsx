@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { LineupPanel } from "./LineupPanel";
 import { changeLiveBehavior } from "../../services/matches";
 
-export function startersPanel({matchId, players, behaviors}) {
+export function StartersPanel({matchId, players, behaviors}) {
     const [error, setError] =useState(null);
 
     async function handleBehaviorChange(playerId, behaviorId) {

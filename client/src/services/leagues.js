@@ -44,3 +44,45 @@ export function leaveLeague(leagueId) {
         method: "DELETE",
     });
 }
+
+export async function startLeague(leagueId) {
+    return await request(`/leagues/${leagueId}/start`, {
+        method: "POST",
+    });
+}
+
+// funcion que devuelve partidos de la liga
+export function getLeagueMatches(leagueId) {
+    return request(`/leagues/${leagueId}/matches`, { 
+        method: "GET",
+    });
+}
+
+// funcion que devuelve las posiciones de la liga, un array de la tabla
+export function getStandings(leagueId) {
+    return request(`/leagues/${leagueId}/standings`, {
+        method: "GET",
+    });
+}
+
+// devuelve las ligas en las que participa mi club
+export function getMyLeagues() {
+    return request("/clubs/leagues", {
+        method: "GET",
+    });
+}
+
+// devuelve mi alinación vigente en la liga
+export function getLineup(leagueId) {
+    return request(`/leagues/${leagueId}/lineup`, {
+        method: "GET",
+    });
+}
+
+// guarda mi alineación en la liga
+export function updateLineup(leagueId, data) {
+    return request(`/leagues/${leagueId}/lineup`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+    });
+}

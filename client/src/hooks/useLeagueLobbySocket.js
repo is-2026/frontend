@@ -43,7 +43,14 @@ export const useLeagueLobbySocket = (leagueId, setLeague, setError) => {
                         break;
 
                     case "leagueStarted":
-                        navigate(`/leagues/${leagueId}/lobby`); // cuando la liga empieza, redirigimos a la pantalla de la liga
+                        setLeague((prev) => {
+                            if(!prev) return prev;
+                            return {
+                                ...prev,
+                                is_started: true, // cuando la liga inicie marcarmos como iniciada, en tiempo real
+                                status: "started",
+                            };
+                        });
                         break;
 
                     case "leagueCancelled":

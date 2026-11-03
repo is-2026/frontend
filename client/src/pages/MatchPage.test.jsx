@@ -1,16 +1,28 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { MemoryRouter, Routes, Route, useMatch } from 'react-router-dom';
 import { MatchPage } from './MatchPage';
 import { useMatchSocket } from '../hooks/useMatchSocket';
 import { getPlayers } from '../services/club';
+import { changeLiveBehavior, scheduleSubstitution, cancelSubstitution } from "../services/matches";
+import { getBehaviors } from "../services/behaviors";
 
 vi.mock('../hooks/useMatchSocket', () => ({
-    useMatchSocket: vi.fn()
+    useMatchSocket: vi.fn() //vi.fn es función espía de esta función
 }));
 
 vi.mock('../services/club', () => ({
     getPlayers: vi.fn().mockResolvedValue([])
+}));
+
+vi.mock('../services/behaviors', () => ({
+    getBehaviors: vi.fn().mockResolvedValue([])
+}));
+
+vi.mock('../services/matches', () => ({
+    changeLiveBehavior: vi.fn(),
+    scheduleSubstitution: vi.fn(),
+    cancelSubstitution: vi.fn()
 }));
 
 describe('MatchPage', () => {
@@ -18,25 +30,61 @@ describe('MatchPage', () => {
         vi.clearAllMocks();
     });
 
-    test('1. El inicio del partido renderiza la interfaz completa, la cancha, jugadores y pelota', () => {
+    //Testeo para interacción durante el match
+    //el finished = null es si es undefined, vale null, 
+    // y el = {} indica que la función se puede llamar sin pasar argumentos
+    function mockMatch({ finished = null, pause = null, pausesEnded = 0 } = {}) {
         useMatchSocket.mockReturnValue({
+            teams: { home: { id: 'h', name: 'Local' }, away: { id: 'a', name: 'Visitante' } },
             lineups: {
-                home: [{ player_id: 'p1' }], 
-                away: [{ player_id: 'p3' }]  
+                home: [
+                    {
+                        player_id: 'h1', number: 1, 
+                        name: 'h-tit-1', is_starter: true, 
+                        behavior_id: 'b1', behavior_name: 'Atacante' 
+                    },
+                    {
+                        player_id: 'h2',
+                        number: 2,
+                        name: 'h-sup-1',
+                        is_starter: false
+                    }
+
+                    
+                ],
+                away: [{ player_id: 'a1', number: 4, name: 'a-tit-1', is_starter: true, behavior_id: 'b2', behavior_name: 'Defensor' }],
             },
             scores: { home: 0, away: 0 },
-            state: {
-                matchId: '123',
-                tick: 0,
+            state: { 
+                matchId: '123', 
+                tick: 0, 
                 players: [
-                    { playerId: 'p1', x: -10, y: -5 }, 
-                    { playerId: 'p3', x: 10, y: 5 }  
+                    { playerId: 'h1', x: -20, y: 0 },    
+                    { playerId: 'a1', x: 20, y: 0 }
                 ],
-                ballPosition: { x: 0, y: 0 }
-            },
+                ballPosition: { x: 0, y: 0 } },
             goalInfo: null,
-            finished: { matchEnd: false }
+            finished,
+            pause,
+            pausesEnded,
         });
+    }
+
+    async function renderMatch() {
+        await act(async () => {
+            render(
+                <MemoryRouter initialEntries={['/match/123']}>
+                    <Routes>
+                        <Route path="/match/:matchId" element={<MatchPage />} />
+                    </Routes>
+                </MemoryRouter>
+            );
+        });
+    }
+
+    test('1. El inicio del partido renderiza la interfaz completa, la cancha, jugadores y pelota', async() => {
+        getPlayers.mockResolvedValue([{ id: 'h1' }]);
+        mockMatch();
 
         const { container } = render(
             <MemoryRouter initialEntries={['/match/123']}>
@@ -47,12 +95,13 @@ describe('MatchPage', () => {
         );
 
         // Verificación de Header y Paneles
-        expect(screen.getByText('Equipo Local')).toBeInTheDocument();
-        expect(screen.getByText('Equipo Rival')).toBeInTheDocument();
+        expect(screen.getByText('Local')).toBeInTheDocument();
+        expect(screen.getByText('Visitante')).toBeInTheDocument();
         expect(screen.getByText('00:00')).toBeInTheDocument();
         expect(screen.getByText('Equipo')).toBeInTheDocument();
         expect(screen.getByText('Suplentes')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /realizar cambios/i })).toBeInTheDocument();
+        const changeButton = await screen.findByRole('button', { name: /realizar cambios/i });
+        expect(changeButton).toBeInTheDocument();
 
         // Verificación de los jugadores por sus clases de color (bg-blue-500 y bg-red-500)
         const homePlayers = container.querySelectorAll('.bg-blue-500');
@@ -65,11 +114,11 @@ describe('MatchPage', () => {
         expect(screen.getByTestId('ball')).toBeInTheDocument();
     });
 
-    test('2. Renderiza correctamente el banner de gol cuando goalInfo no es null', () => {
+    test('2. Renderiza correctamente el banner de gol cuando recibe data en goalInfo', () => {
         useMatchSocket.mockReturnValue({
             lineups: {
-                home: [{ player_id: 'p1' }], 
-                away: [{ player_id: 'p2' }]  
+                home: [{ player_id: 'p1' }],
+                away: [{ player_id: 'p2' }]
             },
             scores: { home: 1, away: 0 },
             state: {
@@ -102,8 +151,8 @@ describe('MatchPage', () => {
     test('3. Muestra el resultado final y banner al finalizar el partido (finished.matchEnd = true)', () => {
         useMatchSocket.mockReturnValue({
             lineups: {
-                home: [{ player_id: 'p1' }], 
-                away: [{ player_id: 'p2' }]  
+                home: [{ player_id: 'p1' }],
+                away: [{ player_id: 'p2' }]
             },
             scores: { home: 2, away: 1 },
             state: {
@@ -118,22 +167,22 @@ describe('MatchPage', () => {
                 homeScore: 2,
                 awayScore: 1
             }
+        });
+
+        render(
+            <MemoryRouter initialEntries={['/match/123']}>
+                <Routes>
+                    <Route path="/match/:matchId" element={<MatchPage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        // Verifica el título del banner
+        expect(screen.getByText(/PARTIDO FINALIZADO/i)).toBeInTheDocument();
+
+        // Busca el texto "2 - 1"
+        expect(screen.getByText('Equipo Local 2 - 1 Equipo Rival')).toBeInTheDocument();
     });
-
-    render(
-        <MemoryRouter initialEntries={['/match/123']}>
-            <Routes>
-                <Route path="/match/:matchId" element={<MatchPage />} />
-            </Routes>
-        </MemoryRouter>
-    );
-
-    // Verifica el título del banner
-    expect(screen.getByText(/PARTIDO FINALIZADO/i)).toBeInTheDocument();
-
-    // Busca el texto "2 - 1"
-    expect(screen.getByText('Equipo Local 2 - 1 Equipo Rival')).toBeInTheDocument();
-});
 
     test('4. Tolera coordenadas fuera de rango en la simulación sin romper el componente', () => {
         useMatchSocket.mockReturnValue({
@@ -218,7 +267,7 @@ describe('MatchPage', () => {
         expect(screen.getByText('1')).toBeInTheDocument();
     });
 
-    test('6. Los paneles muestran mi equipo (aunque sea el visitante) y cada ficha tiene su número', async () => {
+    test('6. Los paneles muestran mi equipo y cada ficha tiene su número', async () => {
         const lineup = (prefix, firstNumber) => [
             { player_id: `${prefix}1`, number: firstNumber, name: `${prefix}-tit-1`, is_starter: true, behavior_name: 'Atacante' },
             { player_id: `${prefix}2`, number: firstNumber + 1, name: `${prefix}-tit-2`, is_starter: true, behavior_name: 'Defensor' },
@@ -245,10 +294,146 @@ describe('MatchPage', () => {
 
         expect(await screen.findByText('a-tit-1')).toBeInTheDocument();
         expect(screen.getByText('a-tit-2')).toBeInTheDocument();
-        expect(screen.getByText('Atacante')).toBeInTheDocument();
+        expect(screen.getAllByRole('combobox')).toHaveLength(2); //como ahora es select, verifica que sea cuadro desplegable de longitud 2
         expect(screen.getByText('a-sup-1')).toBeInTheDocument();
         expect(screen.queryByText('h-tit-1')).not.toBeInTheDocument();
         // la ficha del jugador a1 muestra su número
         expect(screen.getByTestId('player-a1')).toHaveTextContent('7');
     });
+
+    // --- Cambio de comportamiento en vivo ---
+
+    const behaviorsMock = [
+        { id: 'b1', name: 'Atacante' },
+        { id: 'b2', name: 'Defensor' },
+    ];
+
+    test('7. Aparece selector de comportamientos con comportamiento actual durante el partido', async () => {
+        getPlayers.mockResolvedValue([{ id: 'h1' }]);
+        getBehaviors.mockResolvedValue([{ id: 'b1', name: 'Atacante' }]);
+        mockMatch();
+        await renderMatch();
+        expect(await screen.findByRole('combobox')).toHaveDisplayValue('Atacante');
+    });
+
+    test('8. Un espectador no puede modificar comportamientos del partido', async () => {
+        getPlayers.mockResolvedValue([{ id: 'otro-club' }]);
+        getBehaviors.mockResolvedValue(behaviorsMock);
+        mockMatch();
+        await renderMatch();
+        expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+        expect(screen.queryByText('Atacante')).not.toBeInTheDocument();
+    });
+
+    test('9. Con el partido terminado no hay selector', async () => {
+        getPlayers.mockResolvedValue([{ id: 'h1' }]);
+        getBehaviors.mockResolvedValue(behaviorsMock);
+        mockMatch({ finished: { matchEnd: true, tick: 5400, homeScore: 0, awayScore: 0 } });
+        await renderMatch();
+        expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+        expect(screen.getByText('Atacante')).toBeInTheDocument();
+    });
+
+    test('10. Cambio rechazado por backend, se muestra mensaje de error y se mantiene el comportamiento anterior', async () => {
+        getPlayers.mockResolvedValue([{ id: 'h1' }]);
+        getBehaviors.mockResolvedValue(behaviorsMock);
+        changeLiveBehavior.mockRejectedValue(
+            Object.assign(new Error('El comportamiento seleccionado fue eliminado o es inválido'), { status: 400 })
+        );
+        mockMatch();
+        await renderMatch();
+        fireEvent.change(screen.getByRole('combobox'), { target: { value: 'b2' } });
+        expect(await screen.findByText('El comportamiento seleccionado fue eliminado o es inválido')).toBeInTheDocument();
+        expect(changeLiveBehavior).toHaveBeenCalledWith('123', 'h1', 'b2');
+        expect(screen.getByRole('combobox')).toHaveDisplayValue('Atacante');
+    });
+
+    test.each([
+        ['cooling_break_1', 'Primera pausa de hidratación'],
+        ['halftime', 'Entretiempo'],
+        ['cooling_break_2', 'Segunda pausa de hidratación'],
+    ])('11. Se ve cartel de pausa en una pausa, y se muestra el nombre de %s', async (type, name) => {
+        const startTime = new Date().toISOString()
+        mockMatch({ pause: { type, endsAt: new Date(Date.now() + 15000).toISOString() } });
+        await renderMatch();
+        
+        expect(screen.getByText(name)).toBeInTheDocument();
+        expect(screen.getByTestId('countdown')).toHaveTextContent('15');
+        
+    });
+
+    test('12. Sin pausa no se muestra el cartel', async () => {
+        mockMatch();
+        await renderMatch();
+
+        expect(screen.queryByTestId('countdown')).not.toBeInTheDocument();
+    });
+
+    test('13. Permite Realizar cambios con pausesEnded < 3 y muestra el cartel de cambio pendiente', async () => {
+        getPlayers.mockResolvedValue([{ id: 'h1' }]);
+        getBehaviors.mockResolvedValue(behaviorsMock);
+        
+        mockMatch({ pausesEnded: 1 }); // Usás tu misma función
+
+        scheduleSubstitution.mockResolvedValueOnce({
+            status: 'pending',
+            player_out_id: 'h1',
+            player_in_id: 'h2'
+        });
+
+        await renderMatch();
+
+        
+        //Abre panel de cambios, selecciona quien sale y quién entra y comportamiento, confirma
+        fireEvent.click(screen.getByRole('button', { name: /Realizar cambios/i }));
+        fireEvent.change(screen.getByDisplayValue('Quién sale...'), { target: { value: 'h1' } });
+        fireEvent.change(screen.getByDisplayValue('Quién entra...'), { target: { value: 'h2' } });
+        fireEvent.change(screen.getByDisplayValue('Qué comportamiento tendrá'), { target: { value: 'b1' } });
+        fireEvent.click(screen.getByRole('button', { name: /Confirmar cambio/i })); 
+        expect(await screen.findByText('Cambio planificado para la próxima pausa')).toBeInTheDocument();
+    });
+
+    test('14. Permite realizar cambios durante una pausa activa', async () => {
+        getPlayers.mockResolvedValue([{ id: 'h1' }]);
+        getBehaviors.mockResolvedValue(behaviorsMock);
+    
+        //Pasa una pausa activa
+        mockMatch({ 
+            pause: { type: 'halftime', endsAt: new Date(Date.now() + 15000).toISOString() }, 
+            pausesEnded: 1 
+        });
+
+        //El cambio debería ejecutarse al instante
+        scheduleSubstitution.mockResolvedValueOnce({
+            status: 'success',
+            player_out_id: 'h1',
+            player_in_id: 'h99' // ID distinto al suplente del array para forzar el estado 'executed'
+        });
+
+        await renderMatch();
+
+  
+        fireEvent.click(screen.getByRole('button', { name: /Realizar cambios/i }));
+        fireEvent.change(screen.getByDisplayValue('Quién sale...'), { target: { value: 'h1' } });
+        fireEvent.change(screen.getByDisplayValue('Quién entra...'), { target: { value: 'h2' } });
+        fireEvent.change(screen.getByDisplayValue('Qué comportamiento tendrá'), { target: { value: 'b1' } });
+        fireEvent.click(screen.getByRole('button', { name: /Confirmar cambio/i }));
+        expect(await screen.findByText('Cambio realizado')).toBeInTheDocument();
+    });
+
+    test('15. No se pueden Realizar cambios con pausesEnded == 3', async () => {
+        getPlayers.mockResolvedValue([{ id: 'h1' }]);
+        getBehaviors.mockResolvedValue(behaviorsMock);
+        
+        mockMatch({ pausesEnded: 3 });
+
+        await renderMatch();
+
+        fireEvent.click(screen.getByRole('button', { name: /Realizar cambios/i }));
+
+        expect(await screen.findByText(/ya se han alcanzado las 3 pausas permitidas/i)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Confirmar cambio/i })).toBeDisabled();
+    });
+
+
 });

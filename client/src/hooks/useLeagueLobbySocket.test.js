@@ -103,18 +103,6 @@ describe("useLeagueLobbySocket Hook", () => {
         expect(nuevoEstado.registered_clubs[0].club_id).toBe("20");
     });
 
-    test("redirecciona a la liga cuando llega el evento 'leagueStarted'", () => {
-        const leagueId = "999";
-        renderHook(() => useLeagueLobbySocket(leagueId, mockSetLeague, mockSetError));
-        const socket = MockWebSocket.instances[0];
-
-        act(() => {
-            socket.sendMessage({ type: "leagueStarted" });
-        });
-
-        expect(mockNavigate).toHaveBeenCalledWith(`/leagues/${leagueId}/lobby`);
-    });
-
     test("muestra el mensaje de error si llega el evento 'leagueCancelled'", () => {
         renderHook(() => useLeagueLobbySocket("123", mockSetLeague, mockSetError));
         const socket = MockWebSocket.instances[0];
@@ -135,5 +123,23 @@ describe("useLeagueLobbySocket Hook", () => {
         unmount();
 
         expect(socket.close).toHaveBeenCalledTimes(1);
+    });
+
+    test("maneja el evento 'leagueStarted' marcando la liga como iniciada", () => {
+        renderHook(() => useLeagueLobbySocket("123", mockSetLeague, mockSetError));
+        const socket = MockWebSocket.instances[0];
+
+        act(() => {
+            socket.sendMessage({ type: "leagueStarted" });
+        });
+
+        expect(mockSetLeague).toHaveBeenCalledTimes(1);
+
+        const updaterFn = mockSetLeague.mock.calls[0][0];
+        const statePrevio = { id: "123", name: "Liga Test", registered_clubs: [] };
+        const nuevoEstado = updaterFn(statePrevio);
+
+        expect(nuevoEstado.is_started).toBe(true);
+        expect(nuevoEstado.status).toBe("started");
     });
 });

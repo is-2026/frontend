@@ -17,6 +17,7 @@ import { CreateFriendlyPage } from "./pages/CreateFriendlyPage";
 import { LeaguesPage } from "./pages/LeaguesPage";
 import { CreateLeaguePage } from "./pages/CreateLeaguePage";
 import { JoinLeaguePage } from "./pages/JoinLeaguePage";
+import { LeagueLineupPage } from "./pages/LeagueLineupPage";
 
 //layout para vistas autenticadas / protegidas con Navbar
 function MainLayout() {
@@ -74,6 +75,7 @@ export default function App() {
         <Route path="/leagues/create" element={<CreateLeaguePage />} />
         <Route path="/leagues/:leagueId/join" element={<JoinLeaguePage />} />
         <Route path="/leagues/:leagueId/lobby" element={<LeagueLobbyPage />} />
+        <Route path="/leagues/:leagueId/lineup" element={<LeagueLineupPage />} />
         </Route>
     </Routes>
   );

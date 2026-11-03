@@ -21,13 +21,13 @@ export const getBehaviors = async () => {
 };
 */
 
-export const getBehaviorById = async (id) => {
+/* export const getBehaviorById = async (id) => {
     return await request(`/club/behaviors/${id}`, { 
         method: 'GET' 
     });
-};
+}; */
 
-/*
+
 export const getBehaviorById = async (id) => {
     // MOCK: Simula la base de datos para probar estilos y funcionalidad 
     const mockDb = {
@@ -46,7 +46,7 @@ export const getBehaviorById = async (id) => {
         }, 500);
     });
 };
-*/
+
 
 export const createBehavior = async (data) => {
     return await request('/club/behaviors', {

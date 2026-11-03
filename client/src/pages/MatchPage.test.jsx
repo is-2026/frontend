@@ -4,7 +4,7 @@ import { MemoryRouter, Routes, Route, useMatch } from 'react-router-dom';
 import { MatchPage } from './MatchPage';
 import { useMatchSocket } from '../hooks/useMatchSocket';
 import { getPlayers } from '../services/club';
-import { changeLiveBehavior } from "../services/matches";
+import { changeLiveBehavior, scheduleSubstitution, cancelSubstitution } from "../services/matches";
 import { getBehaviors } from "../services/behaviors";
 
 vi.mock('../hooks/useMatchSocket', () => ({
@@ -20,7 +20,9 @@ vi.mock('../services/behaviors', () => ({
 }));
 
 vi.mock('../services/matches', () => ({
-    changeLiveBehavior: vi.fn()
+    changeLiveBehavior: vi.fn(),
+    scheduleSubstitution: vi.fn(),
+    cancelSubstitution: vi.fn()
 }));
 
 describe('MatchPage', () => {
@@ -28,25 +30,61 @@ describe('MatchPage', () => {
         vi.clearAllMocks();
     });
 
-    test('1. El inicio del partido renderiza la interfaz completa, la cancha, jugadores y pelota', () => {
+    //Testeo para interacción durante el match
+    //el finished = null es si es undefined, vale null, 
+    // y el = {} indica que la función se puede llamar sin pasar argumentos
+    function mockMatch({ finished = null, pause = null, pausesEnded = 0 } = {}) {
         useMatchSocket.mockReturnValue({
+            teams: { home: { id: 'h', name: 'Local' }, away: { id: 'a', name: 'Visitante' } },
             lineups: {
-                home: [{ player_id: 'p1' }],
-                away: [{ player_id: 'p3' }]
+                home: [
+                    {
+                        player_id: 'h1', number: 1, 
+                        name: 'h-tit-1', is_starter: true, 
+                        behavior_id: 'b1', behavior_name: 'Atacante' 
+                    },
+                    {
+                        player_id: 'h2',
+                        number: 2,
+                        name: 'h-sup-1',
+                        is_starter: false
+                    }
+
+                    
+                ],
+                away: [{ player_id: 'a1', number: 4, name: 'a-tit-1', is_starter: true, behavior_id: 'b2', behavior_name: 'Defensor' }],
             },
             scores: { home: 0, away: 0 },
-            state: {
-                matchId: '123',
-                tick: 0,
+            state: { 
+                matchId: '123', 
+                tick: 0, 
                 players: [
-                    { playerId: 'p1', x: -10, y: -5 },
-                    { playerId: 'p3', x: 10, y: 5 }
+                    { playerId: 'h1', x: -20, y: 0 },    
+                    { playerId: 'a1', x: 20, y: 0 }
                 ],
-                ballPosition: { x: 0, y: 0 }
-            },
+                ballPosition: { x: 0, y: 0 } },
             goalInfo: null,
-            finished: { matchEnd: false }
+            finished,
+            pause,
+            pausesEnded,
         });
+    }
+
+    async function renderMatch() {
+        await act(async () => {
+            render(
+                <MemoryRouter initialEntries={['/match/123']}>
+                    <Routes>
+                        <Route path="/match/:matchId" element={<MatchPage />} />
+                    </Routes>
+                </MemoryRouter>
+            );
+        });
+    }
+
+    test('1. El inicio del partido renderiza la interfaz completa, la cancha, jugadores y pelota', async() => {
+        getPlayers.mockResolvedValue([{ id: 'h1' }]);
+        mockMatch();
 
         const { container } = render(
             <MemoryRouter initialEntries={['/match/123']}>
@@ -57,12 +95,13 @@ describe('MatchPage', () => {
         );
 
         // Verificación de Header y Paneles
-        expect(screen.getByText('Equipo Local')).toBeInTheDocument();
-        expect(screen.getByText('Equipo Rival')).toBeInTheDocument();
+        expect(screen.getByText('Local')).toBeInTheDocument();
+        expect(screen.getByText('Visitante')).toBeInTheDocument();
         expect(screen.getByText('00:00')).toBeInTheDocument();
         expect(screen.getByText('Equipo')).toBeInTheDocument();
         expect(screen.getByText('Suplentes')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /realizar cambios/i })).toBeInTheDocument();
+        const changeButton = await screen.findByRole('button', { name: /realizar cambios/i });
+        expect(changeButton).toBeInTheDocument();
 
         // Verificación de los jugadores por sus clases de color (bg-blue-500 y bg-red-500)
         const homePlayers = container.querySelectorAll('.bg-blue-500');
@@ -269,36 +308,6 @@ describe('MatchPage', () => {
         { id: 'b2', name: 'Defensor' },
     ];
 
-    //Testeo para interacción durante el match
-    //el finished = null es si es undefined, vale null, 
-    // y el = {} indica que la función se puede llamar sin pasar argumentos
-    function mockMatch({ finished = null, pause = null } = {}) {
-        useMatchSocket.mockReturnValue({
-            teams: { home: { id: 'h', name: 'Local' }, away: { id: 'a', name: 'Visitante' } },
-            lineups: {
-                home: [{ player_id: 'h1', number: 1, name: 'h-tit-1', is_starter: true, behavior_id: 'b1', behavior_name: 'Atacante' }],
-                away: [{ player_id: 'a1', number: 4, name: 'a-tit-1', is_starter: true, behavior_id: 'b2', behavior_name: 'Defensor' }],
-            },
-            scores: { home: 0, away: 0 },
-            state: { matchId: '123', tick: 0, players: [], ballPosition: { x: 0, y: 0 } },
-            goalInfo: null,
-            finished,
-            pause,
-        });
-    }
-
-    async function renderMatch() {
-        await act(async () => {
-            render(
-                <MemoryRouter initialEntries={['/match/123']}>
-                    <Routes>
-                        <Route path="/match/:matchId" element={<MatchPage />} />
-                    </Routes>
-                </MemoryRouter>
-            );
-        });
-    }
-
     test('7. Aparece selector de comportamientos con comportamiento actual durante el partido', async () => {
         getPlayers.mockResolvedValue([{ id: 'h1' }]);
         getBehaviors.mockResolvedValue([{ id: 'b1', name: 'Atacante' }]);
@@ -359,5 +368,72 @@ describe('MatchPage', () => {
 
         expect(screen.queryByTestId('countdown')).not.toBeInTheDocument();
     });
+
+    test('13. Permite Realizar cambios con pausesEnded < 3 y muestra el cartel de cambio pendiente', async () => {
+        getPlayers.mockResolvedValue([{ id: 'h1' }]);
+        getBehaviors.mockResolvedValue(behaviorsMock);
+        
+        mockMatch({ pausesEnded: 1 }); // Usás tu misma función
+
+        scheduleSubstitution.mockResolvedValueOnce({
+            status: 'pending',
+            player_out_id: 'h1',
+            player_in_id: 'h2'
+        });
+
+        await renderMatch();
+
+        
+        //Abre panel de cambios, selecciona quien sale y quién entra y comportamiento, confirma
+        fireEvent.click(screen.getByRole('button', { name: /Realizar cambios/i }));
+        fireEvent.change(screen.getByDisplayValue('Quién sale...'), { target: { value: 'h1' } });
+        fireEvent.change(screen.getByDisplayValue('Quién entra...'), { target: { value: 'h2' } });
+        fireEvent.change(screen.getByDisplayValue('Qué comportamiento tendrá'), { target: { value: 'b1' } });
+        fireEvent.click(screen.getByRole('button', { name: /Confirmar cambio/i })); 
+        expect(await screen.findByText('Cambio planificado para la próxima pausa')).toBeInTheDocument();
+    });
+
+    test('14. Permite realizar cambios durante una pausa activa', async () => {
+        getPlayers.mockResolvedValue([{ id: 'h1' }]);
+        getBehaviors.mockResolvedValue(behaviorsMock);
+    
+        //Pasa una pausa activa
+        mockMatch({ 
+            pause: { type: 'halftime', startedAt: new Date().toISOString() }, 
+            pausesEnded: 1 
+        });
+
+        //El cambio debería ejecutarse al instante
+        scheduleSubstitution.mockResolvedValueOnce({
+            status: 'success',
+            player_out_id: 'h1',
+            player_in_id: 'h99' // ID distinto al suplente del array para forzar el estado 'executed'
+        });
+
+        await renderMatch();
+
+  
+        fireEvent.click(screen.getByRole('button', { name: /Realizar cambios/i }));
+        fireEvent.change(screen.getByDisplayValue('Quién sale...'), { target: { value: 'h1' } });
+        fireEvent.change(screen.getByDisplayValue('Quién entra...'), { target: { value: 'h2' } });
+        fireEvent.change(screen.getByDisplayValue('Qué comportamiento tendrá'), { target: { value: 'b1' } });
+        fireEvent.click(screen.getByRole('button', { name: /Confirmar cambio/i }));
+        expect(await screen.findByText('Cambio realizado')).toBeInTheDocument();
+    });
+
+    test('15. No se pueden Realizar cambios con pausesEnded == 3', async () => {
+        getPlayers.mockResolvedValue([{ id: 'h1' }]);
+        getBehaviors.mockResolvedValue(behaviorsMock);
+        
+        mockMatch({ pausesEnded: 3 });
+
+        await renderMatch();
+
+        fireEvent.click(screen.getByRole('button', { name: /Realizar cambios/i }));
+
+        expect(await screen.findByText(/ya se han alcanzado las 3 pausas permitidas/i)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Confirmar cambio/i })).toBeDisabled();
+    });
+
 
 });

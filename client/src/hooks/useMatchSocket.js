@@ -16,6 +16,22 @@ function behaviorUpdate(players, player_id, behavior_id, behavior_name) { //en p
 	});
 }
 
+function substitutionUpdate(players, player_in_id, player_out_id, behavior_id, behavior_name) {
+	return players.map((p)=> {
+		if (p.player_id == player_out_id) {
+			return {...p, is_starter: false};
+		}
+		if (p.player_id == player_in_id) {
+			return {...p, is_starter: true, behavior_id, behavior_name};
+		}
+		return p;
+	})
+}
+//para identificar que team o club hace el cambio (de comportamiento o de jugador)
+function whichTeam(lineups, player_id) {
+	return lineups.home.some((p) => p.player_id == player_id) ? "home" : "away";
+}
+
 export function useMatchSocket(matchId) {
 	const [teams, setTeams] = useState(null); // { home: {id, name, avatar_url}, away: {...} }
 	const [lineups, setLineups] = useState(null); // home, away
@@ -23,6 +39,7 @@ export function useMatchSocket(matchId) {
 	const [state, setState] = useState(null); // match_id, tick, players, ball_position
 	const [goalInfo, setGoalInfo] = useState(null);
 	const [pause, setPause] = useState(null);
+	const [pausesEnded, setPausesEnded] = useState(0);
 	const [finished, setFinished] = useState(null);
 	const [closeCode, setCloseCode] = useState(null);
 
@@ -37,17 +54,31 @@ export function useMatchSocket(matchId) {
 		// Si el cierre lo pedimos nosotros (desmontaje, StrictMode), no es un error.
 		let active = true;
 		
-		socketRef.current = new WebSocket(wsUrl(MATCH_WS_PATH(matchId)));
-		const ws = socketRef.current;
 		/*
 		const ws = new WebSocket(wsUrl(MATCH_WS_PATH(matchId)));
 		socketRef.current = ws;
 		window.__TEST_WS__ = socketRef.current; // Exponer para pruebas
 		if (typeof window !== "undefined") {
-			window.__TEST_WS__ = ws;
-    	}
-		
+			
+			// Simular pausa (ej: 'halftime', 'cooling_break_1', etc.)
+			window.testPause = (type = "halftime") => {
+				setPause({
+					type: type,
+					startedAt: new Date().toISOString(),
+				});
+			};
+
+			// 4. Simular fin de pausa / incrementar pausas terminadas (para probar pausesEnded == 3)
+			window.testResume = (incrementPauses = true) => {
+				setPause(null);
+				if (incrementPauses) {
+					setPausesEnded((n) => n + 1);
+				}
+			};
+		}
 		*/
+		socketRef.current = new WebSocket(wsUrl(MATCH_WS_PATH(matchId)));
+		const ws = socketRef.current;
 		ws.addEventListener("open", () => { console.log("CONNECTED"); });
 		ws.addEventListener("error", () => { console.error(`ERROR`); });
 		ws.addEventListener("close", (e) => {
@@ -139,7 +170,8 @@ export function useMatchSocket(matchId) {
 						})
 					break;
 				}
-
+				
+				//Caso pausa de hidratación
 				case "coolingBreakStart": {
 					const {cooling_break_number, cooling_break_start} = msg.data;
 					setPause({
@@ -149,6 +181,7 @@ export function useMatchSocket(matchId) {
 					break;
 				}
 
+				//Caso pausa de medio tiempo
 				case "halftimeStart": {
 					setPause({
 						type: "halftime",
@@ -157,8 +190,10 @@ export function useMatchSocket(matchId) {
 					break;
 				}
 
+				//Caso partido resumido
 				case "matchResumed": {
 					setPause(null);
+					setPausesEnded((n) => (n+1));
 					break;
 				}
 
@@ -166,12 +201,19 @@ export function useMatchSocket(matchId) {
 				case "behaviorChanged": {
 					const { player_id, behavior_id, behavior_name } = msg.data;
 					setLineups((prev) => {
-						return {
-							home: behaviorUpdate(prev.home, player_id, behavior_id, behavior_name),
-							away: behaviorUpdate(prev.away, player_id, behavior_id, behavior_name)
-						};
-					});
+						const team = whichTeam(prev, player_id); //team puede ser "home" o "away"
+						return { ...prev, [team]: behaviorUpdate(prev[team], player_id, behavior_id, behavior_name)};
+					}); //team se usa como clave para acceder a home o away
 					break;
+				}
+
+				case "substitutionMade": {
+					const { player_in_id, player_out_id, behavior_id, behavior_name } = msg.data;
+					setLineups((prev) => {
+						const team = whichTeam(prev, player_in_id);
+						return { ...prev, [team]: substitutionUpdate(prev[team], player_in_id, player_out_id, behavior_id, behavior_name)};
+					});
+					break;	
 				}
 
 				//error
@@ -187,5 +229,5 @@ export function useMatchSocket(matchId) {
 			}
 		};
 	}, [matchId]);
-	return { teams, lineups , scores , state, goalInfo, finished, closeCode, pause };
+	return { teams, lineups , scores , state, goalInfo, finished, closeCode, pause, pausesEnded };
 }

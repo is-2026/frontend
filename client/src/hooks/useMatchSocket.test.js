@@ -258,16 +258,40 @@ describe('useMatchSocket', () => {
                                                         //que sería el 3er elemento de cada arreglo
     });
 
-    test('9. "matchResumed" termina la pausa', () => {
+    test('9. "matchResumed" termina la pausa y suma 1 al contador', () => {
         const { result, send } = setupHook();
+        expect(result.current.pausesEnded).toBe(0);
 
         send('halftimeStart', { halftime_start: 't' });
         expect(result.current.pause).not.toBeNull();
-
+        
         send('matchResumed', {});
         expect(result.current.pause).toBeNull();
+        expect(result.current.pausesEnded).toBe(1);
+
+        send('coolingBreakStart', { cooling_break_number: 2, cooling_break_start: 't' });
+        expect(result.current.pause).not.toBeNull();
+        send('matchResumed', {});
+        expect(result.current.pausesEnded).toBe(2);
     });
 
+    test('10. "SubstitutionMade" realiza el cambio del titular por suplente con su comportamiento, sin modificar al otro club', ()  =>{
+        const { result, send } = setupHook();
 
+        send('matchStarted', {
+            home_lineup: [{player_id: 'h1', is_starter:true}],
+            away_lineup: [
+                { player_id: 'a1', is_starter: true, behavior_id: 'b1', behavior_name: 'Atacante'},
+                { player_id: 'a2', is_starter: false},
+            ]
+        });
+        const oldHome = result.current.lineups.home;
+
+        send('substitutionMade', {player_in_id: 'a2', player_out_id: 'a1', behavior_id: 'b2', behavior_name: 'Defensor'});
+        const[leaving, entering] = result.current.lineups.away;
+        expect(leaving.is_starter).toBe(false);
+        expect(entering).toEqual({ player_id: 'a2', is_starter: true, behavior_id: 'b2', behavior_name: 'Defensor' });
+        expect(result.current.lineups.home).toBe(oldHome); // verifica que no se modifique home
+    })
 
 });

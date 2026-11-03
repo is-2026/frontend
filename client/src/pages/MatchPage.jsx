@@ -10,19 +10,25 @@ import { useEffect, useState } from "react";
 import { changeLiveBehavior } from "../services/matches";
 import { getBehaviors } from "../services/behaviors";
 import { PauseBanner } from "../components/match/PauseBanner";
+import { SubstitutionPanel } from "../components/match/SubstitutionPanel";
+
 
 export function MatchPage() {
     const { matchId } = useParams();
     const { 
         teams, lineups, scores, 
         state, goalInfo, finished,
-        pause
+        pause, pausesEnded
     } = useMatchSocket(matchId);
 
+    //Variables para cambio de behaviors
     const [behaviors, setBehaviors] = useState([]);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
+    //Variable para mostrar formulario de sustitución
+    const [showForm, setShowForm] = useState(false);
+    
     // ids de los jugadores de mi club, para saber cuál de las dos alineaciones es la mía
     const [myPlayerIds, setMyPlayerIds] = useState(new Set());
     useEffect(() => {
@@ -33,7 +39,13 @@ export function MatchPage() {
             .then((b) => setBehaviors(b || []))
             .catch(() => setBehaviors([]));
     }, []);
-    
+
+    //Cierra formulario de cambio en pausas luego de que acaba la pausa.
+    useEffect(() => {
+        if (!pause) {
+            setShowForm(false);
+        }
+    }, [pause]);
 
     const mySide = lineups?.away?.some((p) => myPlayerIds.has(p.player_id)) ? "away" : "home";
     const myLineup = lineups?.[mySide] ?? [];
@@ -65,7 +77,7 @@ export function MatchPage() {
             {/* Contenedor de cancha.*/}
             <div className="w-[1272px] mx-auto pb-8">
 
-                <div className="flex gap-4">
+                <div className="flex gap-4 items-start">
                     <div className="min-w-0 flex-1 relative">
 
                         {/*cronómetro y evento partido finalizado */}
@@ -83,6 +95,7 @@ export function MatchPage() {
 
                         {/* banner de pausa */}
                         <PauseBanner pause={pause}/>
+
 
                         {/* banner de fin de partido */}
                         <MatchFinishedBanner
@@ -109,10 +122,52 @@ export function MatchPage() {
 
                         { /*suplentes*/}
                         <LineupPanel title="Suplentes" players={substitutes} />
-                        { /*cambios*/}
-                        <button className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-4 border border-slate-600 transition-colors uppercase text-sm mt-auto">
-                            Realizar Cambios
-                        </button>
+                        
+                        { /*Planificar cambios durante el partido*/}
+                        {canChange && !pause && (
+                            <>
+                                <div hidden={!showForm}>
+                                {/* Panel de sustituciones */}
+                                <SubstitutionPanel
+                                    matchId={matchId}
+                                    starters={starters}
+                                    substitutes={substitutes}
+                                    behaviors={behaviors}
+                                    pause={pause}
+                                    pausesEnded={pausesEnded}
+                                />
+                                </div>
+                                <button 
+                                    onClick={() => setShowForm(!showForm)}
+                                    className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-4 border border-slate-600 transition-colors uppercase text-sm mt-auto">
+                                    Realizar cambios
+                                </button>
+                            </>
+                        )}
+
+                        {/* Cambios durante pausas */}
+                        {pause && canChange && (
+                            <div className="bg-slate-900 border border-slate-700 p-4 mt-2 rounded shadow-lg">
+                                <button 
+                                    onClick={() => setShowForm(!showForm)}
+                                    className="bg-emerald-600 hover:bg-emerald-400 text-white font-bold py-2 px-4 ring-2 ring-gray-300 animate-bounce transition-colors uppercase text-[19px]">
+                                    {showForm ? "Ocultar" : "Realizar cambios"}
+                                </button>
+
+                                {showForm && (
+                                    <div className="mt-4">
+                                        <SubstitutionPanel
+                                            matchId={matchId}
+                                            starters={starters}
+                                            substitutes={substitutes}
+                                            behaviors={behaviors}
+                                            pause={pause}
+                                            pausesEnded={pausesEnded}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -94,7 +94,7 @@ export function MatchPage() {
                         <GoalBanner goalInfo={goalInfo} />
 
                         {/* banner de pausa */}
-                        <PauseBanner pause={pause}/>
+                        { pause && <PauseBanner pause={pause}/> }
 
 
                         {/* banner de fin de partido */}

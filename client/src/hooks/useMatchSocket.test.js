@@ -232,19 +232,19 @@ describe('useMatchSocket', () => {
     test.each([
         [
             'coolingBreakStart', 
-            { cooling_break_number: 1, cooling_break_start: 't' }, 
-            { type: 'cooling_break_1', startedAt: 't' }
+            { cooling_break_number: 1, cooling_break_start: 't', ends_at: 'e' }, 
+            { type: 'cooling_break_1', endsAt: 'e' }
         ],
 
         [
             'coolingBreakStart', 
-            { cooling_break_number: 2, cooling_break_start: 't' }, 
-            { type: 'cooling_break_2', startedAt: 't' }
+            { cooling_break_number: 2, cooling_break_start: 't', ends_at: 'e' }, 
+            { type: 'cooling_break_2', endsAt: 'e' }
         ],
         [
             'halftimeStart', 
-            { halftime_start: 't' }, 
-            { type: 'halftime', startedAt: 't' }
+            { halftime_start: 't', ends_at: 'e' }, 
+            { type: 'halftime', endsAt: 'e' }
         ],
     ])('8. "%s" activa la pausa correspondiente', (type, data, expected) => { 
         //type es el string, data es el tipo e inicio de pausa,

@@ -55,30 +55,30 @@ export function useMatchSocket(matchId) {
 		let active = true;
 		
 		/*
-		const ws = new WebSocket(wsUrl(MATCH_WS_PATH(matchId)));
-		socketRef.current = ws;
-		window.__TEST_WS__ = socketRef.current; // Exponer para pruebas
-		if (typeof window !== "undefined") {
-			
-			// Simular pausa (ej: 'halftime', 'cooling_break_1', etc.)
-			window.testPause = (type = "halftime") => {
-				setPause({
-					type: type,
-					startedAt: new Date().toISOString(),
-				});
-			};
+		Mock para probar pausas en consola f12
+		const send = (type, data) =>
+		window.__TEST_WS__.dispatchEvent(
+			new MessageEvent("message", { data: JSON.stringify({ type, data }) })
+		);
+		const inSeconds = (s) => new Date(Date.now() + s * 1000).toISOString();
 
-			// 4. Simular fin de pausa / incrementar pausas terminadas (para probar pausesEnded == 3)
-			window.testResume = (incrementPauses = true) => {
-				setPause(null);
-				if (incrementPauses) {
-					setPausesEnded((n) => n + 1);
-				}
-			};
-		}
+		Y luego enviar estos mensajes 
+		// Pausa de hidratación 1, 15 s
+		send("coolingBreakStart", { cooling_break_number: 1, ends_at: inSeconds(15) });
+
+		// Entretiempo
+		send("halftimeStart", { halftime_start: new Date().toISOString(), ends_at: inSeconds(15) });
+
+		// Hidratación 2
+		send("coolingBreakStart", { cooling_break_number: 2, ends_at: inSeconds(15) });
+
+		// Fin de pausa
+		send("matchResumed", {});
 		*/
 		socketRef.current = new WebSocket(wsUrl(MATCH_WS_PATH(matchId)));
 		const ws = socketRef.current;
+		if (import.meta.env.DEV) window.__TEST_WS__ = ws;
+
 		ws.addEventListener("open", () => { console.log("CONNECTED"); });
 		ws.addEventListener("error", () => { console.error(`ERROR`); });
 		ws.addEventListener("close", (e) => {
@@ -173,10 +173,10 @@ export function useMatchSocket(matchId) {
 				
 				//Caso pausa de hidratación
 				case "coolingBreakStart": {
-					const {cooling_break_number, cooling_break_start} = msg.data;
+					const {cooling_break_number, ends_at} = msg.data;
 					setPause({
 						type: cooling_break_number == 1 ? "cooling_break_1" : "cooling_break_2", //identifica qué cooling break es
-						startedAt: cooling_break_start,
+						endsAt: ends_at,
 					});
 					break;
 				}
@@ -185,7 +185,7 @@ export function useMatchSocket(matchId) {
 				case "halftimeStart": {
 					setPause({
 						type: "halftime",
-						startedAt: msg.data.halftime_start,
+						endsAt: msg.data.ends_at,
 					});
 					break;
 				}

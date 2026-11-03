@@ -1,34 +1,34 @@
 import { describe, test, it, expect, vi, beforeEach } from "vitest";
-  import { request } from "./api";
-  import { createLeagues, getLeagues, getLeagueById, joinLeague , leaveLeague, startLeague, getLeagueMatches, getStandings, getLineup, updateLineup } from "./leagues";
+import { request } from "./api";
+import { createLeagues, getLeagues, getLeagueById, joinLeague , leaveLeague, startLeague, getLeagueMatches, getStandings, getMyLeagues, getLineup, updateLineup } from "./leagues";
 
-  vi.mock("./api", () => ({
-      request: vi.fn(),
-  }));
+vi.mock("./api", () => ({
+    request: vi.fn(),
+}));
 
-  describe("leagues service", () => {
-      beforeEach(() => {
-          vi.resetAllMocks();
-      });
+describe("leagues service", () => {
+    beforeEach(() => {
+        vi.resetAllMocks();
+    });
 
-      describe("getLeagues", () => {
-          test("debe retornar la lista de ligas cuando la petición es exitosa", async () => {
-              const mockLeagues = [
-                  {
-                        id: "1",
-                        name: "Liga A",
-                        is_private: false,
-                        max_clubs: 10,
-                        status: "not_started",
-                        registered_clubs: [{ club_id: "c1", club_name: "Club 1" }]
-                  },
-                  {
-                        id: "2",
-                        name: "Liga B",
-                        is_private: true,
-                        max_clubs: 15,
-                        status: "not_started",
-                        registered_clubs: [{ club_id: "c2", club_name: "Club 2" }, { club_id: "c3", club_name: "Club 3" }],
+    describe("getLeagues", () => {
+        test("debe retornar la lista de ligas cuando la petición es exitosa", async () => {
+            const mockLeagues = [
+                {
+                    id: "1",
+                    name: "Liga A",
+                    is_private: false,
+                    max_clubs: 10,
+                    status: "not_started",
+                    registered_clubs: [{ club_id: "c1", club_name: "Club 1" }]
+                },
+                {
+                    id: "2",
+                    name: "Liga B",
+                    is_private: true,
+                    max_clubs: 15,
+                    status: "not_started",
+                    registered_clubs: [{ club_id: "c2", club_name: "Club 2" }, { club_id: "c3", club_name: "Club 3" }],
                 },
             ];
 
@@ -277,6 +277,18 @@ import { describe, test, it, expect, vi, beforeEach } from "vitest";
                 method: "PUT",
                 body: JSON.stringify(data),
             });
+        });
+    });
+
+    describe("getMyLeagues", () => {
+        test("debe pedir mis ligas y retornarlas", async () => {
+            const mockLeagues = [{ id: "1", name: "Liga A", status: "started" }];
+            request.mockResolvedValueOnce(mockLeagues);
+
+            const result = await getMyLeagues();
+
+            expect(request).toHaveBeenCalledWith("/clubs/leagues", { method: "GET" });
+            expect(result).toEqual(mockLeagues);
         });
     });
 });

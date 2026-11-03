@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { LeaguesPage } from "./LeaguesPage";
 import { MemoryRouter } from "react-router-dom";
@@ -43,5 +43,36 @@ describe("LeaguesPage Component", () => {
     
     const emptyMessage = await screen.findByText("No hay ligas disponibles por ahora.");
     expect(emptyMessage).toBeDefined();
+  });
+
+  test("debe mostrar mis ligas con nombre, estado y clubes al entrar a la pestaña 'mis ligas'", async () => {
+    vi.spyOn(leaguesService, "getLeagues").mockResolvedValue([]);
+    vi.spyOn(leaguesService, "getMyLeagues").mockResolvedValue([  { id: "1", name: "Liga A", status: "started", max_clubs: 10, registered_clubs: [{ club_id: "c1" }, { club_id: "c2" }] }
+    ]);
+
+    render(
+      <MemoryRouter>
+        <LeaguesPage/>
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByText("Mis ligas"));
+    expect(await screen.findByText("Liga A")).toBeDefined();
+    expect(screen.getByText("En curso")).toBeDefined();
+    expect(screen.getByText("2/10 clubes")).toBeDefined();
+  });
+
+  test("debe mostrar el mensaje si no participa de ninguna liga", async () => {
+    vi.spyOn(leaguesService, "getLeagues").mockResolvedValue([]);
+    vi.spyOn(leaguesService, "getMyLeagues").mockResolvedValue([]);
+
+    render(
+      <MemoryRouter>
+        <LeaguesPage/>
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByText("Mis ligas"));
+    expect(await screen.findByText("No participás en ninguna liga.")).toBeDefined();
   });
 });

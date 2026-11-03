@@ -65,6 +65,13 @@ export function getStandings(leagueId) {
     });
 }
 
+// devuelve las ligas en las que participa mi club
+export function getMyLeagues() {
+    return request("/clubs/leagues", {
+        method: "GET",
+    });
+}
+
 // devuelve mi alinación vigente en la liga
 export function getLineup(leagueId) {
     return request(`/leagues/${leagueId}/lineup`, {

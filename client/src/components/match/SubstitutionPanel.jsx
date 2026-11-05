@@ -5,13 +5,12 @@ const SELECT_CLASS = "w-full border border-white/20 bg-slate-800 px-2 py-1 text-
 const TOTAL_PAUSES_NUMBER = 3;
 export function SubstitutionPanel({
     matchId, starters = [], substitutes = [], behaviors = [], 
-    pause, pausesEnded
+    pause, pausesEnded, scheduled, setScheduled
 }) {
     const [playerOut, setPlayerOut] = useState("");
     const [playerIn, setPlayerIn] = useState("");
     const [behavior, setBehavior] = useState("");
     const [notice, setNotice] = useState(null);
-    const [scheduled, setScheduled] = useState(null);
     const [error, setError] = useState(null);
     const [sending, setSending] = useState(false);
 
@@ -21,7 +20,6 @@ export function SubstitutionPanel({
         scheduled && substitutes.some((p) => p.player_id == scheduled.player_in_id)
             ? scheduled
             : null;
-    const executed = scheduled && !pending; // el hook ya lo pasó a titular
 
     async function handleSubmit() {
         setError(null);
@@ -32,7 +30,7 @@ export function SubstitutionPanel({
             const res = await scheduleSubstitution(matchId, playerOut, playerIn, behavior);
             if (res.status == "pending"){
                 setScheduled({...res, substitution_behavior_id: behavior});
-                setNotice("Cambio planificado para la próxima pausa");
+                setNotice("Se realizará al fin de la pausa");
             } else {
                 setScheduled(null);
                 setNotice("Cambio realizado");
@@ -68,12 +66,6 @@ export function SubstitutionPanel({
     return (
         <div className="bg-slate-900 border border-slate-700 p-4 space-y-2 test-sm">
             <h3 className="text-sm text-slate-400 uppercase font-bold">Cambio de jugador</h3>
-            
-            {(pausesEnded < TOTAL_PAUSES_NUMBER) && (
-                <p className="text-slate-300">
-                    {pause ? "Se hará ahora" : "Se hará en la próxima pausa"}
-                </p> 
-            )}
 
             {/* Aviso si no hay más pausas disponibles */}
             {(pausesEnded >= TOTAL_PAUSES_NUMBER) && (
@@ -117,9 +109,12 @@ export function SubstitutionPanel({
 
             {/* Anuncia la realización del cambio o no. Acá notice no viene del ws sino del servicio,
                 por eso se toma como caso aparte */}
-            {(executed || notice) && (
-                <p className="text-emerald-400">{executed ? "Cambio realizado": notice}</p>
+            {notice && (
+                <p className={notice === "Cambio cancelado" ? "text-red-400" : "text-emerald-400"}>
+                    {notice}
+                </p>
             )}
+            
             {error && <p className="text-red-400">{error}</p>}
 
             <button

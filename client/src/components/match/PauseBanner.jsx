@@ -10,7 +10,7 @@ function secondsLeft(endsAt) {
     return Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
 }
 
-export function PauseBanner({ pause }) {
+export function PauseBanner({ pause, substitutionDone }) {
 
     const endsAt = Date.parse(pause.endsAt);
     const [left, setLeft] = useState(() => secondsLeft(endsAt));
@@ -27,9 +27,12 @@ export function PauseBanner({ pause }) {
         <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-10">
             <div className="bg-slate-900 border border-slate-600 px-8 py-4 text-center">
                 <p className="text-xl font-bold uppercase">{NAMES[pause.type]}</p>
-                <span data-testid="countdown" className="font-mono text-emerald-400 font-bold tracking-widest">
+                <div data-testid="countdown" className="font-mono text-emerald-400 font-bold tracking-widest">
                     {left}
-                </span>
+                </div>
+                    <p className="bg-slate-900 text-center">
+                        El cambio será realizado al finalizar la pausa
+                    </p>
             </div>
         </div>
     );

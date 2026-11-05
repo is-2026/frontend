@@ -140,52 +140,28 @@ export function MatchPage() {
                         <LineupPanel title="Suplentes" players={substitutes} />
                         
                         { /*Planificar cambios durante el partido*/}
-                        {canChange && !pause && (
+                        {canChange &&  (
                             <>
-                                <div hidden={!showForm}>
-                                {/* Panel de sustituciones */}
-                                <SubstitutionPanel
-                                    matchId={matchId}
-                                    starters={starters}
-                                    substitutes={substitutes}
-                                    behaviors={behaviors}
-                                    pausesEnded={pausesEnded}
-                                    scheduled={scheduled}
-                                    setScheduled={setScheduled}
-                                />
-                                </div>
+                                {showForm && (
+                                    <SubstitutionPanel
+                                        matchId={matchId}
+                                        starters={starters}
+                                        substitutes={substitutes}
+                                        behaviors={behaviors}
+                                        pausesEnded={pausesEnded}
+                                        scheduled={scheduled}
+                                        setScheduled={setScheduled}
+                                    />
+                                )}
+                                
                                 <button 
                                     onClick={() => setShowForm(!showForm)}
                                     className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-4 border border-slate-600 transition-colors uppercase text-sm mt-auto">
-                                    Realizar cambios
+                                    {showForm ? "Ocultar" : "Realizar cambios"}
                                 </button>
                             </>
                         )}
 
-                        {/* Cambios durante pausas */}
-                        {pause && canChange && (
-                            <div className="bg-slate-900 border border-slate-700 p-4 mt-2 rounded shadow-lg">
-                                <button 
-                                    onClick={() => setShowForm(!showForm)}
-                                    className="bg-emerald-600 hover:bg-emerald-400 text-white font-bold py-2 px-4 ring-2 ring-gray-300 animate-bounce transition-colors uppercase text-[19px]">
-                                    {showForm ? "Ocultar" : "Realizar cambios"}
-                                </button>
-
-                                {showForm && (
-                                    <div className="mt-4">
-                                        <SubstitutionPanel
-                                            matchId={matchId}
-                                            starters={starters}
-                                            substitutes={substitutes}
-                                            behaviors={behaviors}
-                                            pausesEnded={pausesEnded}
-                                            scheduled={scheduled}
-                                            setScheduled={setScheduled}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                        )}
                     </div>
                     {/* Rival: solo lectura */}
                     <div className={`flex flex-col gap-4 w-64 shrink-0 ${rivalOrder}`}>

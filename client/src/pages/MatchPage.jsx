@@ -22,9 +22,9 @@ export function MatchPage() {
 
     //Variables para cambio de behaviors
     const [behaviors, setBehaviors] = useState([]);
-    const [error, setError] = useState(null);
     const navigate = useNavigate();
-
+    const [scheduled, setScheduled] = useState(null);
+    const [justFinishedSub, setJustFinishedSub] = useState(false);
     //Variable para mostrar formulario de sustitución
     const [showForm, setShowForm] = useState(false);
     
@@ -50,6 +50,14 @@ export function MatchPage() {
     const myLineup = lineups?.[mySide] ?? [];
     const starters = myLineup.filter((p) => p.is_starter);
     const substitutes = myLineup.filter((p) => !p.is_starter);
+    const rivalSide = mySide === "home" ? "away" : "home";
+    const rivalLineup = lineups?.[rivalSide] ?? [];
+    const rivalStarters = rivalLineup.filter((p) => p.is_starter);
+    const rivalSubstitutes = rivalLineup.filter((p) => !p.is_starter);
+
+    // el local va a la izquierda, el visitante a la derecha (igual que el marcador)
+    const myOrder = mySide === "home" ? "order-1" : "order-3";
+    const rivalOrder = mySide === "home" ? "order-3" : "order-1";
 
     //Verifica si el partido pertenece a quien cambiará el comportamiento
     const isOwnMatch = (
@@ -60,6 +68,24 @@ export function MatchPage() {
 
     const canChange = isOwnMatch && !finished;
 
+    //Se limpia scheduled luego de la pausa. Lo necesita al inicio para mostrar el cambio, por eso no se borra al inicio.
+    useEffect(() => {
+    if (!pause) setScheduled(null);
+    }, [pause]);
+
+    // Escuchar cuando 'pausesEnded' incrementa
+    useEffect(() => {
+        // Si la pausa terminó y tenías un cambio planificado
+        if (pausesEnded > 0 && scheduled) {
+            setJustFinishedSub(true);
+
+            const timer = setTimeout(() => {
+                setJustFinishedSub(false);
+            }, 3000); // Se oculta a los 3 segundos
+
+            return () => clearTimeout(timer);
+        }
+    }, [pausesEnded]);
     return (
         // fixed para sobreescribir configuracion default de app
         <div className="fixed inset-0 bg-slate-950 p-8 text-white overflow-auto z-50">
@@ -68,7 +94,7 @@ export function MatchPage() {
             <div className="w-[1272px] mx-auto pb-8">
 
                 <div className="flex gap-4 items-start">
-                    <div className="min-w-0 flex-1 relative">
+                    <div className="min-w-0 flex-1 relative order-2">
 
                         {/*cronómetro y evento partido finalizado */}
                         <MatchHeader
@@ -84,7 +110,7 @@ export function MatchPage() {
                         <GoalBanner goalInfo={goalInfo} />
 
                         {/* banner de pausa */}
-                        { pause && <PauseBanner pause={pause}/> }
+                        { pause && <PauseBanner pause={pause} substitutionDone={Boolean(scheduled)}/> }
 
 
                         {/* banner de fin de partido */}
@@ -93,15 +119,23 @@ export function MatchPage() {
                             teams={teams}
                             onExit={() => navigate("/friendlies")}
                         />
-                        
+                        {/* Cartel de aviso cuando se completa la pausa */}
+                        {justFinishedSub && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-30 pointer-events-none">
+                                <p className="text-3xl font-black text-white uppercase tracking-wider">
+                                    Cambio realizado
+                                </p>
+                            </div>
+                    )}
                     </div>
 
-                    <div className="flex flex-col gap-4 w-64 shrink-0">
+                    {/* Mi equipo */}
+                    <div className={`flex flex-col gap-4 w-64 shrink-0 ${myOrder}`}>
                         { /*titulares*/}
                         {canChange ?  (
                             <StartersPanel matchId={matchId} players={starters} behaviors={behaviors} />
                         ) : (
-                            <LineupPanel title="Equipo" players={starters} />
+                            <LineupPanel title="Titulares" players={starters} />
                         )}
                         <LineupPanel title="Suplentes" players={substitutes} />
                         
@@ -117,6 +151,8 @@ export function MatchPage() {
                                     behaviors={behaviors}
                                     pause={pause}
                                     pausesEnded={pausesEnded}
+                                    scheduled={scheduled}
+                                    setScheduled={setScheduled}
                                 />
                                 </div>
                                 <button 
@@ -145,11 +181,18 @@ export function MatchPage() {
                                             behaviors={behaviors}
                                             pause={pause}
                                             pausesEnded={pausesEnded}
+                                            scheduled={scheduled}
+                                            setScheduled={setScheduled}
                                         />
                                     </div>
                                 )}
                             </div>
                         )}
+                    </div>
+                    {/* Rival: solo lectura */}
+                    <div className={`flex flex-col gap-4 w-64 shrink-0 ${rivalOrder}`}>
+                        <LineupPanel title="Titulares" players={rivalStarters} />
+                        <LineupPanel title="Suplentes" players={rivalSubstitutes} />
                     </div>
                 </div>
             </div>

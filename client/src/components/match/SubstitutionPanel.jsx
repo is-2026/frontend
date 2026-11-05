@@ -5,7 +5,7 @@ const SELECT_CLASS = "w-full border border-white/20 bg-slate-800 px-2 py-1 text-
 const TOTAL_PAUSES_NUMBER = 3;
 export function SubstitutionPanel({
     matchId, starters = [], substitutes = [], behaviors = [], 
-    pause, pausesEnded, scheduled, setScheduled
+    pausesEnded, scheduled, setScheduled
 }) {
     const [playerOut, setPlayerOut] = useState("");
     const [playerIn, setPlayerIn] = useState("");
@@ -28,13 +28,13 @@ export function SubstitutionPanel({
         setScheduled(null);
         try {
             const res = await scheduleSubstitution(matchId, playerOut, playerIn, behavior);
-            if (res.status == "pending"){
-                setScheduled({...res, substitution_behavior_id: behavior});
-                setNotice("Se realizará al fin de la pausa");
-            } else {
-                setScheduled(null);
-                setNotice("Cambio realizado");
-            }
+            setScheduled({
+                ...(res || {}),
+                player_out_id: playerOut,
+                player_in_id: playerIn,
+                substitution_behavior_id: behavior
+            });
+            setNotice("Se realizará al fin de la pausa");
             setPlayerOut("");
             setPlayerIn("");
             setBehavior("");

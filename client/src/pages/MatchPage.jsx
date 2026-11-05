@@ -149,7 +149,6 @@ export function MatchPage() {
                                     starters={starters}
                                     substitutes={substitutes}
                                     behaviors={behaviors}
-                                    pause={pause}
                                     pausesEnded={pausesEnded}
                                     scheduled={scheduled}
                                     setScheduled={setScheduled}
@@ -179,7 +178,6 @@ export function MatchPage() {
                                             starters={starters}
                                             substitutes={substitutes}
                                             behaviors={behaviors}
-                                            pause={pause}
                                             pausesEnded={pausesEnded}
                                             scheduled={scheduled}
                                             setScheduled={setScheduled}

@@ -47,13 +47,10 @@ describe('LobbyPage', () => {
         expect(mockNavigate).toHaveBeenCalledWith('/match/match-999');
     });
 
-    test('Muestra el rival y los segundos que faltan según starts_at', () => {
-        vi.useFakeTimers();
-        vi.setSystemTime(new Date('2026-10-05T12:00:00Z'));
+    test('Muestra el rival, sin cuenta regresiva', () => {
         useInitFriendlySocket.mockReturnValue({
             matchId: null,
             rival: { id: 'club-2', name: 'Chacarita' },
-            startsAt: new Date('2026-10-05T12:00:27Z'),
         });
 
         render(
@@ -62,24 +59,7 @@ describe('LobbyPage', () => {
             </MemoryRouter>
         );
 
-        expect(screen.getByText('vs Chacarita')).toBeInTheDocument();
-        expect(screen.getByText('27')).toBeInTheDocument();
-        vi.useRealTimers();
-    });
-
-    test('Cuando llega a cero muestra que está arrancando', () => {
-        useInitFriendlySocket.mockReturnValue({
-            matchId: null,
-            rival: { id: 'club-2', name: 'Chacarita' },
-            startsAt: new Date(Date.now() - 1000), // ya pasó
-        });
-
-        render(
-            <MemoryRouter>
-                <LobbyPage />
-            </MemoryRouter>
-        );
-
-        expect(screen.getByText('Arrancando...')).toBeInTheDocument();
+        expect(screen.getByText('Vas a jugar contra Chacarita')).toBeInTheDocument();
+        expect(screen.getByText('Arrancando el partido...')).toBeInTheDocument();
     });
 });

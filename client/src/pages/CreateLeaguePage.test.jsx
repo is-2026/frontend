@@ -171,7 +171,7 @@ describe("CreateLeaguePage", () => {
                 password: "secreto123",
                 max_clubs: 16,
                 match_duration_minutes: 5,
-                allows_draws: false, // añado esta linea, para manadar el payload correcto
+                allows_draws: true, // añado esta linea, para mandar el payload correcto
                 players: [
                     { player_id: "p1", is_starter: true, behavior_id: "b1" },
                     { player_id: "p2", is_starter: true, behavior_id: "b2" },
@@ -215,7 +215,7 @@ describe("CreateLeaguePage", () => {
         });
     });
 
-    test("envía allows_draws en true cuando se marca la casilla sin empates", async () => {
+    test("envía allows_draws en false cuando se marca la casilla sin empates", async () => {
         createLeagues.mockResolvedValueOnce({ id: "liga-123" });
 
         render(
@@ -236,7 +236,7 @@ describe("CreateLeaguePage", () => {
 
         await waitFor(() => {
             expect(createLeagues).toHaveBeenCalledWith(
-                expect.objectContaining({ allows_draws: true }),
+                expect.objectContaining({ allows_draws: false }),
             );
         });
     });

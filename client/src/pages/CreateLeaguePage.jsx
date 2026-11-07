@@ -67,7 +67,7 @@ export function CreateLeaguePage() {
                 ...(password.trim() ? { password: password.trim() } : {}),
                 max_clubs: Number(maxClubs),
                 match_duration_minutes: 5,
-                allows_draws: noDraws,
+                allows_draws: !noDraws,
                 players: [
                     ...selection.starters.map((starter) => ({
                         player_id: starter.player_id,

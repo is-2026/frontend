@@ -12,7 +12,7 @@ export default function LeagueCard({ league }) {
                 <p className="text-sm text-white/60">
                     {league.is_private ? "Privada" : "Pública"}
                 </p>
-                {league.allows_draws && (
+                {league.allows_draws === false && (
                     <p className="text-sm text-white/60">Sin empates</p>
                 )}
             </div>

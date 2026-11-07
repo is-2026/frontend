@@ -4,6 +4,7 @@ import { MemoryRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { LeagueLobbyPage } from "./LeagueLobbyPage";
 import { getLeague, getLeagues, leaveLeague, startLeague } from "../services/leagues";
 import { useLeagueLobbySocket } from "../hooks/useLeagueLobbySocket";
+import { getMyClub } from "../services/club";
 
 // mock completo del servicio de leagues
 vi.mock("../services/leagues", () => ({
@@ -21,9 +22,15 @@ vi.mock("../hooks/useLeagueLobbySocket", () => ({
     useLeagueLobbySocket: vi.fn(),
 }));
 
+// mock del servicio de club (para saber si soy el creador)
+vi.mock("../services/club", () => ({
+    getMyClub: vi.fn(),
+}));
+
 describe("LeagueLobbyPage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        getMyClub.mockResolvedValue({ id: "club-1" }); // mi club
     });
 
     // helper para renderizar con React Router y el parámetro de URL
@@ -159,7 +166,7 @@ describe("LeagueLobbyPage", () => {
             id: "123",
             name: "Liga Test",
             max_clubs: 10,
-            is_creator: false,
+            creator_club_id: "club-2",
             registered_clubs: [
                 { club_id: "c1", club_name: "Club 1" },
                 { club_id: "c2", club_name: "Club 2" },
@@ -181,7 +188,7 @@ describe("LeagueLobbyPage", () => {
             id: "123",
             name: "Liga Test",
             max_clubs: 10,
-            is_creator: true,
+            creator_club_id: "club-1",
             registered_clubs: [
                 { club_id: "c1", club_name: "Club 1" },
                 { club_id: "c2", club_name: "Club 2" },
@@ -206,7 +213,7 @@ describe("LeagueLobbyPage", () => {
             id: "123",
             name: "Liga Test",
             max_clubs: 10,
-            is_creator: true,
+            creator_club_id: "club-1",
             registered_clubs: [
                 { club_id: "c1", club_name: "Club 1" },
                 { club_id: "c2", club_name: "Club 2" },
@@ -234,7 +241,7 @@ describe("LeagueLobbyPage", () => {
             id: "123",
             name: "Liga Test",
             max_clubs: 10,
-            is_creator: true,
+            creator_club_id: "club-1",
             registered_clubs: [
                 { club_id: "c1", club_name: "Club 1" },
                 { club_id: "c2", club_name: "Club 2" },

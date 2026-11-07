@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams , useNavigate } from "react-router-dom";
 import { getLeagues, leaveLeague, startLeague } from "../services/leagues";
+import { getMyClub } from "../services/club";
 import { useLeagueLobbySocket } from "../hooks/useLeagueLobbySocket";
 import { LeagueInProgress } from "../components/leagues/LeagueInProgress";
 
@@ -12,6 +13,7 @@ export function LeagueLobbyPage() {
     const [ loading, setLoading ] = useState(true);
     const [ error, setError ] = useState(null);
     const [ abandonError, setAbandonError ] = useState(null);
+    const [ myClubId, setMyClubId ] = useState(null);
 
     // estados para iniciar liga.
     const [ isStartLeague, setIsStartLeague ] = useState(false);
@@ -25,6 +27,9 @@ export function LeagueLobbyPage() {
                 setLoading(true);
                 const data = await getLeagues(leagueId);
                 setLeague(data);
+                 // pedimos mi club para saber si soy el creador
+                const myClub = await getMyClub();
+                setMyClubId(myClub.id);
             } catch (err) {
                 setError(err.message || "Error al cargar la liga.");
             } finally {
@@ -64,7 +69,7 @@ export function LeagueLobbyPage() {
     const registeredClubs = league?.registered_clubs || [];
     const registeredCount = registeredClubs.length;
     const maxClubs = league?.max_clubs || 0;
-    const isCreator = Boolean(league?.is_creator); // identificamos si el usuario es el creador de la liga
+    const isCreator = Boolean(myClubId) && league?.creator_club_id === myClubId; // soy el creador si mi club es el que creó la liga
     const isStarted = Boolean(league?.is_started || league?.status === "started"); // estado de liga en curso
     const minClubs = registeredCount >= 3; // verifica el minimo de 3 clubes para iniciar
 

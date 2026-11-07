@@ -8,6 +8,17 @@ vi.mock("react-router-dom", () => ({
     useNavigate: () => mockNavigate,
 }));
 
+// mock de config para controlar la URL del WebSocket
+vi.mock("../config", () => {
+    const WS_URL = "ws://localhost:8000";
+    const LEAGUE_LOBBY_WS_PATH = (id) => `/ws/leagues/${id}/lobby`;
+    return {
+        WS_URL,
+        LEAGUE_LOBBY_WS_PATH,
+        wsUrl: (path) => `${WS_URL}${path}?token=${encodeURIComponent(localStorage.getItem("token") ?? "")}`,
+    };
+});
+
 // mock de la API de WebSocket
 class MockWebSocket {
     static instances = [];
@@ -34,6 +45,7 @@ describe("useLeagueLobbySocket Hook", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        localStorage.setItem("token", "test-token-123");
         MockWebSocket.instances = [];
         global.WebSocket = MockWebSocket;
 
@@ -46,12 +58,11 @@ describe("useLeagueLobbySocket Hook", () => {
         expect(MockWebSocket.instances.length).toBe(0);
     });
 
-    test("se conecta a la URL correcta del WebSocket", () => {
-        const leagueId = "123";
-        renderHook(() => useLeagueLobbySocket(leagueId, mockSetLeague, mockSetError));
+    test("se conecta al backend con la URL y el token correctos", () => {
+        renderHook(() => useLeagueLobbySocket("123", mockSetLeague, mockSetError));
 
         expect(MockWebSocket.instances.length).toBe(1);
-        expect(MockWebSocket.instances[0].url).toContain(`/ws/leagues/${leagueId}/lobby`);
+        expect(MockWebSocket.instances[0].url).toBe("ws://localhost:8000/ws/leagues/123/lobby?token=test-token-123");
     });
 
     test("maneja el evento 'clubRegistered' agregando el nuevo club", () => {

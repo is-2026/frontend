@@ -24,6 +24,7 @@ export function BehaviorDetail() {
             });
     }, [id, navigate]);
 
+
     if (error) return (
         <div className="mx-auto max-w-3xl p-6">
             <p className="text-red-400 mb-6">{error}</p>

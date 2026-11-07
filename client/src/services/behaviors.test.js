@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from 'vitest';
-import { getBehaviors, getBehaviorById, createBehavior, updateBehavior } from './behaviors';
+import { getBehaviors, getBehaviorById, createBehavior, updateBehavior, deleteBehavior } from './behaviors';
 import * as api from './api';
 
 describe('Behaviors service', () => {
@@ -58,6 +58,18 @@ test('updateBehavior hace un PUT a /club/behaviors/:id con los datos actualizado
     expect(api.request).toHaveBeenCalledWith('/club/behaviors/1', {
         method: 'PUT',
         body: JSON.stringify(payload)
+    });
+    expect(result).toEqual(mockResponse);
+});
+
+test('deleteBehavior hace un DELETE a /club/behaviors/:id', async () => {
+    const mockResponse = { status: 200, message: 'Comportamiento eliminado' };
+    vi.spyOn(api, 'request').mockResolvedValueOnce(mockResponse);
+
+    const result = await deleteBehavior('1');
+
+    expect(api.request).toHaveBeenCalledWith('/club/behaviors/1', {
+        method: 'DELETE'
     });
     expect(result).toEqual(mockResponse);
 });

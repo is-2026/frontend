@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { LEAGUE_LOBBY_WS_PATH, wsUrl } from "../config";
 
 export const useLeagueLobbySocket = (leagueId, setLeague, setError) => {
     const navigate = useNavigate();
@@ -7,9 +8,7 @@ export const useLeagueLobbySocket = (leagueId, setLeague, setError) => {
     useEffect(() => {
         if(!leagueId) return; // verificamos que la id de la liga exista, si no paramos ejec.
         
-        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        const wsUrl = `${protocol}//${window.location.host}/ws/leagues/${leagueId}/lobby`; // construimos la direccion url
-        const socket = new WebSocket(wsUrl); // creamos la instancia de ws y conectamos con el sv
+        const socket = new WebSocket(wsUrl(LEAGUE_LOBBY_WS_PATH(leagueId))); // conectamos al backend (localhost:8000) con el token
         
         socket.onmessage = (event) => {
             try {

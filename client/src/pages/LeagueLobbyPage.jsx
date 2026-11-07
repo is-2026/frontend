@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams , useNavigate } from "react-router-dom";
-import { getLeagues, leaveLeague, startLeague } from "../services/leagues";
+import { getLeagues, leaveLeague, startLeague, cancelLeague } from "../services/leagues";
 import { getMyClub } from "../services/club";
 import { useLeagueLobbySocket } from "../hooks/useLeagueLobbySocket";
 import { LeagueInProgress } from "../components/leagues/LeagueInProgress";
@@ -19,6 +19,12 @@ export function LeagueLobbyPage() {
     const [ isStartLeague, setIsStartLeague ] = useState(false);
     const [ startLeagueError, setStartLeagueError ] = useState(null);
     const [ isStartingLeague, setIsStartingLeague ] = useState(false);
+
+    // estados para cancelar liga.
+    const [ isCancelLeague, setIsCancelLeague ] = useState(false); // modal de confirmación abierto
+    const [ cancelLeagueError, setCancelLeagueError ] = useState(null);
+    const [ isCancellingLeague, setIsCancellingLeague ] = useState(false);
+    const [ isCancelled, setIsCancelled ] = useState(false); // la liga se canceló con éxito
 
     // carga inicial via HTTP GET 
     useEffect(() => {
@@ -53,14 +59,35 @@ export function LeagueLobbyPage() {
         );
     }
 
-    // estado de error
-    if (error) {
+    // la liga se cancelo, mostramos el mensaje antes de volver a las ligas
+    if (isCancelled) {
         return (
-        <div className="max-w-xl mx-auto my-8 p-4 bg-red-500/10 border border-red-500/40 text-red-400 text-center text-sm font-semibold rounded-lg shadow-md">
-            {error}
+        <div className="max-w-xl mx-auto my-8 p-6 bg-emerald-500/10 border border-emerald-500/40 text-center rounded-lg shadow-md flex flex-col gap-2">
+            <h2 className="text-xl font-bold text-emerald-400">
+            ¡Liga cancelada con éxito!
+            </h2>
+            <p className="text-slate-300 text-sm">
+            Volviendo a las ligas...
+            </p>
         </div>
         );
     }
+
+    // estado de error
+    if (error) {
+        return (
+        <div className="max-w-xl mx-auto my-8 p-4 bg-red-500/10 border border-red-500/40 text-red-400 text-center text-sm font-semibold rounded-lg shadow-md flex flex-col items-center gap-3">
+            {error}
+            <button
+                onClick={() => navigate("/leagues")}
+                className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 font-semibold text-sm rounded-lg"
+            >
+                Volver a las ligas
+            </button>
+        </div>
+        );
+    }
+
 
     if (league?.status === "started" || league?.status === "finished") {
         return <LeagueInProgress league={league} />;
@@ -102,6 +129,30 @@ export function LeagueLobbyPage() {
             }
         } finally {
             setIsStartingLeague(false);
+        }
+    };
+
+    const handleCancelLeague = async () => {
+        try {
+            setCancelLeagueError(null);
+            setIsCancellingLeague(true);
+            await cancelLeague(leagueId);
+
+            setIsCancelLeague(false);
+            setIsCancelled(true);
+
+            // espera 1.5 segundos para que el creador lea el mensaje y vuelve a las ligas
+            setTimeout(() => {
+                navigate("/leagues");
+            }, 1500);
+        } catch (err) {
+            if ([403, 409].includes(err.status)) {
+                setCancelLeagueError(err.message || "La liga no se pudo cancelar.");
+            } else {
+                setCancelLeagueError("Ocurrió un error inesperado al cancelar la liga.");
+            }
+        } finally {
+            setIsCancellingLeague(false);
         }
     };
     
@@ -153,6 +204,13 @@ export function LeagueLobbyPage() {
                             Se necesitan al menos 3 clubes inscriptos para poder iniciar la liga.
                         </p>
                     )}
+
+                    <button
+                        onClick={() => setIsCancelLeague(true)}
+                        className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg text-sm uppercase tracking-wider transition-colors"
+                    >
+                        Cancelar liga
+                    </button>
                 </div>
             )}
 
@@ -228,6 +286,48 @@ export function LeagueLobbyPage() {
                                 className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 font-bold text-sm rounded-lg transition-colors disabled:opacity-50"
                             >
                                 {isStartingLeague ? "Iniciando..." : "Confirmar e Iniciar"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* modal de confirmación de cancelación de liga */}
+            {isCancelLeague && (
+                <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50">
+                    <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl max-w-md w-full flex flex-col gap-4 shadow-2xl">
+                        <h3 className="text-xl font-bold text-white">
+                            Confirmar cancelación de liga
+                        </h3>
+                        <p className="text-slate-300 text-sm">
+                            ¿Estás seguro de que deseas cancelar la liga? Se avisará a los clubes inscriptos y no se podrá deshacer.
+                        </p>
+
+                        {cancelLeagueError && (
+                            <div className="p-3 bg-red-500/10 border border-red-500/40 text-red-400 text-xs font-semibold rounded-lg">
+                                {cancelLeagueError}
+                            </div>
+                        )}
+
+                        <div className="flex justify-end gap-3 mt-2">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsCancelLeague(false);
+                                    setCancelLeagueError(null);
+                                }}
+                                disabled={isCancellingLeague}
+                                className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 font-semibold text-sm rounded-lg transition-colors"
+                            >
+                                Volver
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleCancelLeague}
+                                disabled={isCancellingLeague}
+                                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 font-bold text-sm rounded-lg transition-colors disabled:opacity-50"
+                            >
+                                {isCancellingLeague ? "Cancelando..." : "Confirmar y cancelar"}
                             </button>
                         </div>
                     </div>

@@ -12,14 +12,14 @@ export function LineupPanel({
         <div className="bg-slate-900 border border-slate-700 min-h-[10rem]">
             <h3 className="text-sm text-slate-400 mb-2 uppercase font-bold">{title}</h3>
             <ul className="space-y-1 text-sm">
-                {(players ?? []).map((p) => (
-                    <li key={p.player_id}>
+                {(players ?? []).map((player) => (
+                    <li key={player.player_id}>
                         {/* fila 1: número + nombre, y a la derecha el select (si hay) */}
                         <div className="flex justify-between items-center gap-2">
                             <span className="truncate">
-                                <span className="text-slate-400">#{p.number}</span> {p.name}
+                                <span className="text-slate-400">#{player.number}</span> {player.name}
                             </span>
-                            {renderRight?.(p)}
+                            {renderRight?.(player)}
                         </div>
 
                         {/* fila 2: atributos en su propia línea, a todo el ancho */}
@@ -27,7 +27,7 @@ export function LineupPanel({
                             {STATS.map(([label, key]) => (
                                 <span key={key}>
                                     <span className="text-slate-500">{label}</span>{" "}
-                                    <span className="text-slate-300">{p[key] ?? "-"}</span>
+                                    <span className="text-slate-300">{player[key] ?? "-"}</span>
                                 </span>
                             ))}
                         </div>

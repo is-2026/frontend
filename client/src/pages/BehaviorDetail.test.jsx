@@ -1,12 +1,14 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { BehaviorDetail } from './BehaviorDetail';
 import * as behaviorsService from '../services/behaviors';
 
 vi.mock('../services/behaviors', () => ({
     getBehaviorById: vi.fn(),
+    deleteBehavior: vi.fn(),
 }));
+
 
 describe('BehaviorDetail', () => {
     test('renderiza el nombre y codigo del comportamiento', async () => {

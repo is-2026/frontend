@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-export function BehaviorCard({ behavior }) {
+export function BehaviorCard({ behavior, onDelete }) {
   const navigate = useNavigate();
 
   return (
@@ -16,6 +16,9 @@ export function BehaviorCard({ behavior }) {
           {behavior.code}
         </code>
       </div>
+      <button onClick={(e) => { e.stopPropagation(); onDelete(behavior.id); }} className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-semibold transition-colors">
+        Eliminar
+      </button>
     </li>
   );
 }

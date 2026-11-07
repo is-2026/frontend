@@ -9,7 +9,6 @@ export function CreateFriendlyPage() {
     const navigate = useNavigate();
 
     // estados del formulario, duración, pass y jugadores tit. y sup.
-    const [duration, setDuration] = useState(5);
     const [password, setPassword] = useState("");
     const [selection, setSelection] = useState({ starters: [], substitutes: []});
     
@@ -114,19 +113,7 @@ export function CreateFriendlyPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Duración */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Duración del partido (minutos)
-          </label>
-          <input
-            type="text"
-            value="5 minutos"
-            disabled
-            readOnly
-            className="w-full border border-white/10 bg-slate-900/60 p-2 text-white/50 cursor-not-allowed select-none"
-          />
-        </div>
+
 
         {/* Contraseña */}
         <div>

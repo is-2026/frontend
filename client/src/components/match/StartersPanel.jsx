@@ -17,7 +17,7 @@ export function StartersPanel({matchId, players, behaviors}) {
     return (
         <>
             <LineupPanel
-                title="Equipo"
+                title="Titulares"
                 players={players}
                 renderRight={(p) => (
                     <select

@@ -12,14 +12,20 @@ function secondsLeft(endsAt) {
 
 export function PauseBanner({ pause }) {
 
+    //Se guarda a qué tora termina
     const endsAt = Date.parse(pause.endsAt);
     const [left, setLeft] = useState(() => secondsLeft(endsAt));
 
+    //y se actualiza el contador cada 250ms
+    //El componente se desmonta cuando pause = null
+    //pause == null cuando llega mensaje matchResumed por ws 
     useEffect(() => {
         const update = () => setLeft(secondsLeft(endsAt));
         update();
-        const id = setInterval(update, 250);
+        const id = setInterval(update, 250); 
+        //setInterval vuelve a correr update cada un intervalo de 250ms
         return () => clearInterval(id);
+        //clearInterval limpia el intervalo
     }, [endsAt]);
 
     if (left <= 0) return null;
@@ -27,9 +33,12 @@ export function PauseBanner({ pause }) {
         <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-10">
             <div className="bg-slate-900 border border-slate-600 px-8 py-4 text-center">
                 <p className="text-xl font-bold uppercase">{NAMES[pause.type]}</p>
-                <span data-testid="countdown" className="font-mono text-emerald-400 font-bold tracking-widest">
+                <div data-testid="countdown" className="font-mono text-emerald-400 font-bold tracking-widest">
                     {left}
-                </span>
+                </div>
+                    <p className="bg-slate-900 text-center">
+                        El cambio será realizado al finalizar la pausa
+                    </p>
             </div>
         </div>
     );

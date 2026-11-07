@@ -1,4 +1,4 @@
-import { render, screen, act, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, act, fireEvent, waitFor, within } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { MatchPage } from './MatchPage';
@@ -98,8 +98,8 @@ describe('MatchPage', () => {
         expect(screen.getByText('Local')).toBeInTheDocument();
         expect(screen.getByText('Visitante')).toBeInTheDocument();
         expect(screen.getByText('00:00')).toBeInTheDocument();
-        expect(screen.getByText('Equipo')).toBeInTheDocument();
-        expect(screen.getByText('Suplentes')).toBeInTheDocument();
+        expect(screen.getAllByText('Titulares')).toHaveLength(2);
+        expect(screen.getAllByText('Suplentes')).toHaveLength(2);
         const changeButton = await screen.findByRole('button', { name: /realizar cambios/i });
         expect(changeButton).toBeInTheDocument();
 
@@ -268,37 +268,95 @@ describe('MatchPage', () => {
         expect(screen.getByText('1')).toBeInTheDocument();
     });
 
-    test('6. Los paneles muestran mi equipo y cada ficha tiene su número', async () => {
-        const lineup = (prefix, firstNumber) => [
-            { player_id: `${prefix}1`, number: firstNumber, name: `${prefix}-tit-1`, is_starter: true, behavior_name: 'Atacante' },
-            { player_id: `${prefix}2`, number: firstNumber + 1, name: `${prefix}-tit-2`, is_starter: true, behavior_name: 'Defensor' },
-            { player_id: `${prefix}3`, number: firstNumber + 2, name: `${prefix}-sup-1`, is_starter: false },
+    test('6. Los paneles muestran mi equipo y rival con sus números (#), selector y sus 5 estadísticas PACC (suma = 300)', async () => {
+        // 💡 Estadísticas PACC que suman EXACTAMENTE 300 puntos:
+        // a-tit-1: 85 + 75 + 65 + 45 + 30 = 300
+        // h-tit-1: 80 + 70 + 60 + 50 + 40 = 300
+        const myLineup = [
+            { 
+                player_id: 'a1', number: 7, name: 'a-tit-1', is_starter: true, 
+                behavior_name: 'Atacante', power: 85, agility: 75, control: 65, speed: 45, strength: 30 
+            },
         ];
+
+        const rivalLineup = [
+            { 
+                player_id: 'h1', number: 1, name: 'h-tit-1', is_starter: true, 
+                behavior_name: 'Atacante', power: 80, agility: 70, control: 60, speed: 50, strength: 40 
+            }
+        ];
+
         useMatchSocket.mockReturnValue({
             teams: { home: { id: 'h', name: 'Local' }, away: { id: 'a', name: 'Visita' } },
-            lineups: { home: lineup('h', 1), away: lineup('a', 7) },
+            lineups: { home: rivalLineup, away: myLineup },
             scores: { home: 0, away: 0 },
             state: { matchId: '123', tick: 0, players: [{ playerId: 'a1', x: 5, y: 0 }], ballPosition: { x: 0, y: 0 } },
             goalInfo: null,
             finished: null,
         });
-        // mis jugadores son los del visitante
-        getPlayers.mockResolvedValue([{ id: 'a1' }, { id: 'a2' }, { id: 'a3' }]);
 
-        render(
-            <MemoryRouter initialEntries={['/match/123']}>
-                <Routes>
-                    <Route path="/match/:matchId" element={<MatchPage />} />
-                </Routes>
-            </MemoryRouter>
-        );
+        // Mis jugadores son los del visitante (away: a1)
+        getPlayers.mockResolvedValue([{ id: 'a1' }]);
 
-        expect(await screen.findByText('a-tit-1')).toBeInTheDocument();
-        expect(screen.getByText('a-tit-2')).toBeInTheDocument();
-        expect(screen.getAllByRole('combobox')).toHaveLength(2); //como ahora es select, verifica que sea cuadro desplegable de longitud 2
-        expect(screen.getByText('a-sup-1')).toBeInTheDocument();
-        expect(screen.queryByText('h-tit-1')).not.toBeInTheDocument();
-        // la ficha del jugador a1 muestra su número
+        await act(async () => {
+            render(
+                <MemoryRouter initialEntries={['/match/123']}>
+                    <Routes>
+                        <Route path="/match/:matchId" element={<MatchPage />} />
+                    </Routes>
+                </MemoryRouter>
+            );
+        });
+
+        // --- 1. VALIDACIÓN DE MI JUGADOR (a-tit-1)
+
+        const myElements = await screen.findAllByText('a-tit-1');
+        const myCard = myElements[myElements.length - 1].closest('li');
+        expect(myCard).toBeInTheDocument();
+
+        const myUtils = within(myCard);
+        expect(myUtils.getByText('#7')).toBeInTheDocument();
+        expect(myUtils.getByText('a-tit-1')).toBeInTheDocument();
+
+        expect(myUtils.getByText('POW')).toBeInTheDocument();
+        expect(myUtils.getByText('85')).toBeInTheDocument();
+        expect(myUtils.getByText('AGI')).toBeInTheDocument();
+        expect(myUtils.getByText('75')).toBeInTheDocument();
+        expect(myUtils.getByText('CON')).toBeInTheDocument();
+        expect(myUtils.getByText('65')).toBeInTheDocument();
+        expect(myUtils.getByText('SPE')).toBeInTheDocument();
+        expect(myUtils.getByText('45')).toBeInTheDocument();
+        expect(myUtils.getByText('STR')).toBeInTheDocument();
+        expect(myUtils.getByText('30')).toBeInTheDocument();
+
+        // Selector de comportamiento presente sólo en mi jugador
+        expect(myUtils.getByRole('combobox')).toBeInTheDocument();
+
+        // --- 2. VALIDACIÓN DEL JUGADOR RIVAL (h-tit-1) ---
+
+        const rivalElements = await screen.findAllByText('h-tit-1');
+        const rivalCard = rivalElements[rivalElements.length - 1].closest('li');
+        expect(rivalCard).toBeInTheDocument();
+
+        const rivalUtils = within(rivalCard);
+        expect(rivalUtils.getByText('#1')).toBeInTheDocument();
+        expect(rivalUtils.getByText('h-tit-1')).toBeInTheDocument();
+
+        expect(rivalUtils.getByText('POW')).toBeInTheDocument();
+        expect(rivalUtils.getByText('80')).toBeInTheDocument();
+        expect(rivalUtils.getByText('AGI')).toBeInTheDocument();
+        expect(rivalUtils.getByText('70')).toBeInTheDocument();
+        expect(rivalUtils.getByText('CON')).toBeInTheDocument();
+        expect(rivalUtils.getByText('60')).toBeInTheDocument();
+        expect(rivalUtils.getByText('SPE')).toBeInTheDocument();
+        expect(rivalUtils.getByText('50')).toBeInTheDocument();
+        expect(rivalUtils.getByText('STR')).toBeInTheDocument();
+        expect(rivalUtils.getByText('40')).toBeInTheDocument();
+
+        // El rival NO debe tener selector de comportamiento
+        expect(rivalUtils.queryByRole('combobox')).not.toBeInTheDocument();
+
+        // --- 3. FICHA EN CANCHA ---
         expect(screen.getByTestId('player-a1')).toHaveTextContent('7');
     });
 
@@ -391,7 +449,7 @@ describe('MatchPage', () => {
         fireEvent.change(screen.getByDisplayValue('Quién entra...'), { target: { value: 'h2' } });
         fireEvent.change(screen.getByDisplayValue('Qué comportamiento tendrá'), { target: { value: 'b1' } });
         fireEvent.click(screen.getByRole('button', { name: /Confirmar cambio/i })); 
-        expect(await screen.findByText('Cambio planificado para la próxima pausa')).toBeInTheDocument();
+        expect(await screen.findByText('Se realizará al fin de la pausa')).toBeInTheDocument();
     });
 
     test('14. Permite realizar cambios durante una pausa activa', async () => {
@@ -419,7 +477,7 @@ describe('MatchPage', () => {
         fireEvent.change(screen.getByDisplayValue('Quién entra...'), { target: { value: 'h2' } });
         fireEvent.change(screen.getByDisplayValue('Qué comportamiento tendrá'), { target: { value: 'b1' } });
         fireEvent.click(screen.getByRole('button', { name: /Confirmar cambio/i }));
-        expect(await screen.findByText('Cambio realizado')).toBeInTheDocument();
+        expect(await screen.findByText('Se realizará al fin de la pausa')).toBeInTheDocument();
     });
 
     test('15. No se pueden Realizar cambios con pausesEnded == 3', async () => {

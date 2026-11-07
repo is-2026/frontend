@@ -1,6 +1,6 @@
-import { render, screen, waitFor, act, fireEvent } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { MemoryRouter, Routes, Route, useMatch } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { MatchPage } from './MatchPage';
 import { useMatchSocket } from '../hooks/useMatchSocket';
 import { getPlayers } from '../services/club';
@@ -104,8 +104,9 @@ describe('MatchPage', () => {
         expect(changeButton).toBeInTheDocument();
 
         // Verificación de los jugadores por sus clases de color (bg-blue-500 y bg-red-500)
-        const homePlayers = container.querySelectorAll('.bg-blue-500');
+        const homePlayers = container.querySelectorAll('.bg-blue-500'); 
         const awayPlayers = container.querySelectorAll('.bg-red-500');
+        //query a diferencia de get, si no encuentra devuelve null
 
         expect(homePlayers.length).toBe(1);
         expect(awayPlayers.length).toBe(1);
@@ -331,7 +332,7 @@ describe('MatchPage', () => {
         mockMatch({ finished: { matchEnd: true, tick: 5400, homeScore: 0, awayScore: 0 } });
         await renderMatch();
         expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
-        expect(screen.getByText('Atacante')).toBeInTheDocument();
+        expect(screen.queryByText('Atacante')).not.toBeInTheDocument();
     });
 
     test('10. Cambio rechazado por backend, se muestra mensaje de error y se mantiene el comportamiento anterior', async () => {

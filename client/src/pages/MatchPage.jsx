@@ -7,11 +7,10 @@ import { MatchFinishedBanner } from "../components/match/MatchFinishedBanner";
 import { LineupPanel } from "../components/match/LineupPanel";
 import { getPlayers } from "../services/club";
 import { useEffect, useState } from "react";
-import { changeLiveBehavior } from "../services/matches";
 import { getBehaviors } from "../services/behaviors";
 import { PauseBanner } from "../components/match/PauseBanner";
 import { SubstitutionPanel } from "../components/match/SubstitutionPanel";
-
+import { StartersPanel } from "../components/match/StartersPanel";
 
 export function MatchPage() {
     const { matchId } = useParams();
@@ -61,15 +60,6 @@ export function MatchPage() {
 
     const canChange = isOwnMatch && !finished;
 
-    async function handleBehaviorChange(player_id, behavior_id) {
-        setError(null);
-        try {
-            await changeLiveBehavior(matchId, player_id, behavior_id); //Espera la respuesta del service matches
-        } catch (e) {
-            setError(e.message);
-        }
-    }
-
     return (
         // fixed para sobreescribir configuracion default de app
         <div className="fixed inset-0 bg-slate-950 p-8 text-white overflow-auto z-50">
@@ -108,19 +98,11 @@ export function MatchPage() {
 
                     <div className="flex flex-col gap-4 w-64 shrink-0">
                         { /*titulares*/}
-                        <LineupPanel
-                            title="Equipo"
-                            players={starters}
-                            showBehavior={isOwnMatch}
-                            canChange={canChange}
-                            behaviors={behaviors}
-                            onChangeBehavior={handleBehaviorChange}
-                        />
-
-                        { /*error al cambiar comportamiento en partido*/}
-                        {error && <p className="text-red-400 text-sm">{error}</p>}
-
-                        { /*suplentes*/}
+                        {canChange ?  (
+                            <StartersPanel matchId={matchId} players={starters} behaviors={behaviors} />
+                        ) : (
+                            <LineupPanel title="Equipo" players={starters} />
+                        )}
                         <LineupPanel title="Suplentes" players={substitutes} />
                         
                         { /*Planificar cambios durante el partido*/}

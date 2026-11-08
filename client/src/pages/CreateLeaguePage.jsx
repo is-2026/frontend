@@ -13,7 +13,7 @@ export function CreateLeaguePage() {
     const [maxClubs, setMaxClubs] = useState(8);
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
-    const [noDraws, setNoDraws] = useState(false);
+    const [allowDraws, setAllowDraws] = useState(true);
     const [selection, setSelection] = useState({ starters: [], substitutes: []});
     
     // estados de los datos
@@ -67,7 +67,7 @@ export function CreateLeaguePage() {
                 ...(password.trim() ? { password: password.trim() } : {}),
                 max_clubs: Number(maxClubs),
                 match_duration_minutes: 5,
-                allows_draws: !noDraws,
+                allows_draws: allowDraws,
                 players: [
                     ...selection.starters.map((starter) => ({
                         player_id: starter.player_id,
@@ -195,8 +195,8 @@ export function CreateLeaguePage() {
           <input
             type="checkbox"
             id="noDraws"
-            checked={noDraws}
-            onChange={(e) => setNoDraws(e.target.checked)}
+            checked={!allowDraws}
+            onChange={(e) => setAllowDraws(!e.target.checked)}
           />
           <label htmlFor="noDraws" className="text-sm font-medium">
             Sin empates

@@ -80,6 +80,7 @@ export function JoinLeaguePage() {
             navigate(`/leagues/${leagueId}/lobby`);
         } catch (e) {
             if (e.status === 400) setError(e.message || "Datos de inscripción inválidos.");
+            else if (e.status === 404) setError("La liga no existe.");
             else if (e.status === 409) setError("Tu club ya está inscripto en esta liga.");
             else setError("Ocurrió un error inesperado al unirse a la liga.");
         } finally {

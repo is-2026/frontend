@@ -292,6 +292,56 @@ describe('useMatchSocket', () => {
         expect(leaving.is_starter).toBe(false);
         expect(entering).toEqual({ player_id: 'a2', is_starter: true, behavior_id: 'b2', behavior_name: 'Defensor' });
         expect(result.current.lineups.home).toBe(oldHome); // verifica que no se modifique home
-    })
+    });
+
+    test('11. "PenaltyShootoutStart": trae ends_at y marca el inicio de los penales con isOn', ()  =>{
+        const { result, send } = setupHook();
+
+        expect(result.current.penaltyStart).toBeNull();
+
+        send('PenaltyShootoutStart', { ends_at: 'end'});
+
+        expect(result.current.penaltyStart.endsAt).toBe('end');
+        expect(result.current.penaltyStart.isOn).toBe(true);
+    });
+
+    test('12. "PenaltyResultData": trae los stats hasta ahora y si el último penal fue gol y de qué equipo fue', ()  =>{
+        const { result, send } = setupHook();
+
+        expect(result.current.penaltyResult).toBeNull();
+
+        send('PenaltyResultData', { 
+            team_id: 'tid',
+            scored: true,
+            home_penalties: 4,
+            away_penalties: 3,
+            number: 9
+        });
+
+        expect(result.current.penaltyResult.teamId).toBe('tid');
+        expect(result.current.penaltyResult.scored).toBe(true);
+        expect(result.current.penaltyResult.homePenalties).toBe(4);
+        expect(result.current.penaltyResult.awayPenalties).toBe(3);
+        expect(result.current.penaltyResult.number).toBe(9);
+    });
+
+    test('13. "PenaltyKick": trae que equipo y jugador patea, quién ataja y el numero de penal', ()  =>{
+        const { result, send } = setupHook();
+
+        expect(result.current.penaltyKick).toBeNull();
+
+        send('PenaltyKick', { 
+            kicker_id: 'kid',
+            defender_id: 'did',
+            team_id: 'tid',
+            number: 9
+        });
+
+        expect(result.current.penaltyKick.kickerId).toBe('kid');
+        expect(result.current.penaltyKick.defenderId).toBe('did');
+        expect(result.current.penaltyKick.teamId).toBe('tid');
+        expect(result.current.penaltyKick.number).toBe(9);
+    });
+
 
 });

@@ -86,3 +86,10 @@ export function updateLineup(leagueId, data) {
         body: JSON.stringify(data),
     });
 }
+
+// cancela la liga no iniciada (solo el creador)
+export function cancelLeague(leagueId) {
+    return request(`/leagues/${leagueId}`, {
+        method: "DELETE",
+    });
+}

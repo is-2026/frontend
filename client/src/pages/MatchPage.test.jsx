@@ -151,6 +151,10 @@ describe('MatchPage', () => {
 
     test('3. Muestra el resultado final y banner al finalizar el partido (finished.matchEnd = true)', () => {
         useMatchSocket.mockReturnValue({
+            teams: {
+                home: { id: 'club-h', name: 'River' },
+                away: { id: 'club-a', name: 'Atenas' }
+            },
             lineups: {
                 home: [{ player_id: 'p1' }],
                 away: [{ player_id: 'p2' }]
@@ -158,7 +162,7 @@ describe('MatchPage', () => {
             scores: { home: 2, away: 1 },
             state: {
                 matchId: '123',
-                tick: 5400,
+                tick: 3000,
                 players: [],
                 ballPosition: { x: 0, y: 0 }
             },
@@ -166,7 +170,10 @@ describe('MatchPage', () => {
             finished: {
                 matchEnd: true,
                 homeScore: 2,
-                awayScore: 1
+                awayScore: 1,
+                homePenalties: null,
+                awayPenalties: null,
+                winnerClubId: 'club-h'
             }
         });
 
@@ -182,7 +189,8 @@ describe('MatchPage', () => {
         expect(screen.getByText(/PARTIDO FINALIZADO/i)).toBeInTheDocument();
 
         // Busca el texto "2 - 1"
-        expect(screen.getByText('Equipo Local 2 - 1 Equipo Rival')).toBeInTheDocument();
+        expect(screen.getByText('River 2 - 1 Atenas')).toBeInTheDocument();
+        expect(screen.getByText('Ganó River')).toBeInTheDocument();
     });
 
     test('4. Tolera coordenadas fuera de rango en la simulación sin romper el componente', () => {

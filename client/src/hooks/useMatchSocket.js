@@ -159,7 +159,12 @@ export function useMatchSocket(matchId) {
 			
 				//4. Caso finalización del partido
 				case "matchFinished": {
-					const { tick, match_end, home_score, away_score } = msg.data;
+					const { 
+						tick, match_end, 
+						home_score, away_score,
+						home_penalties, away_penalties,
+						winner_club_id
+					} = msg.data;
 					//Se setea finished con estos valores, deja de ser null.
 					setScores({ 
 						home: home_score, 
@@ -168,8 +173,11 @@ export function useMatchSocket(matchId) {
 					setFinished({
 						tick,
 						matchEnd: match_end,
-						homeScore: home_score ?? 0,
-						awayScore: away_score ?? 0,
+						homeScore: home_score,
+						awayScore: away_score,
+						homePenalties: home_penalties, 
+						awayPenalties: away_penalties,
+						winnerClubId: winner_club_id
 						})
 					break;
 				}
@@ -221,7 +229,7 @@ export function useMatchSocket(matchId) {
 				}
 
 				//10. caso inicio penales
-				case "PenaltyShootoutStart":{
+				case "penaltyShootoutStart":{
 					const { ends_at } = msg.data;
 					setPenaltyStart({
 						isOn: true,
@@ -231,7 +239,7 @@ export function useMatchSocket(matchId) {
 				}
 
 				//11. Caso penal individual terminado
-				case "PenaltyResultData":{
+				case "penaltyResult":{
 					const{
 						team_id, scored, 
 						home_penalties, away_penalties,
@@ -248,7 +256,7 @@ export function useMatchSocket(matchId) {
 				}
 
 				//12. Caso patear penal (quién patea y quién ataja)
-				case "PenaltyKick":{
+				case "penaltyKick":{
 					const {
 						defender_id, kicker_id, 
 						team_id, number

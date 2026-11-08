@@ -294,23 +294,23 @@ describe('useMatchSocket', () => {
         expect(result.current.lineups.home).toBe(oldHome); // verifica que no se modifique home
     });
 
-    test('11. "PenaltyShootoutStart": trae ends_at y marca el inicio de los penales con isOn', ()  =>{
+    test('11. "penaltyShootoutStart": trae ends_at y marca el inicio de los penales con isOn', ()  =>{
         const { result, send } = setupHook();
 
         expect(result.current.penaltyStart).toBeNull();
 
-        send('PenaltyShootoutStart', { ends_at: 'end'});
+        send('penaltyShootoutStart', { ends_at: 'end'});
 
         expect(result.current.penaltyStart.endsAt).toBe('end');
         expect(result.current.penaltyStart.isOn).toBe(true);
     });
 
-    test('12. "PenaltyResultData": trae los stats hasta ahora y si el último penal fue gol y de qué equipo fue', ()  =>{
+    test('12. "PenaltyResult": trae los stats hasta ahora y si el último penal fue gol y de qué equipo fue', ()  =>{
         const { result, send } = setupHook();
 
         expect(result.current.penaltyResult).toBeNull();
 
-        send('PenaltyResultData', { 
+        send('penaltyResult', { 
             team_id: 'tid',
             scored: true,
             home_penalties: 4,
@@ -325,12 +325,12 @@ describe('useMatchSocket', () => {
         expect(result.current.penaltyResult.number).toBe(9);
     });
 
-    test('13. "PenaltyKick": trae que equipo y jugador patea, quién ataja y el numero de penal', ()  =>{
+    test('13. "penaltyKick": trae que equipo y jugador patea, quién ataja y el numero de penal', ()  =>{
         const { result, send } = setupHook();
 
         expect(result.current.penaltyKick).toBeNull();
 
-        send('PenaltyKick', { 
+        send('penaltyKick', { 
             kicker_id: 'kid',
             defender_id: 'did',
             team_id: 'tid',

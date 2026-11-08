@@ -1,6 +1,6 @@
 import { describe, test, it, expect, vi, beforeEach } from "vitest";
 import { request } from "./api";
-import { createLeagues, getLeagues, getLeagueById, joinLeague , leaveLeague, startLeague, getLeagueMatches, getStandings, getMyLeagues, getLineup, updateLineup } from "./leagues";
+import { createLeagues, getLeagues, getLeagueById, joinLeague , leaveLeague, startLeague, cancelLeague, getLeagueMatches, getStandings, getMyLeagues, getLineup, updateLineup } from "./leagues";
 
 vi.mock("./api", () => ({
     request: vi.fn(),
@@ -208,6 +208,30 @@ describe("leagues service", () => {
         });
     });
 
+    describe("cancelLeague", () => {
+        test("debe enviar la peticióna a /leagues/:id con método DELETE exitosamente", async () => {
+            const leagueId = "liga-123";
+            const mockResponse = { message: "Liga cancelada" };
+            request.mockResolvedValueOnce(mockResponse);
+
+            const result = await cancelLeague(leagueId);
+
+            expect(request).toHaveBeenCalledWith(`/leagues/${leagueId}`, {
+                method: "DELETE",
+            });
+            expect(result).toEqual(mockResponse);
+        });
+
+        test("debe propagar los errores si la API falla", async () => {
+            const mockError = new Error("Solo el creador de la liga puede cancelarla");
+            mockError.status = 403;
+
+            request.mockRejectedValueOnce(mockError);
+
+            await expect(cancelLeague("liga-123")).rejects.toThrow("Solo el creador de la liga puede cancelarla");
+        });
+    });
+
     describe("getLeagueMatches", () => {
         test("debe pedir los partidos a /leagues/:id/matches y retornarlos", async () => {
             const mockMatches = [
@@ -287,7 +311,7 @@ describe("leagues service", () => {
 
             const result = await getMyLeagues();
 
-            expect(request).toHaveBeenCalledWith("/clubs/leagues", { method: "GET" });
+            expect(request).toHaveBeenCalledWith("/club/leagues", { method: "GET" });
             expect(result).toEqual(mockLeagues);
         });
     });

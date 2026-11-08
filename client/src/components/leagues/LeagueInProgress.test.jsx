@@ -143,4 +143,28 @@ describe("LeagueInProgress", () => {
             await screen.findByText("Error al cargar los datos de la liga.")
         ).toBeInTheDocument();
     });
+
+    test("vuelve a pedir el fixture y la tabla cuando llega la liga actualizada", async () => {
+        const { rerender } = render(
+            <MemoryRouter>
+                <LeagueInProgress league={league} />
+            </MemoryRouter>
+        );
+
+        await screen.findByText("Próximo partido");
+        expect(getLeagueMatches).toHaveBeenCalledTimes(1);
+        expect(getStandings).toHaveBeenCalledTimes(1);
+
+        // llega el detalle nuevo (leagueUpdated): la liga termino
+        const updatedLeague = { ...league, status: "finished" };
+        rerender(
+            <MemoryRouter>
+                <LeagueInProgress league={updatedLeague} />
+            </MemoryRouter>
+        );
+
+        expect(await screen.findByText("Campeón")).toBeInTheDocument();
+        expect(getLeagueMatches).toHaveBeenCalledTimes(2);
+        expect(getStandings).toHaveBeenCalledTimes(2);
+    });
 });

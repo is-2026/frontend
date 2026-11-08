@@ -10,16 +10,22 @@ function secondsLeft(endsAt) {
     return Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
 }
 
-export function PauseBanner({ pause, substitutionDone }) {
+export function PauseBanner({ pause }) {
 
+    //Se guarda a qué tora termina
     const endsAt = Date.parse(pause.endsAt);
     const [left, setLeft] = useState(() => secondsLeft(endsAt));
 
+    //y se actualiza el contador cada 250ms
+    //El componente se desmonta cuando pause = null
+    //pause == null cuando llega mensaje matchResumed por ws 
     useEffect(() => {
         const update = () => setLeft(secondsLeft(endsAt));
         update();
-        const id = setInterval(update, 250);
+        const id = setInterval(update, 250); 
+        //setInterval vuelve a correr update cada un intervalo de 250ms
         return () => clearInterval(id);
+        //clearInterval limpia el intervalo
     }, [endsAt]);
 
     if (left <= 0) return null;

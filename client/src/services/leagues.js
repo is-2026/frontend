@@ -67,7 +67,7 @@ export function getStandings(leagueId) {
 
 // devuelve las ligas en las que participa mi club
 export function getMyLeagues() {
-    return request("/clubs/leagues", {
+    return request("/club/leagues", {
         method: "GET",
     });
 }
@@ -84,5 +84,12 @@ export function updateLineup(leagueId, data) {
     return request(`/leagues/${leagueId}/lineup`, {
         method: "PUT",
         body: JSON.stringify(data),
+    });
+}
+
+// cancela la liga no iniciada (solo el creador)
+export function cancelLeague(leagueId) {
+    return request(`/leagues/${leagueId}`, {
+        method: "DELETE",
     });
 }

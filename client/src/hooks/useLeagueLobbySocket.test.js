@@ -1,12 +1,29 @@
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act, waitFor } from "@testing-library/react";
 import { describe, test, expect, beforeEach, vi } from "vitest";
 import { useLeagueLobbySocket } from "./useLeagueLobbySocket";
+import { getLeagues } from "../services/leagues";
 
 // mock de react-router-dom con funciones de Vitest
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", () => ({
     useNavigate: () => mockNavigate,
 }));
+
+// mock del servicio de ligas (para leagueUpdated)
+vi.mock("../services/leagues", () => ({
+    getLeagues: vi.fn(),
+}));
+
+// mock de config para controlar la URL del WebSocket
+vi.mock("../config", () => {
+    const WS_URL = "ws://localhost:8000";
+    const LEAGUE_LOBBY_WS_PATH = (id) => `/ws/leagues/${id}/lobby`;
+    return {
+        WS_URL,
+        LEAGUE_LOBBY_WS_PATH,
+        wsUrl: (path) => `${WS_URL}${path}?token=${encodeURIComponent(localStorage.getItem("token") ?? "")}`,
+    };
+});
 
 // mock de la API de WebSocket
 class MockWebSocket {
@@ -34,6 +51,7 @@ describe("useLeagueLobbySocket Hook", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        localStorage.setItem("token", "test-token-123");
         MockWebSocket.instances = [];
         global.WebSocket = MockWebSocket;
 
@@ -46,12 +64,11 @@ describe("useLeagueLobbySocket Hook", () => {
         expect(MockWebSocket.instances.length).toBe(0);
     });
 
-    test("se conecta a la URL correcta del WebSocket", () => {
-        const leagueId = "123";
-        renderHook(() => useLeagueLobbySocket(leagueId, mockSetLeague, mockSetError));
+    test("se conecta al backend con la URL y el token correctos", () => {
+        renderHook(() => useLeagueLobbySocket("123", mockSetLeague, mockSetError));
 
         expect(MockWebSocket.instances.length).toBe(1);
-        expect(MockWebSocket.instances[0].url).toContain(`/ws/leagues/${leagueId}/lobby`);
+        expect(MockWebSocket.instances[0].url).toBe("ws://localhost:8000/ws/leagues/123/lobby?token=test-token-123");
     });
 
     test("maneja el evento 'clubRegistered' agregando el nuevo club", () => {
@@ -141,5 +158,22 @@ describe("useLeagueLobbySocket Hook", () => {
 
         expect(nuevoEstado.is_started).toBe(true);
         expect(nuevoEstado.status).toBe("started");
+    });
+
+    test("maneja el evento 'leagueUpdated' volviendo a pedir el detalle de la liga", async () => {
+        const ligaActualizada = { id: "123", name: "Liga Test", status: "finished" };
+        getLeagues.mockResolvedValueOnce(ligaActualizada);
+
+        renderHook(() => useLeagueLobbySocket("123", mockSetLeague, mockSetError));
+        const socket = MockWebSocket.instances[0];
+
+        act(() => {
+            socket.sendMessage({ type: "leagueUpdated", data: { league_id: "123" } });
+        });
+
+        expect(getLeagues).toHaveBeenCalledWith("123");
+        await waitFor(() => {
+            expect(mockSetLeague).toHaveBeenCalledWith(ligaActualizada);
+        });
     });
 });

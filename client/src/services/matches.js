@@ -31,15 +31,26 @@ export function scheduleSubstitution(match_id, player_out_id, player_in_id, subs
     });
 }
 
+/**
+ * Cancela sustitución planificada
+ * @param {string} match_id -UUID del partido
+ */
 export function cancelSubstitution(match_id) {
     return request(`/matches/${match_id}/substitutions`, {
         method:"DELETE",
     });
 }
 
-export function setPenaltyOrder(match_id) {
+/**
+ * Elige los 5 pateadores de la tanda de penales, en orden.
+ * Solo durante la ventana que abre penaltyShootoutStart.
+ * @param {string} match_id - UUID del partido
+ * @param {{player_id: string, behavior_id: string}[]} kickers - 5 pateadores en orden
+ */
+export function setPenaltyOrder(match_id, kickers) {
     return request(`/matches/${match_id}/penalty-order`, {
         method:"PUT",
+        body: JSON.stringify({ kickers }),
     });
 }
 

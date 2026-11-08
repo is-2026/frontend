@@ -42,7 +42,9 @@ export function useMatchSocket(matchId) {
 	const [pausesEnded, setPausesEnded] = useState(0);
 	const [finished, setFinished] = useState(null);
 	const [closeCode, setCloseCode] = useState(null);
-
+	const [penalty, setPenalty] = useState(null);
+	const [penaltyResult, setPenaltyResult] = useState(null);
+	const [penaltyKick, setPenaltyKick] = useState(null);
 	const socketRef = useRef(null);
 
 	useEffect(() => {
@@ -105,6 +107,10 @@ export function useMatchSocket(matchId) {
 						home: started.home_score ?? 0,
 						away: started.away_score ?? 0,
 					});
+					setPenalty({
+						isOn:false,
+						ends_at:null
+					})
 					break;
 				}
 
@@ -207,6 +213,7 @@ export function useMatchSocket(matchId) {
 					break;
 				}
 
+				//caso sustitución realizada
 				case "substitutionMade": {
 					const { player_in_id, player_out_id, behavior_id, behavior_name } = msg.data;
 					setLineups((prev) => {
@@ -215,6 +222,45 @@ export function useMatchSocket(matchId) {
 					});
 					break;	
 				}
+
+				//caso inicio penales
+				case "PenaltyShootoutStart":{
+					const {match_id, ends_at} = msg.data;
+					setPenalty({
+						isOn: true,
+						endsAt: ends_at
+					});
+					break;
+				}
+
+				//Caso penal individual terminado
+				case "PenaltyResultData":{
+					const{
+						match_id, team_id, scored, 
+						home_penalties, away_penalties 
+					} = msg.data;
+					setPenaltyResult({
+						MatchId: match_id,
+						teamId: team_id,
+						scored: scored,
+						homePenalties: home_penalties,
+						awayPenalties: away_penalties
+					});
+					break;
+				}
+
+				//Caso patear penal (quién patea y quién ataja)
+				case "PenaltyKick":{
+					const {
+						kicker, goalie
+					} = msg.data;
+					setPenaltyKick({
+						kicker: kicker,
+						goalie: goalie
+					})
+					break;
+				}
+
 
 				//error
 				default:

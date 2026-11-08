@@ -82,17 +82,17 @@ export function PenaltyOrderPanel({matchId, players = [], behaviors = [], endsAt
                     >
                         <option value="">Jugador</option>
                         {players
-                            .filter((p) => (p.player_id == slot.playerId) || !chosen.includes(p.player_id))
-                            .map((p) => (
-                                <option key={p.player_id} value={p.player_id}>
-                                    #{p.number} {p.name}
+                            .filter((player) => (player.player_id == slot.playerId) || !chosen.includes(p.player_id))
+                            .map((player) => (
+                                <option key={player.player_id} value={player.player_id}>
+                                    #{player.number} {player.name}
                                 </option>
                             ))}
                     </select>
                     <select 
                         className={SELECT_CLASS}
                         value={slot.behaviorId}
-                        onChange={(e) => updateSlot(i, "behaviorId", e.target.value)}
+                        onChange={(event) => updateSlot(i, "behaviorId", event.target.value)}
                     >
                         <option value="">Comportamiento</option>
                         {playerBehaviors.map((behavior) => (

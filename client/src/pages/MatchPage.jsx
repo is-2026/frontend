@@ -132,8 +132,6 @@ export function MatchPage() {
                                 endsAt={penaltyStart.endsAt}
                                 />
                             </div>
-
-                            
                         )
                         )}
 

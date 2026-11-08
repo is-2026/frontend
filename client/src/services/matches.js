@@ -37,4 +37,10 @@ export function cancelSubstitution(match_id) {
     });
 }
 
+export function setPenaltyOrder(match_id) {
+    return request(`/matches/${match_id}/penalty-order`, {
+        method:"PUT",
+    });
+}
+
 

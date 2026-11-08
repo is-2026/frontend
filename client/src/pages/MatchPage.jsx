@@ -17,7 +17,8 @@ export function MatchPage() {
     const { 
         teams, lineups, scores, 
         state, goalInfo, finished,
-        pause, pausesEnded
+        pause, pausesEnded, closeCode,
+        penaltyStart, penaltyResult, penaltyKick
     } = useMatchSocket(matchId);
 
     //Variables para cambio de behaviors
@@ -95,6 +96,13 @@ export function MatchPage() {
 
                 <div className="flex gap-4 items-start">
                     <div className="min-w-0 flex-1 relative order-2">
+
+                        {/* Mensaje de error por desconexión */}
+                        {closeCode && (
+                            <div className="bg-red-600 text-white text-center py-2">
+                                Conexión perdida con el servidor (Código: {closeCode}). Reintentando...
+                            </div>
+                        )}
 
                         {/*cronómetro y evento partido finalizado */}
                         <MatchHeader

@@ -67,7 +67,7 @@ export function getStandings(leagueId) {
 
 // devuelve las ligas en las que participa mi club
 export function getMyLeagues() {
-    return request("/clubs/leagues", {
+    return request("/club/leagues", {
         method: "GET",
     });
 }

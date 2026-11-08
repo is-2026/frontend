@@ -311,7 +311,7 @@ describe("leagues service", () => {
 
             const result = await getMyLeagues();
 
-            expect(request).toHaveBeenCalledWith("/clubs/leagues", { method: "GET" });
+            expect(request).toHaveBeenCalledWith("/club/leagues", { method: "GET" });
             expect(result).toEqual(mockLeagues);
         });
     });

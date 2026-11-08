@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { LEAGUE_LOBBY_WS_PATH, wsUrl } from "../config";
+import { getLeagues } from "../services/leagues";
 
 export const useLeagueLobbySocket = (leagueId, setLeague, setError) => {
     const navigate = useNavigate();
@@ -52,9 +53,17 @@ export const useLeagueLobbySocket = (leagueId, setLeague, setError) => {
                         });
                         break;
 
+                    case "leagueUpdated":
+                        // algo cambio en la liga en curso, volvemos a pedir el detalle
+                        getLeagues(data.league_id)
+                            .then((league) => setLeague(league))
+                            .catch((err) => console.error("Error al actualizar la liga:", err));
+                        break;
+                    
                     case "leagueCancelled":
                         setError("La liga fue cancelada por el creador."); // guardamos el mensaje de error para mostrar al usuario
                         break;
+                    
                 }
             } catch (err) { // capturamos cualquier falla en la lectura del mensaje
                 console.error("Error al procesar el mensaje del WebSocket:", err); // muestra mensaje de error

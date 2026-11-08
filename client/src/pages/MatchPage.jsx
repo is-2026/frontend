@@ -11,6 +11,7 @@ import { getBehaviors } from "../services/behaviors";
 import { PauseBanner } from "../components/match/PauseBanner";
 import { SubstitutionPanel } from "../components/match/SubstitutionPanel";
 import { StartersPanel } from "../components/match/StartersPanel";
+import { PenaltyOrderPanel } from "../components/match/PenaltyOrderPanel" 
 
 export function MatchPage() {
     const { matchId } = useParams();
@@ -69,6 +70,7 @@ export function MatchPage() {
 
     const canChange = isOwnMatch && !finished;
 
+    const inPenaltyWindow = canChange && penaltyStart?.isOn;
     //Se limpia scheduled luego de la pausa. Lo necesita al inicio para mostrar el cambio, por eso no se borra al inicio.
     useEffect(() => {
     if (!pause) setScheduled(null);
@@ -120,6 +122,20 @@ export function MatchPage() {
                         {/* banner de pausa */}
                         { pause && <PauseBanner pause={pause} substitutionDone={Boolean(scheduled)}/> }
 
+                        {/* Panel de penales */}
+                        {(inPenaltyWindow && (
+                            <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 overflow-auto">
+                                <PenaltyOrderPanel
+                                matchId={matchId}
+                                players={myLineup}
+                                behaviors={behaviors}
+                                endsAt={penaltyStart.endsAt}
+                                />
+                            </div>
+
+                            
+                        )
+                        )}
 
                         {/* banner de fin de partido */}
                         <MatchFinishedBanner

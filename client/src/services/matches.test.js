@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { request } from "./api";
-import { cancelSubstitution, changeLiveBehavior, setPenaltyOrder } from "./matches";
+import { 
+    cancelSubstitution, scheduleSubstitution, 
+    changeLiveBehavior, setPenaltyOrder 
+} from "./matches";
 
 vi.mock("./api", () => ({
     request: vi.fn(),
@@ -28,6 +31,43 @@ describe("changeLiveBehavior", () => {
         request.mockRejectedValue(err); //simulamos error en request
 
         await expect(changeLiveBehavior("m1", "p1", "b1")).rejects.toBe(err); //el mensaje de response es rspuesta de error, se espera que changeLiveBehavior devuelva eso 
+    });
+});
+
+describe("scheduleSubstitution", () => {
+    beforeEach(() => {
+        vi.resetAllMocks();
+    });
+
+    it("hace POST a las sustituciones del partido con quién sale, quién entra y el comportamiento", async () => {
+        request.mockResolvedValue({ status: "pending" });
+
+        await scheduleSubstitution("m1", "out1", "in1", "b1");
+
+        expect(request).toHaveBeenCalledWith("/matches/m1/substitutions", {
+            method: "POST",
+            body: JSON.stringify({
+                player_out_id: "out1",
+                player_in_id: "in1",
+                substitution_behavior_id: "b1",
+            }),
+        });
+    });
+
+    it("devuelve la sustitución que responde el servidor", async () => {
+        // el panel usa res.status para saber si quedó pendiente o se ejecutó en el momento
+        const substitution = {
+            id: "s1",
+            player_out_id: "out1",
+            player_in_id: "in1",
+            window: "halftime",
+            status: "pending",
+        };
+        request.mockResolvedValue(substitution);
+
+        const res = await scheduleSubstitution("m1", "out1", "in1", "b1");
+
+        expect(res).toEqual(substitution);
     });
 });
 

@@ -5,9 +5,13 @@ import { request } from "./api"; // Import de la función request de api. Ver ar
  Devuelve una lista con los amistosos disponibles
  */
 
-export function getFriendlies() {
-  return request("/friendlies");
-}
+export function getFriendlies(clubName="") {
+  const cleanName = clubName.trim();
+    const endpoint = cleanName 
+        ? request(`/friendlies?club_name=${encodeURIComponent(cleanName)}`) 
+        : request(`/friendlies`);
+    return(request(endpoint));
+} 
 
 /*
 //Esto es un mock para ver si funciona:

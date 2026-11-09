@@ -232,10 +232,10 @@ export function useMatchSocket(matchId) {
 				case "penaltyShootoutStart":{
 					const { ends_at } = msg.data;
 					setPenaltyStart({
-						isOn: true,
-						endsAt: ends_at
+						endsAt: ends_at,
 					});
-					break;
+					setPenaltyResult({ homePenalties: 0, awayPenalties: 0 });
+    				break;
 				}
 
 				//11. Caso penal individual terminado
@@ -259,13 +259,15 @@ export function useMatchSocket(matchId) {
 				case "penaltyKick":{
 					const {
 						defender_id, kicker_id, 
-						team_id, number
+						team_id, number,
+						penalty_ticks
 					} = msg.data;
 					setPenaltyKick({
 						kickerId: kicker_id,
 						defenderId: defender_id,
 						teamId: team_id,
-						number: number  
+						number: number,
+						penaltyTicks: penalty_ticks
 					});
 					break;
 				}

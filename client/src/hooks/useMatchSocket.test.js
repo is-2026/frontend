@@ -185,6 +185,7 @@ describe('useMatchSocket', () => {
             teamName: 'River',
         });
     });
+    test('7. Procesa el evento MatchFinished')
 
     test('7. Procesa el evento "behaviorChanged" y actualiza solo al jugador indicado', () => {
         const { result } = renderHook(() => useMatchSocket('123'));
@@ -294,7 +295,7 @@ describe('useMatchSocket', () => {
         expect(result.current.lineups.home).toBe(oldHome); // verifica que no se modifique home
     });
 
-    test('11. "penaltyShootoutStart": trae ends_at y marca el inicio de los penales con isOn', ()  =>{
+    test('11. "penaltyShootoutStart": trae ends_at', ()  =>{
         const { result, send } = setupHook();
 
         expect(result.current.penaltyStart).toBeNull();
@@ -302,7 +303,6 @@ describe('useMatchSocket', () => {
         send('penaltyShootoutStart', { ends_at: 'end'});
 
         expect(result.current.penaltyStart.endsAt).toBe('end');
-        expect(result.current.penaltyStart.isOn).toBe(true);
     });
 
     test('12. "PenaltyResult": trae los stats hasta ahora y si el último penal fue gol y de qué equipo fue', ()  =>{

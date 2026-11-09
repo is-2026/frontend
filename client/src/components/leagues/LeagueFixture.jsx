@@ -52,7 +52,7 @@ export function LeagueFixture({ matches, clubs }) {
                             >
                                 <span className="font-semibold">{match.home_club_name}</span>
                                 <span className="font-black text-white">
-                                    {match.status === "scheduled" ? "vs" : `${match.home_score} - ${match.away_score}`}
+                                    {match.status === "scheduled" || match.home_score === null ? "vs" : `${match.home_score} - ${match.away_score}`}
                                 </span>
                                 <span className="font-semibold">{match.away_club_name}</span>
                                 <span className="text-xs text-slate-400">{statusText[match.status]}</span>

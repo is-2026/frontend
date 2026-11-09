@@ -30,8 +30,8 @@ const matches = [
         away_club_id: "c3",
         home_club_name: "Boca",
         away_club_name: "Racing",
-        home_score: 0,
-        away_score: 0,
+        home_score: null,
+        away_score: null,
     },
     {
         id: "m3",
@@ -41,8 +41,8 @@ const matches = [
         away_club_id: "c3",
         home_club_name: "River",
         away_club_name: "Racing",
-        home_score: 0,
-        away_score: 0,
+        home_score: null,
+        away_score: null,
     },
 ];
 
@@ -80,14 +80,14 @@ describe("LeagueFixture", () => {
     test("partido programado muestra 'vs' y el estado", () => {
         renderFixture(matches, clubs);
 
-        expect(screen.getByText("vs")).toBeInTheDocument();
+        expect(screen.getAllByText("vs")).toHaveLength(2);
         expect(screen.getByText("Programado")).toBeInTheDocument();
     });
 
-    test("partido en juego muestra el resultado, el estado y el boton 'Ver en vivo'", () => {
+    test("partido en juego sin resultado muestra 'vs', el estado y el boton 'Ver en vivo'", () => {
         renderFixture(matches, clubs);
 
-        expect(screen.getByText("0 - 0")).toBeInTheDocument();
+        expect(screen.queryByText("null - null")).not.toBeInTheDocument();
         expect(screen.getByText("En juego")).toBeInTheDocument();
 
         const link = screen.getByRole("link", { name: "Ver en vivo" });

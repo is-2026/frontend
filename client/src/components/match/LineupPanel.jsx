@@ -5,9 +5,16 @@ const STATS = [
     ["SPE", "speed"],
     ["STR", "strength"],
 ];
-export function LineupPanel({
-    title, players, renderRight
-}) { //
+export function LineupPanel({title, players, renderRight, kickerId, defenderId}) { //
+
+    const penaltyRole = (p) => {
+        if (kickerId != null && p.player_id == kickerId)
+            return <span className="text-xs font-bold">PATEA</span>;
+        if (defenderId != null && p.player_id == defenderId)
+            return <span className="text-xs font-bold">DEFIENDE</span>;
+        return null;
+    };
+
     return (
         <div className="bg-slate-900 border border-slate-700 min-h-[10rem]">
             <h3 className="text-sm text-slate-400 mb-2 uppercase font-bold">{title}</h3>
@@ -19,7 +26,9 @@ export function LineupPanel({
                             <span className="truncate">
                                 <span className="text-slate-400">#{p.number}</span> {p.name}
                             </span>
-                            {renderRight?.(p)}
+                            {renderRight?.(p)} 
+                            {penaltyRole(p)}
+                            {/* Si renderRight es null, no dibuja nada, lo mismo en penaltyRole */}
                         </div>
 
                         {/* fila 2: atributos en su propia línea, a todo el ancho */}

@@ -35,9 +35,7 @@ export function PenaltyShootoutInfo({ penaltyKick, penaltyResult, state, lineups
             <p className="font-mono font-bold">
                 {homeName} {homeResult} - {awayResult} {awayName}
             </p>
-            {!resolved && fresh && (
-                <p className="font-mono font-bold text-emerald-400">{formatMatchTime(ticksLeft)}</p>
-            )}
+            <p className="font-mono font-bold text-emerald-400">{formatMatchTime(ticksLeft)}</p>
         </div>
     )
 }

@@ -541,8 +541,8 @@ describe('MatchPage', () => {
         await renderMatch();
 
         expect(screen.getByText(/Penal #1/i)).toBeInTheDocument();
-        expect(screen.getAllByText("h-tit-1").length).toBeGreaterThanOrEqual(1);
-        expect(screen.getAllByText("a-tit-1").length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText("h-tit-1")).toHaveLength(2); //aparece en panel de penales y en lineup.
+        expect(screen.getAllByText("a-tit-1")).toHaveLength(2);
     });
 
 

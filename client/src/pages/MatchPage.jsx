@@ -27,7 +27,7 @@ export function MatchPage() {
     const [behaviors, setBehaviors] = useState([]);
     const navigate = useNavigate();
     const [scheduled, setScheduled] = useState(null);
-    const [justFinishedSub, setJustFinishedSub] = useState(false);
+    const [finishedSub, setFinishedSub] = useState(false);
     //Variable para mostrar formulario de sustitución
     const [showForm, setShowForm] = useState(false);
     
@@ -70,9 +70,11 @@ export function MatchPage() {
     );
 
     const canChange = isOwnMatch && !finished;
-    
+    const inShootout = penaltyStart != null || penaltyKick != null;
+    const inPenaltyWindow = canChange && penaltyStart != null && penaltyKick == null;
+    //inShootout se usa durante el juego de los penales
+    //inPenaltyWindow se usa para mostrar el panel de elección de pateadores
 
-    const inPenaltyWindow = canChange && (penaltyStart != null) && (penaltyKick == null);
     //Se limpia scheduled luego de la pausa. Lo necesita al inicio para mostrar el cambio, por eso no se borra al inicio.
     useEffect(() => {
     if (!pause) setScheduled(null);
@@ -82,10 +84,10 @@ export function MatchPage() {
     useEffect(() => {
         // Si la pausa terminó y tenías un cambio planificado
         if (pausesEnded > 0 && scheduled) {
-            setJustFinishedSub(true);
+            setFinishedSub(true);
 
             const timer = setTimeout(() => {
-                setJustFinishedSub(false);
+                setFinishedSub(false);
             }, 3000); // Se oculta a los 3 segundos
 
             return () => clearTimeout(timer);
@@ -154,7 +156,7 @@ export function MatchPage() {
                             onExit={() => navigate("/friendlies")}
                         />
                         {/* Cartel de aviso cuando se completa la pausa */}
-                        {justFinishedSub && (
+                        {finishedSub && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-30 pointer-events-none">
                                 <p className="text-3xl font-black text-white uppercase tracking-wider">
                                     Cambio realizado
@@ -168,15 +170,27 @@ export function MatchPage() {
                     {/* Mi equipo */}
                     <div className={`flex flex-col gap-4 w-64 shrink-0 ${myOrder}`}>
                         { /*titulares*/}
-                        {canChange ?  (
-                            <StartersPanel matchId={matchId} players={starters} behaviors={behaviors} />
-                        ) : (
-                            <LineupPanel title="Titulares" players={starters} />
+                        {inShootout ? (
+                            <LineupPanel 
+                            title="Convocados" 
+                            players={myLineup}
+                            kickerId={penaltyKick?.kickerId}
+                            defenderId={penaltyKick?.defenderId}  />
+                        ) : ( 
+                            <>
+                                {canChange ? (
+                                    <StartersPanel matchId={matchId} players={starters} behaviors={behaviors} />
+                                ) : (
+                                    <LineupPanel title="Titulares" players={starters} />
+                                )}
+                                <LineupPanel title="Suplentes" players={substitutes} />
+                            </>
                         )}
-                        <LineupPanel title="Suplentes" players={substitutes} />
+                        
+                        
                         
                         { /*Planificar cambios durante el partido*/}
-                        {canChange &&  (
+                        {(canChange && !inShootout) &&  (
                             <>
                                 {showForm && (
                                     <SubstitutionPanel
@@ -201,8 +215,18 @@ export function MatchPage() {
                     </div>
                     {/* Rival: solo lectura */}
                     <div className={`flex flex-col gap-4 w-64 shrink-0 ${rivalOrder}`}>
-                        <LineupPanel title="Titulares" players={rivalStarters} />
-                        <LineupPanel title="Suplentes" players={rivalSubstitutes} />
+                        {(inShootout ? (
+                            <LineupPanel 
+                            title="Convocados" 
+                            players={rivalLineup}
+                            kickerId={penaltyKick?.kickerId}
+                            defenderId={penaltyKick?.defenderId}  />
+                        ) : (
+                            <>
+                                <LineupPanel title="Titulares" players={rivalStarters} />
+                                <LineupPanel title="Suplentes" players={rivalSubstitutes} />
+                            </>
+                        ))}
                     </div>
                 </div>
             </div>

@@ -15,7 +15,7 @@ export function RankingPage() {
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
 
-    getMyClub().then((c) => setMyClubId(c.id));
+    getMyClub().then((c) => setMyClubId(c.id)).catch(() => {});
   }, []);
 
   return (

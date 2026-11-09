@@ -4,6 +4,7 @@ import { getLeagues, joinLeague } from "../services/leagues";
 import { getPlayers } from "../services/club";
 import { getBehaviors } from "../services/behaviors";
 import { PlayerSelection } from "../components/PlayerSelection";
+import { FormationSelection } from "../components/FormationSelection"
 
 export function JoinLeaguePage() {
     const { leagueId } = useParams();
@@ -182,6 +183,12 @@ export function JoinLeaguePage() {
                 availablePlayers={players}
                 behaviors={behaviors}
                 onChange={setSelection}
+            />
+            
+            <FormationSelection
+                value={formation} 
+                onChange={setFormation} 
+                className="mb-4"
             />
 
             {error && <p className="mt-4 text-red-400 text-sm">{error}</p>}

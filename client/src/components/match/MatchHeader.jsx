@@ -2,7 +2,7 @@ import { formatMatchTime } from "./utils/utils";
 
 export function MatchHeader({ teams, scores, tick = 0 }) {
     return (
-        <div className="flex justify-between items-center bg-slate-900 border border-slate-700 mb-4">
+        <div className="flex justify-between items-center bg-slate-900 mb-4">
             <div className="flex items-center gap-4">
                 <span className="font-bold text-xl text-blue-400">
                     {teams?.home?.name ?? "Equipo Local"}

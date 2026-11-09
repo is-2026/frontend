@@ -4,7 +4,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { MatchPage } from './MatchPage';
 import { useMatchSocket } from '../hooks/useMatchSocket';
 import { getPlayers } from '../services/club';
-import { changeLiveBehavior, scheduleSubstitution, cancelSubstitution } from "../services/matches";
+import { changeLiveBehavior, scheduleSubstitution } from "../services/matches";
 import { getBehaviors } from "../services/behaviors";
 
 vi.mock('../hooks/useMatchSocket', () => ({
@@ -22,7 +22,6 @@ vi.mock('../services/behaviors', () => ({
 vi.mock('../services/matches', () => ({
     changeLiveBehavior: vi.fn(),
     scheduleSubstitution: vi.fn(),
-    cancelSubstitution: vi.fn()
 }));
 
 describe('MatchPage', () => {
@@ -33,7 +32,14 @@ describe('MatchPage', () => {
     //Testeo para interacción durante el match
     //el finished = null es si es undefined, vale null, 
     // y el = {} indica que la función se puede llamar sin pasar argumentos
-    function mockMatch({ finished = null, pause = null, pausesEnded = 0 } = {}) {
+    function mockMatch({ 
+        finished = null, 
+        pause = null, 
+        pausesEnded = 0,
+        penaltyStart = null,
+        penaltyKick = null,
+        penaltyResult = null
+     } = {}) {
         useMatchSocket.mockReturnValue({
             teams: { home: { id: 'h', name: 'Local' }, away: { id: 'a', name: 'Visitante' } },
             lineups: {
@@ -67,6 +73,9 @@ describe('MatchPage', () => {
             finished,
             pause,
             pausesEnded,
+            penaltyStart,
+            penaltyKick,
+            penaltyResult
         });
     }
 
@@ -500,6 +509,40 @@ describe('MatchPage', () => {
 
         expect(await screen.findByText(/ya se han alcanzado las 3 pausas permitidas/i)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Confirmar cambio/i })).toBeDisabled();
+    });
+
+
+    test("16. Muestra el modal PenaltyOrderPanel al inicio  de los penales", async () => {
+        getPlayers.mockResolvedValue([{ id: "h1" }]);
+        getBehaviors.mockResolvedValue([{ id: "b1", name: "Atacante", kind: "player" }]);
+
+        mockMatch({
+            penaltyStart: { endsAt: new Date(Date.now() + 15000).toISOString() }
+        });
+
+        await renderMatch();
+
+        expect(screen.getByText(/Orden de penales/i)).toBeInTheDocument();
+        expect(screen.getAllByText(/Pateador/i)).toHaveLength(5);
+    });
+
+    test("17. Muestra PenaltyShootoutInfo cuando se está ejecutando un penal", async () => {
+        mockMatch({
+            penaltyKick: {
+                kickerId: "h1",
+                defenderId: "a1",
+                teamId: "h",
+                number: 1,
+                penaltyTicks: 300
+            },
+            penaltyResult: { homePenalties: 0, awayPenalties: 0 }
+        });
+
+        await renderMatch();
+
+        expect(screen.getByText(/Penal #1/i)).toBeInTheDocument();
+        expect(screen.getAllByText("h-tit-1").length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText("a-tit-1").length).toBeGreaterThanOrEqual(1);
     });
 
 

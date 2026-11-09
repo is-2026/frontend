@@ -1,22 +1,38 @@
 export function MatchFinishedBanner({ finished, teams, onExit , testing = false}) {
     if (!finished) return null;
 
-    const home = teams?.home?.name ?? "Equipo Local";
-    const away = teams?.away?.name ?? "Equipo Rival";
-    const { homeScore, awayScore } = finished;
+    const home = teams?.home?.name;
+    const away = teams?.away?.name;
+    const { 
+        homeScore, awayScore, 
+        homePenalties, awayPenalties,
+        winnerClubId 
+    } = finished;
 
-    let outcome = "Empate";
-    if (homeScore > awayScore) outcome = `Ganó ${home}`;
-    if (awayScore > homeScore) outcome = `Ganó ${away}`;
+    const byPenalties = (homePenalties != null && awayPenalties != null);
+    const winner = teams?.home?.id == winnerClubId ? home : away;
+    let outcome;
+    let scores;
+    if(byPenalties) {
+
+        outcome = `Ganó ${winner} por penales`
+        scores = `${home} ${homePenalties} - ${awayPenalties} ${away}`
+    } else if (homeScore == awayScore){
+        outcome = `Empate`;
+        scores = `${home} ${homeScore} - ${awayScore} ${away}`
+    } else {
+        outcome = `Ganó ${winner}`;
+        scores = `${home} ${homeScore} - ${awayScore} ${away}`
+    }
     
     return (
-        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/75 backdrop-blur-sm">
-            <div className="text-center p-8 bg-slate-900 border-2 border-slate-700 shadow-2xl">
+        <div className="absolute inset-0 z-30 flex items-center justify-center">
+            <div className="text-center p-8 bg-slate-900 shadow-2xl">
                 <h2 className="text-4xl font-extrabold text-amber-400 uppercase tracking-widest">
                     PARTIDO FINALIZADO
                 </h2>
                 <div className="mt-4 text-3xl font-bold text-white">
-                    {home} {homeScore} - {awayScore} {away}
+                    {scores}
                 </div>
                 <p className="mt-2 text-xl text-slate-300">{outcome}</p>
                 

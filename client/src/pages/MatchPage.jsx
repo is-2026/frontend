@@ -11,6 +11,8 @@ import { getBehaviors } from "../services/behaviors";
 import { PauseBanner } from "../components/match/PauseBanner";
 import { SubstitutionPanel } from "../components/match/SubstitutionPanel";
 import { StartersPanel } from "../components/match/StartersPanel";
+import { PenaltyOrderPanel } from "../components/match/PenaltyOrderPanel" 
+import { PenaltyShootoutInfo } from "../components/match/PenaltyShootoutInfo" 
 import { SubstitutionMadeNotice } from "../components/match/SubstitutionMadeNotice"
 
 export function MatchPage() {
@@ -18,7 +20,8 @@ export function MatchPage() {
     const { 
         teams, lineups, scores, 
         state, goalInfo, finished,
-        pause, pausesEnded
+        pause, pausesEnded, closeCode,
+        penaltyStart, penaltyResult, penaltyKick
     } = useMatchSocket(matchId);
 
     //Variables para cambio de behaviors
@@ -95,6 +98,10 @@ export function MatchPage() {
     );
 
     const canChange = isOwnMatch && !finished && !hasCoach;
+    const inShootout = penaltyStart != null || penaltyKick != null;
+    const inPenaltyWindow = canChange && penaltyStart != null && penaltyKick == null;
+    //inShootout se usa durante el juego de los penales
+    //inPenaltyWindow se usa para mostrar el panel de elección de pateadores
 
 
     // Escuchar cuando 'pausesEnded' incrementa
@@ -117,17 +124,35 @@ export function MatchPage() {
         <div className="fixed inset-0 bg-slate-950 p-8 text-white overflow-auto z-50">
 
             {/* Contenedor de cancha.*/}
-            <div className="w-[1272px] mx-auto pb-8">
+            <div className="w-full max-w-[1600px] mx-auto pb-8">
 
                 <div className="flex gap-4 items-start">
                     <div className="min-w-0 flex-1 relative order-2">
 
-                        {/*cronómetro y evento partido finalizado */}
-                        <MatchHeader
+                        {/* Mensaje de error por desconexión */}
+                        {closeCode && (
+                            <div className="bg-red-600 text-white text-center py-2">
+                                Conexión perdida con el servidor (Código: {closeCode}). Reintentando...
+                            </div>
+                        )}
+
+                        {/*cronómetro y evento partido finalizado o header de penal*/}
+                        {penaltyKick ? (
+                            <PenaltyShootoutInfo
+                                penaltyKick={penaltyKick}
+                                penaltyResult={penaltyResult}
+                                state={state}
+                                lineups={lineups}
+                                teams={teams}
+                                penaltyTicks={penaltyKick.penaltyTicks}    
+                            />
+                        ) : (
+                            <MatchHeader
                             teams={teams}
                             scores={scores}
                             tick={finished?.tick ?? state?.tick}
-                        />
+                            />
+                        )}
 
                         {/*cancha */}
                         <Field state={state} lineups={lineups} />
@@ -138,6 +163,16 @@ export function MatchPage() {
                         {/* banner de pausa */}
                         { pause && <PauseBanner pause={pause}/> }
 
+                        {/* Panel de penales */}
+                        {(inPenaltyWindow && (                            
+                            <PenaltyOrderPanel
+                                matchId={matchId}
+                                players={myLineup}
+                                behaviors={behaviors}
+                                endsAt={penaltyStart.endsAt}
+                            />
+                        )
+                        )}
 
                         {/* banner de fin de partido */}
                         <MatchFinishedBanner
@@ -154,15 +189,27 @@ export function MatchPage() {
                     {/* Mi equipo */}
                     <div className={`flex flex-col gap-4 w-64 shrink-0 ${myOrder}`}>
                         { /*titulares*/}
-                        {canChange ?  (
-                            <StartersPanel matchId={matchId} players={myStarters} behaviors={behaviors} />
-                        ) : (
-                            <LineupPanel title="Titulares" players={myStarters} />
+                        {inShootout ? (
+                            <LineupPanel 
+                            title="Convocados" 
+                            players={myLineup}
+                            kickerId={penaltyKick?.kickerId}
+                            defenderId={penaltyKick?.defenderId}  />
+                        ) : ( 
+                            <>
+                                {canChange ? (
+                                    <StartersPanel matchId={matchId} players={myStarters} behaviors={behaviors} />
+                                ) : (
+                                    <LineupPanel title="Titulares" players={myStarters} />
+                                )}
+                                <LineupPanel title="Suplentes" players={mySubstitutes} />
+                            </>
                         )}
-                        <LineupPanel title="Suplentes" players={mySubstitutes} />
+                        
+                        
                         
                         { /*Planificar cambios durante el partido*/}
-                        {canChange &&  (
+                        {(canChange && !inShootout) &&  (
                             <>
                                 {showForm && (
                                     <SubstitutionPanel
@@ -191,8 +238,18 @@ export function MatchPage() {
                     </div>
                     {/* Rival: solo lectura */}
                     <div className={`flex flex-col gap-4 w-64 shrink-0 ${rivalOrder}`}>
-                        <LineupPanel title="Titulares" players={rivalStarters} />
-                        <LineupPanel title="Suplentes" players={rivalSubstitutes} />
+                        {(inShootout ? (
+                            <LineupPanel 
+                            title="Convocados" 
+                            players={rivalLineup}
+                            kickerId={penaltyKick?.kickerId}
+                            defenderId={penaltyKick?.defenderId}  />
+                        ) : (
+                            <>
+                                <LineupPanel title="Titulares" players={rivalStarters} />
+                                <LineupPanel title="Suplentes" players={rivalSubstitutes} />
+                            </>
+                        ))}
                     </div>
                 </div>
             </div>

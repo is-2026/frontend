@@ -120,7 +120,7 @@ export function SubstitutionPanel({
             <button
                 onClick={handleSubmit}
                 disabled={!complete || Boolean(pending) || sending || (pausesEnded >= TOTAL_PAUSES_NUMBER)} /* sending es para que no se puedan reenviar  */
-                className="w-full bg-emerald-600 py-2 font-medium hover:bg-emerald-500 disabled:opacity-40"
+                className="w-full bg-emerald-600 py-2 font-medium hover:bg-emerald-500 transition-colors duration-200 disabled:opacity-40"
             >
                 Confirmar cambio
             </button>

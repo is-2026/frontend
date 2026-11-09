@@ -1,4 +1,4 @@
-export function MatchFinishedBanner({ finished, teams, onExit }) {
+export function MatchFinishedBanner({ finished, teams, onExit , testing = false}) {
     if (!finished) return null;
 
     const home = teams?.home?.name;
@@ -35,12 +35,15 @@ export function MatchFinishedBanner({ finished, teams, onExit }) {
                     {scores}
                 </div>
                 <p className="mt-2 text-xl text-slate-300">{outcome}</p>
-                <button
-                    onClick={onExit}
-                    className="mt-6 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 uppercase text-sm"
-                >
-                    Volver a amistosos
-                </button>
+                
+                {!testing && (
+                    <button
+                        onClick={onExit}
+                        className="mt-6 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 border border-slate-600 uppercase text-sm"
+                    >
+                        Volver a amistosos
+                    </button>
+                )}
             </div>
         </div>
     );

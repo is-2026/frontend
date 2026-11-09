@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from 'vitest';
-import { getBehaviors, getBehaviorById, createBehavior, updateBehavior, deleteBehavior } from './behaviors';
+import { getBehaviors, getBehaviorById, createBehavior, updateBehavior, deleteBehavior, behaviorMatch } from './behaviors';
 import * as api from './api';
 
 describe('Behaviors service', () => {
@@ -73,3 +73,16 @@ test('deleteBehavior hace un DELETE a /club/behaviors/:id', async () => {
     });
     expect(result).toEqual(mockResponse);
 });
+
+test('behaviorMatch hace un POST a /club/behaviors/test con el código', async () => {
+        const mockResponse = { match_id: 'm1' };
+        vi.spyOn(api, 'request').mockResolvedValueOnce(mockResponse);
+
+        const result = await behaviorMatch('attack()');
+
+        expect(api.request).toHaveBeenCalledWith('/club/behaviors/test', {
+            method: 'POST',
+            body: JSON.stringify({ code: 'attack()' })
+        });
+        expect(result).toEqual(mockResponse);
+    });

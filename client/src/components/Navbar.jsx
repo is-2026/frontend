@@ -51,6 +51,10 @@ export default function Navbar() {
             <NavLink to="/leagues" className={navLinkClass}>
               Ligas
             </NavLink>
+            <NavLink to="/ranking" className={navLinkClass}>
+              Ranking
+            </NavLink>
+            
 
             <button
               type="button"

@@ -27,9 +27,9 @@ describe('BehaviorsPage Component', () => {
     test('2. muestra los 3 comportamientos default con sus respectivos nombres (Criterio de Aceptación)', async () => {
         // Mock de 3 comportamientos para probar el requerimiento
         const mockData = [
-            { id: '1', name: 'Comportamiento Defensivo', code: 'defend()' },
-            { id: '2', name: 'Comportamiento Ofensivo', code: 'attack()' },
-            { id: '3', name: 'Comportamiento Equilibrado', code: 'balance()' }
+            { id: '1', name: 'Comportamiento Defensivo', code: 'defend()', kind: 'player'  },
+            { id: '2', name: 'Comportamiento Ofensivo', code: 'attack()', kind: 'player'  },
+            { id: '3', name: 'Comportamiento Equilibrado', code: 'balance()', kind: 'player'  }
         ];
         behaviorsService.getBehaviors.mockResolvedValueOnce(mockData);
 
@@ -96,7 +96,7 @@ describe('BehaviorsPage Component', () => {
         expect(screen.getByText('Editor de Comportamiento')).toBeInTheDocument();
     });
 
-        const mockList = [{ id: '1', name: 'Ofensivo', code: 'attack()' }];
+        const mockList = [{ id: '1', name: 'Ofensivo', code: 'attack()', kind: 'player'  }];
 
     test('cancela la eliminación si el usuario no confirma en el pop-up', async () => {
         behaviorsService.getBehaviors.mockResolvedValueOnce(mockList);

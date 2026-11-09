@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { createClub, getMyClub, DEFAULT_AVATAR } from './club';
+import { createClub, getMyClub, DEFAULT_AVATAR , updateDtBehavior} from './club';
 import { request } from './api';
 
 // Mockear el cliente HTTP (api.js)
@@ -65,5 +65,33 @@ describe('club service (getMyClub)', () => {
         const result = await getMyClub();
 
         expect(result).toEqual(club);
+    });
+});
+
+describe('club service (updateDtBehavior)', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    test('envía PATCH a /club/coach con el id del comportamiento', async () => {
+        request.mockResolvedValue({ id: 'c1', coach_behavior_id: 'b1' });
+
+        await updateDtBehavior('b1');
+
+        expect(request).toHaveBeenCalledWith('/club/coach', {
+            method: 'PATCH',
+            body: JSON.stringify({ behavior_id: 'b1' }),
+        });
+    });
+
+    test('envía null para quitar el DT', async () => {
+        request.mockResolvedValue({ id: 'c1', coach_behavior_id: null });
+
+        await updateDtBehavior(null);
+
+        expect(request).toHaveBeenCalledWith('/club/coach', {
+            method: 'PATCH',
+            body: JSON.stringify({ behavior_id: null }),
+        });
     });
 });

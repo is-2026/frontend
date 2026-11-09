@@ -21,7 +21,7 @@ export function StartersPanel({matchId, players, behaviors}) {
                 players={players}
                 renderRight={(p) => (
                     <select
-                        className="border border-white/20 bg-slate-800 px-1 text-xs text-white max-w-[50%]"
+                        className="bg-slate-800 px-1 text-xs text-white max-w-[50%]"
                         value={p.behavior_id}
                         onChange={(e) => handleBehaviorChange(p.player_id, e.target.value)}
                     > 

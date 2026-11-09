@@ -18,6 +18,8 @@ import { LeaguesPage } from "./pages/LeaguesPage";
 import { CreateLeaguePage } from "./pages/CreateLeaguePage";
 import { JoinLeaguePage } from "./pages/JoinLeaguePage";
 import { LeagueLineupPage } from "./pages/LeagueLineupPage";
+import { RankingPage } from "./pages/RankingPage";
+import { DtPage } from "./pages/DtPage";
 
 //layout para vistas autenticadas / protegidas con Navbar
 function MainLayout() {
@@ -53,7 +55,7 @@ export default function App() {
     <Routes>
       {/* Rutas Públicas: Muestran "Bot-ines" centrado */}
       <Route element={<PublicLayout />}>
-        <Route path="/" element={<Navigate to="/register" replace />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/create-club" element={<ClubPage />} />
@@ -63,6 +65,7 @@ export default function App() {
       <Route element={<MainLayout />}>
         <Route path="/club" element={<ClubDashboardPage />} />
         <Route path="/club/players" element={<PlayersPage />} />
+        <Route path="/club/dt" element={<DtPage />} />
         <Route path="/club/players/create" element={<CreatePlayerPage />} />
         <Route path="/club/behaviors" element={<BehaviorsPage />} />
         <Route path="/club/behaviors/:id" element={<BehaviorDetail />} />
@@ -76,6 +79,7 @@ export default function App() {
         <Route path="/leagues/:leagueId/join" element={<JoinLeaguePage />} />
         <Route path="/leagues/:leagueId/lobby" element={<LeagueLobbyPage />} />
         <Route path="/leagues/:leagueId/lineup" element={<LeagueLineupPage />} />
+        <Route path="/ranking" element={<RankingPage />} />
         </Route>
     </Routes>
   );

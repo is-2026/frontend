@@ -12,6 +12,7 @@ import { PauseBanner } from "../components/match/PauseBanner";
 import { SubstitutionPanel } from "../components/match/SubstitutionPanel";
 import { StartersPanel } from "../components/match/StartersPanel";
 import { PenaltyOrderPanel } from "../components/match/PenaltyOrderPanel" 
+import { PenaltyShootoutInfo } from "../components/match/PenaltyShootoutInfo" 
 
 export function MatchPage() {
     const { matchId } = useParams();
@@ -69,8 +70,9 @@ export function MatchPage() {
     );
 
     const canChange = isOwnMatch && !finished;
+    
 
-    const inPenaltyWindow = canChange && penaltyStart?.isOn;
+    const inPenaltyWindow = canChange && (penaltyStart != null) && (penaltyKick == null);
     //Se limpia scheduled luego de la pausa. Lo necesita al inicio para mostrar el cambio, por eso no se borra al inicio.
     useEffect(() => {
     if (!pause) setScheduled(null);
@@ -89,6 +91,7 @@ export function MatchPage() {
             return () => clearTimeout(timer);
         }
     }, [pausesEnded]);
+
     return (
         // fixed para sobreescribir configuracion default de app
         <div className="fixed inset-0 bg-slate-950 p-8 text-white overflow-auto z-50">
@@ -106,12 +109,23 @@ export function MatchPage() {
                             </div>
                         )}
 
-                        {/*cronómetro y evento partido finalizado */}
-                        <MatchHeader
+                        {/*cronómetro y evento partido finalizado o header de penal*/}
+                        {penaltyKick ? (
+                            <PenaltyShootoutInfo
+                                penaltyKick={penaltyKick}
+                                penaltyResult={penaltyResult}
+                                state={state}
+                                lineups={lineups}
+                                teams={teams}
+                                penaltyTicks={penaltyKick.penaltyTicks}    
+                            />
+                        ) : (
+                            <MatchHeader
                             teams={teams}
                             scores={scores}
                             tick={finished?.tick ?? state?.tick}
-                        />
+                            />
+                        )}
 
                         {/*cancha */}
                         <Field state={state} lineups={lineups} />
@@ -123,15 +137,13 @@ export function MatchPage() {
                         { pause && <PauseBanner pause={pause} substitutionDone={Boolean(scheduled)}/> }
 
                         {/* Panel de penales */}
-                        {(inPenaltyWindow && (
-                            <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 overflow-auto">
-                                <PenaltyOrderPanel
+                        {(inPenaltyWindow && (                            
+                            <PenaltyOrderPanel
                                 matchId={matchId}
                                 players={myLineup}
                                 behaviors={behaviors}
                                 endsAt={penaltyStart.endsAt}
-                                />
-                            </div>
+                            />
                         )
                         )}
 
@@ -147,8 +159,10 @@ export function MatchPage() {
                                 <p className="text-3xl font-black text-white uppercase tracking-wider">
                                     Cambio realizado
                                 </p>
-                            </div>
-                    )}
+                        </div>
+
+                        )}
+                        
                     </div>
 
                     {/* Mi equipo */}

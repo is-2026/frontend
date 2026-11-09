@@ -64,52 +64,54 @@ export function PenaltyOrderPanel({matchId, players = [], behaviors = [], endsAt
     if (left <= 0) return null;
     
     return (
-        <div className="bg-slate-900 p-4 space-y-2 text-sm">
-            <div className="flex justify-between items-center">
-                <h3 className="text-sm text-slate-400 uppercase font-bold">Orden de penales</h3>
-                <span className="font-mono text-emerald-400 font-bold">{left}</span>
-            </div>
-
-            {slots.map((slot, i) => (
-                <div key={i} className="space-y-1"> 
-                    <p className="text-xs text-slate-400">Pateador {i+1}</p>
-                    <select
-                        className={SELECT_CLASS}
-                        value={slot.playerId}
-                        onChange={(e) =>
-                            updateSlot(i, "playerId", e.target.value)
-                        }
-                    >
-                        <option value="">Jugador</option>
-                        {players
-                            .filter((player) => (player.player_id == slot.playerId) || !chosen.includes(p.player_id))
-                            .map((player) => (
-                                <option key={player.player_id} value={player.player_id}>
-                                    #{player.number} {player.name}
-                                </option>
-                            ))}
-                    </select>
-                    <select 
-                        className={SELECT_CLASS}
-                        value={slot.behaviorId}
-                        onChange={(event) => updateSlot(i, "behaviorId", event.target.value)}
-                    >
-                        <option value="">Comportamiento</option>
-                        {playerBehaviors.map((behavior) => (
-                            <option key={behavior.id} value={behavior.id}> {behavior.name}</option>
-                        ))}
-                    </select>
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 overflow-auto">
+            <div className="bg-slate-900 p-4 space-y-2 text-sm">
+                <div className="flex justify-between items-center">
+                    <h3 className="text-sm text-slate-400 uppercase font-bold">Orden de penales</h3>
+                    <span className="font-mono text-emerald-400 font-bold">{left}</span>
                 </div>
-            ))}
-            {notice && <p className="text-emerald-400">{notice}</p>}
-            {error && <p className="text-red-400">{error}</p>}
-            <button
-                onClick={handleConfirm}
-                disabled={!complete || sending}
-                className="w-full bg-emerald-600 py-2 font-medium disabled:opacity-40 hover:bg-emerald-500 transition-colors duration-200"
-            >
-                Confirmar elección
-            </button>
+
+                {slots.map((slot, i) => (
+                    <div key={i} className="space-y-1"> 
+                        <p className="text-xs text-slate-400">Pateador {i+1}</p>
+                        <select
+                            className={SELECT_CLASS}
+                            value={slot.playerId}
+                            onChange={(e) =>
+                                updateSlot(i, "playerId", e.target.value)
+                            }
+                        >
+                            <option value="">Jugador</option>
+                            {players
+                                .filter((player) => (player.player_id == slot.playerId) || !chosen.includes(player.player_id))
+                                .map((player) => (
+                                    <option key={player.player_id} value={player.player_id}>
+                                        #{player.number} {player.name}
+                                    </option>
+                                ))}
+                        </select>
+                        <select 
+                            className={SELECT_CLASS}
+                            value={slot.behaviorId}
+                            onChange={(event) => updateSlot(i, "behaviorId", event.target.value)}
+                        >
+                            <option value="">Comportamiento</option>
+                            {playerBehaviors.map((behavior) => (
+                                <option key={behavior.id} value={behavior.id}> {behavior.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                ))}
+                {notice && <p className="text-emerald-400">{notice}</p>}
+                {error && <p className="text-red-400">{error}</p>}
+                <button
+                    onClick={handleConfirm}
+                    disabled={!complete || sending}
+                    className="w-full bg-emerald-600 py-2 font-medium disabled:opacity-40 hover:bg-emerald-500 transition-colors duration-200"
+                >
+                    Confirmar elección
+                </button>
+            </div>
         </div>
     );
 }

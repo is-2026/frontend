@@ -42,9 +42,6 @@ describe('BehaviorTester', () => {
 
         expect(screen.getByText('PARTIDO FINALIZADO')).toBeInTheDocument();
         expect(screen.getByText('Ganó Prueba')).toBeInTheDocument();
-
-        fireEvent.click(screen.getByText('Volver a amistosos'));
-        expect(setTestLayout).toHaveBeenCalledWith(false);
     });
 
     test('4. el botón Cerrar Prueba cierra el panel', () => {

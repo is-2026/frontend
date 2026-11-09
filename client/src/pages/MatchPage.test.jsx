@@ -22,7 +22,7 @@ vi.mock('../services/behaviors', () => ({
 vi.mock('../services/matches', () => ({
     changeLiveBehavior: vi.fn(),
     scheduleSubstitution: vi.fn(),
-    cancelSubstitution: vi.fn()
+    cancelSubstitution: vi.fn(),
 }));
 
 describe('MatchPage', () => {
@@ -33,7 +33,14 @@ describe('MatchPage', () => {
     //Testeo para interacción durante el match
     //el finished = null es si es undefined, vale null, 
     // y el = {} indica que la función se puede llamar sin pasar argumentos
-    function mockMatch({ finished = null, pause = null, pausesEnded = 0 } = {}) {
+    function mockMatch({ 
+        finished = null, 
+        pause = null, 
+        pausesEnded = 0,
+        penaltyStart = null,
+        penaltyKick = null,
+        penaltyResult = null
+     } = {}) {
         useMatchSocket.mockReturnValue({
             teams: { home: { id: 'h', name: 'Local' }, away: { id: 'a', name: 'Visitante' } },
             lineups: {
@@ -67,6 +74,9 @@ describe('MatchPage', () => {
             finished,
             pause,
             pausesEnded,
+            penaltyStart,
+            penaltyKick,
+            penaltyResult
         });
     }
 
@@ -151,6 +161,10 @@ describe('MatchPage', () => {
 
     test('3. Muestra el resultado final y banner al finalizar el partido (finished.matchEnd = true)', () => {
         useMatchSocket.mockReturnValue({
+            teams: {
+                home: { id: 'club-h', name: 'River' },
+                away: { id: 'club-a', name: 'Atenas' }
+            },
             lineups: {
                 home: [{ player_id: 'p1' }],
                 away: [{ player_id: 'p2' }]
@@ -158,7 +172,7 @@ describe('MatchPage', () => {
             scores: { home: 2, away: 1 },
             state: {
                 matchId: '123',
-                tick: 5400,
+                tick: 3000,
                 players: [],
                 ballPosition: { x: 0, y: 0 }
             },
@@ -166,7 +180,10 @@ describe('MatchPage', () => {
             finished: {
                 matchEnd: true,
                 homeScore: 2,
-                awayScore: 1
+                awayScore: 1,
+                homePenalties: null,
+                awayPenalties: null,
+                winnerClubId: 'club-h'
             }
         });
 
@@ -182,7 +199,8 @@ describe('MatchPage', () => {
         expect(screen.getByText(/PARTIDO FINALIZADO/i)).toBeInTheDocument();
 
         // Busca el texto "2 - 1"
-        expect(screen.getByText('Equipo Local 2 - 1 Equipo Rival')).toBeInTheDocument();
+        expect(screen.getByText('River 2 - 1 Atenas')).toBeInTheDocument();
+        expect(screen.getByText('Ganó River')).toBeInTheDocument();
     });
 
     test('4. Tolera coordenadas fuera de rango en la simulación sin romper el componente', () => {
@@ -353,7 +371,7 @@ describe('MatchPage', () => {
         expect(rivalUtils.getByText('STR')).toBeInTheDocument();
         expect(rivalUtils.getByText('40')).toBeInTheDocument();
 
-        // El rival NO debe tener selector de comportamiento
+        // El rival no debe tener selector de comportamiento
         expect(rivalUtils.queryByRole('combobox')).not.toBeInTheDocument();
 
         // --- 3. FICHA EN CANCHA ---
@@ -538,5 +556,39 @@ describe('MatchPage', () => {
             expect(screen.queryByText(/Pendiente:/i)).not.toBeInTheDocument();
         });
     });
+
+    test("16. Muestra el modal PenaltyOrderPanel al inicio  de los penales", async () => {
+        getPlayers.mockResolvedValue([{ id: "h1" }]);
+        getBehaviors.mockResolvedValue([{ id: "b1", name: "Atacante", kind: "player" }]);
+
+        mockMatch({
+            penaltyStart: { endsAt: new Date(Date.now() + 15000).toISOString() }
+        });
+
+        await renderMatch();
+
+        expect(screen.getByText(/Orden de penales/i)).toBeInTheDocument();
+        expect(screen.getAllByText(/Pateador/i)).toHaveLength(5);
+    });
+
+    test("17. Muestra PenaltyShootoutInfo cuando se está ejecutando un penal", async () => {
+        mockMatch({
+            penaltyKick: {
+                kickerId: "h1",
+                defenderId: "a1",
+                teamId: "h",
+                number: 1,
+                penaltyTicks: 300
+            },
+            penaltyResult: { homePenalties: 0, awayPenalties: 0 }
+        });
+
+        await renderMatch();
+
+        expect(screen.getByText(/Penal #1/i)).toBeInTheDocument();
+        expect(screen.getAllByText("h-tit-1")).toHaveLength(2); //aparece en panel de penales y en lineup.
+        expect(screen.getAllByText("a-tit-1")).toHaveLength(2);
+    });
+
 
 });

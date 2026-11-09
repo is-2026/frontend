@@ -5,20 +5,6 @@ import { formatMatchTime } from "./utils/utils";
 
 export function PenaltyShootoutInfo({ penaltyKick, penaltyResult, state, lineups, teams, penaltyTicks}) {
     
-   // ya llegó el penaltyResult de este mismo penal
-    const resolved = penaltyResult?.number === penaltyKick?.number;
-
-    //Cuando llega un penaltyKick nuevo, el state guardado todavía es del penal anterior.
-    //Se guarda ese state para no usar su tick hasta que llegue un matchState nuevo.
-    //Esto es para que no se muestre el timer del penal anterior en el penal actual (son 100ms aprox, se podría sacar)
-    const lastNumber = useRef(null);
-    const staleState = useRef(null);
-    if (penaltyKick && penaltyKick.number !== lastNumber.current) {
-        lastNumber.current = penaltyKick.number;
-        staleState.current = state;
-    }
-    const fresh = state != null && state !== staleState.current;
-
     if (!penaltyKick) return null;
 
     const ticksLeft = Math.max(0, penaltyTicks - state.tick);

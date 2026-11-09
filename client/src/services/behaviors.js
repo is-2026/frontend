@@ -67,3 +67,10 @@ export const deleteBehavior = async (id) => {
         method: 'DELETE'
     });
 };
+
+export const behaviorMatch = async (code) => {
+    return await request('/club/behaviors/test', {
+        method: 'POST',
+        body: JSON.stringify({ code })
+    });
+}

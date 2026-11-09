@@ -54,7 +54,13 @@ export function CreateLeaguePage() {
 		selection.starters.every((s) => s.behavior_id && s.behavior_id !== "") &&
 		selection.substitutes.length === 3;
 
-	const isFormValid = validSelection && name.trim() !== "" && maxClubs >= 3 && maxClubs <= 30 && duration >= 1 && duration <= 90;
+	const isFormValid = 
+		validSelection && 
+		name.trim() !== "" && 
+		maxClubs >= 3 && 
+		maxClubs <= 30 && 
+		duration >= 3 && 
+		duration <= 10;
 
 	async function handleSubmit(e) {
 		e.preventDefault();
@@ -69,7 +75,7 @@ export function CreateLeaguePage() {
 				name: name.trim(),
 				...(password.trim() ? { password: password.trim() } : {}),
 				max_clubs: Number(maxClubs),
-				match_duration_minutes: 5,
+				match_duration_minutes: Number(duration),
 				allows_draws: allowDraws,
 				players: [
 					...selection.starters.map((starter) => ({
@@ -149,11 +155,15 @@ export function CreateLeaguePage() {
 						Duración del partido (minutos)
 					</label>
 					<input
-						type="text"
-						value="5 minutos"
-						disabled
-						readOnly
-						className="w-full border border-white/10 bg-slate-900/60 p-2 text-white/50 cursor-not-allowed select-none"
+						type="number"
+						id="duration"
+						min="3"
+						max="10"
+						value={duration}
+						onChange={(e) => setDuration(e.target.value)}												
+						className="w-full border border-white/10 bg-slate-900/60 p-2 text-white focus:outline-none focus:border-white/30"
+						placeholder="5 minutos por defecto"
+						required
 					/>
 				</div>
 

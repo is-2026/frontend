@@ -87,3 +87,10 @@ export async function getPlayers() {
 export function getMyClub() {
     return request("/club");
 }
+
+export const updateDtBehavior = async (coach_behavior_id) => {
+    return await request(`/club/coach`, {
+        method: 'PATCH',
+        body: JSON.stringify({ behavior_id: coach_behavior_id })
+    });
+};

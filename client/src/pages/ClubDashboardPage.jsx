@@ -23,6 +23,12 @@ export function ClubDashboardPage() {
         >
           Ver mi plantilla
         </button>
+        <button 
+          onClick={() => navigate("/club/dt")}
+          className="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-semibold py-3 px-6 transition-all duration-200 shadow-md"
+        >
+          Ver mi Dt
+        </button>
 
         <button 
           onClick={() => navigate("/club/behaviors")}

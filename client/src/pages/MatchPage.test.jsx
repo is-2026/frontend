@@ -12,7 +12,8 @@ vi.mock('../hooks/useMatchSocket', () => ({
 }));
 
 vi.mock('../services/club', () => ({
-    getPlayers: vi.fn().mockResolvedValue([])
+    getPlayers: vi.fn().mockResolvedValue([]),
+    getMyClub: vi.fn().mockResolvedValue({ id: 'c1', coach_behavior_id: null })
 }));
 
 vi.mock('../services/behaviors', () => ({

@@ -17,7 +17,7 @@ Prism.languages.insertBefore('python', 'keyword', {
     }
 });
 
-export function BehaviorEditor({ isOpen, onClose, initialBehavior }) {
+export function BehaviorEditor({ isOpen, onClose, initialBehavior, kind= "player" }) {
     const navigate = useNavigate()
 
     //form states
@@ -55,12 +55,12 @@ export function BehaviorEditor({ isOpen, onClose, initialBehavior }) {
         try {
             if (initialBehavior) {
                 // PUT: update existing behavior
-                await updateBehavior(initialBehavior.id, { name, code });
+                await updateBehavior(initialBehavior.id, { name, code, kind });
                 onClose(); 
             } else {
                 // POST: create new behavior
-                const res = await createBehavior({ name, code });
-                navigate(`/club/behaviors/${res.id}`);
+                const res = await createBehavior({ name, code, kind });
+                if (kind === "player") navigate(`/club/behaviors/${res.id}`);
                 onClose();
             }
         } catch (err) {
@@ -124,9 +124,11 @@ export function BehaviorEditor({ isOpen, onClose, initialBehavior }) {
                             {/* Error message for backend validation */}
                             {errorResponse && <p className="text-red-500 text-xs mt-1">{errorResponse}</p>}
                             <div className="flex justify-end gap-2 mt-4">
-                                <button onClick={handleTestBehavior} className="bg-slate-700 hover:bg-slate-500 text-white font-bold py-2 px-4 rounded" disabled={testLayout || !code.trim()}>
-                                    Probar
-                                </button>
+                                {kind === "player" && (
+                                    <button onClick={handleTestBehavior} className="bg-slate-700 hover:bg-slate-500 text-white font-bold py-2 px-4 rounded" disabled={testLayout || !code.trim()}>
+                                        Probar
+                                    </button>
+                                )}
                                 <button 
                                     onClick={handleSave}
                                     disabled={isInvalid || testLayout}

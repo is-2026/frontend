@@ -142,7 +142,7 @@ export function CreateLeaguePage() {
 						id="name"
 						value={name}
 						onChange={(e) => setName(e.target.value)}
-						className="w-full border border-white/10 bg-slate-800 p-2 text-white focus:outline-none focus:border-white/30"
+						className="w-full border border-white/10 bg-slate-800 p-2 text-white focus:bg-slate-950 focus:outline-none focus:border-white/30"
 						placeholder="Nombre de la liga"
 						required
 					/>
@@ -161,7 +161,7 @@ export function CreateLeaguePage() {
 						max="10"
 						value={duration}
 						onChange={(e) => setDuration(e.target.value)}												
-						className="w-full border border-white/10 bg-slate-900/60 p-2 text-white focus:outline-none focus:border-white/30"
+						className="w-full border border-white/10 bg-slate-800 p-2 text-white focus:bg-slate-950 focus:outline-none focus:border-white/30"
 						placeholder="5 minutos por defecto"
 						required
 					/>
@@ -180,7 +180,7 @@ export function CreateLeaguePage() {
 						id="password"
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
-						className="w-full border border-white/10 bg-slate-800 p-2 text-white focus:outline-none focus:border-white/30"
+						className="w-full border border-white/10 bg-slate-800 p-2 text-white focus:bg-slate-950 focus:outline-none focus:border-white/30"
 						placeholder="Dejar en blanco para liga pública"
 					/>
 				</div>
@@ -197,7 +197,7 @@ export function CreateLeaguePage() {
 						max="30"
 						value={maxClubs}
 						onChange={(e) => setMaxClubs(e.target.value)}
-						className="w-full border border-white/10 bg-slate-800 p-2 text-white focus:outline-none focus:border-white/30"
+						className="w-full border border-white/10 bg-slate-800 p-2 text-white focus:bg-slate-950 focus:outline-none focus:border-white/30"
 						placeholder="Ej: 10"
 						required
 					/>

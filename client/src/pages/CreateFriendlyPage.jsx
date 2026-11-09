@@ -142,7 +142,7 @@ export function CreateFriendlyPage() {
 				/>
 
 				{/* Selección de Jugadores */}
-				<div className="border-t border-white/10 pt-4">
+				<div className="border-t border-white/10 pt-4 ">
 					<PlayerSelection
 						availablePlayers={players}
 						behaviors={behaviors}

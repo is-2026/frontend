@@ -4,6 +4,7 @@ import { createLeagues } from "../services/leagues";
 import { getPlayers } from "../services/club";
 import { getBehaviors } from "../services/behaviors";
 import { PlayerSelection } from "../components/PlayerSelection";
+import { FormationSelection } from "../components/FormationSelection";
 
 export function CreateLeaguePage() {
 	const navigate = useNavigate();
@@ -20,6 +21,7 @@ export function CreateLeaguePage() {
 	const [players, setPlayers] = useState([]);
 	const [behaviors, setBehaviors] = useState([]);
 	const [loadingData, setLoadingData] = useState(true);
+	const [formation, setFormation] = useState("TRIANGLE");
 
 	// estados de UI / feedback
 	const [error, setError] = useState(null);
@@ -63,6 +65,7 @@ export function CreateLeaguePage() {
 
 		try {
 			const payload = {
+				formation,
 				name: name.trim(),
 				...(password.trim() ? { password: password.trim() } : {}),
 				max_clubs: Number(maxClubs),

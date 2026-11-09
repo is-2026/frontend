@@ -36,6 +36,7 @@ export function JoinFriendlyPage() {
 	// Datos reales para el formulario
 	const [availablePlayers, setAvailablePlayers] = useState([]);
 	const [behaviors, setBehaviors] = useState([]);
+	const [formation, setFormation] = useState("TRIANGLE");
 
 	// Estados del formulario y feedback
 	const [password, setPassword] = useState("");
@@ -86,6 +87,7 @@ export function JoinFriendlyPage() {
 
 		try {
 			const body = {
+				formation,
 				...(isPrivate ? { password } : {}),
 				players: [
 					...selection.starters.map((t) => ({

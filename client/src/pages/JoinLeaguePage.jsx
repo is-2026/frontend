@@ -18,7 +18,8 @@ export function JoinLeaguePage() {
 
     const [players, setPlayers] = useState([]);
     const [behaviors, setBehaviors] = useState([]);
-
+    const [formation, setFormation] = useState("TRIANGLE");
+    
     // Estados del formulario
     const [password, setPassword] = useState("");
     const [selection, setSelection] = useState({ starters: [], substitutes: [] });
@@ -65,6 +66,7 @@ export function JoinLeaguePage() {
 
         try {
             const body = {
+                formation,
                 ...(isPrivate ? { password } : {}),
                 players: [
                     ...selection.starters.map((t) => ({
@@ -184,7 +186,7 @@ export function JoinLeaguePage() {
                 behaviors={behaviors}
                 onChange={setSelection}
             />
-            
+
             <FormationSelection
                 value={formation} 
                 onChange={setFormation} 

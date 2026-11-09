@@ -118,7 +118,7 @@ export function MatchPage() {
         <div className="fixed inset-0 bg-slate-950 p-8 text-white overflow-auto z-50">
 
             {/* Contenedor de cancha.*/}
-            <div className="w-[1272px] mx-auto pb-8">
+            <div className="w-full max-w-[1600px] mx-auto pb-8">
 
                 <div className="flex gap-4 items-start">
                     <div className="min-w-0 flex-1 relative order-2">

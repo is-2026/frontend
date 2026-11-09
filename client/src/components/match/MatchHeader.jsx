@@ -11,7 +11,7 @@ export function MatchHeader({ teams, scores, tick = 0 }) {
             </div>
 
             {/* Cronómetro */}
-            <div className="text-2xl font-mono text-emerald-400 font-bold tracking-widest bg-slate-950 px-6 py-2 border border-slate-800 rounded">
+            <div className="text-2xl font-mono text-emerald-400 font-bold tracking-widest bg-slate-950 px-6 py-2">
                 {formatMatchTime(tick)}
             </div>
 

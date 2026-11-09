@@ -9,14 +9,14 @@ export function LineupPanel({title, players, renderRight, kickerId, defenderId})
 
     const penaltyRole = (player) => {
         if (kickerId != null && player.player_id == kickerId)
-            return <span className="text-xs font-bold">PATEA</span>;
+            return <span className="text-s font-bold text-green-200">PATEA</span>;
         if (defenderId != null && player.player_id == defenderId)
-            return <span className="text-xs font-bold">DEFIENDE</span>;
+            return <span className="text-s font-bold text-orange-200">ATAJA</span>;
         return null;
     };
 
     return (
-        <div className="bg-slate-900 border border-slate-700 min-h-[10rem]">
+        <div className="bg-slate-900 min-h-[10rem] px-2 py-2">
             <h3 className="text-sm text-slate-400 mb-2 uppercase font-bold">{title}</h3>
             <ul className="space-y-1 text-sm">
                 {(players ?? []).map((player) => (

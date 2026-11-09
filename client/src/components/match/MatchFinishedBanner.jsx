@@ -26,8 +26,8 @@ export function MatchFinishedBanner({ finished, teams, onExit }) {
     }
     
     return (
-        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/75 backdrop-blur-sm">
-            <div className="text-center p-8 bg-slate-900 border-2 border-slate-700 shadow-2xl">
+        <div className="absolute inset-0 z-30 flex items-center justify-center">
+            <div className="text-center p-8 bg-slate-900 shadow-2xl">
                 <h2 className="text-4xl font-extrabold text-amber-400 uppercase tracking-widest">
                     PARTIDO FINALIZADO
                 </h2>
@@ -37,7 +37,7 @@ export function MatchFinishedBanner({ finished, teams, onExit }) {
                 <p className="mt-2 text-xl text-slate-300">{outcome}</p>
                 <button
                     onClick={onExit}
-                    className="mt-6 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 border border-slate-600 uppercase text-sm"
+                    className="mt-6 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 uppercase text-sm"
                 >
                     Volver a amistosos
                 </button>

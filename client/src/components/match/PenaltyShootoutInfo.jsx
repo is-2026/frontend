@@ -25,11 +25,11 @@ export function PenaltyShootoutInfo({ penaltyKick, penaltyResult, state, lineups
     const awayResult = penaltyResult?.awayPenalties ?? 0;
 
     return (
-        <div className="bg-slate-900 mb-4 px-4 py-2 text-center text-sm">
+        <div className="bg-slate-900 mb-4 px-4 text-center text-base text-xl">
             <p className="font-bold uppercase">Penal #{penaltyKick.number}</p>
             <p>
                 Patea <span className="text-white">{kickerName}</span>
-                {" - "}Defiende <span className="text-white">{defenderName}</span>
+                {" - "}Ataja <span className="text-white">{defenderName}</span>
             </p>
             <p className="font-mono font-bold">
                 {homeName} {homeResult} - {awayResult} {awayName}

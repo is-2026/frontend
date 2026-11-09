@@ -150,6 +150,7 @@ describe("JoinFriendlyPage", () => {
     await waitFor(() => {
       expect(friendliesService.joinFriendly).toHaveBeenCalledWith("2", {
         password: "secretpass",
+        formation: "TRIANGLE",
         players: [
           { player_id: "j1", is_starter: true, behavior_id: "ofensivo" },
           { player_id: "j2", is_starter: true, behavior_id: "defensivo" },

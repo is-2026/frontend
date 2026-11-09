@@ -140,7 +140,7 @@ export function MatchPage() {
                             onExit={() => navigate("/friendlies")}
                         />
                         {/* Cartel de aviso cuando se completa la pausa */}
-                        {justFinishedSub && (
+                        {finishedSub && (
                             <SubstitutionMadeNotice/>
                         )}
                     </div>

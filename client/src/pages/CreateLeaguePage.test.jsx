@@ -83,7 +83,7 @@ describe("CreateLeaguePage", () => {
         getBehaviors.mockResolvedValue(mockBehaviors);
     });
 
-    test("muestra el estado de carga inicialmente y luego renderiza el formulario", async () => {
+    test("1. Muestra el estado de carga inicialmente y luego renderiza el formulario", async () => {
         render(
             <MemoryRouter>
                 <CreateLeaguePage />
@@ -100,7 +100,7 @@ describe("CreateLeaguePage", () => {
         expect(getBehaviors).toHaveBeenCalledTimes(1);
     });
 
-    test("muestra mensaje de error si falla la carga inicial de datos", async () => {
+    test("2. Muestra mensaje de error si falla la carga inicial de datos", async () => {
         getPlayers.mockRejectedValueOnce(new Error("Error de red"));
 
         render(
@@ -116,7 +116,7 @@ describe("CreateLeaguePage", () => {
         });
     });
 
-    test("mantiene el botón de confirmar deshabilitado si faltan datos obligatorios o la alineación no es válida", async () => {        
+    test("3. Mantiene el botón de confirmar deshabilitado si faltan datos obligatorios o la alineación no es válida", async () => {        
         render(
             <MemoryRouter>
                 <CreateLeaguePage />
@@ -131,7 +131,7 @@ describe("CreateLeaguePage", () => {
         expect(submitButton).toBeDisabled();
     });
 
-    test("habilita el botón, envía el payload correcto y redirige al lobby exitosamente", async () => {
+    test("4. Habilita el botón, envía el payload correcto y redirige al lobby exitosamente", async () => {
         createLeagues.mockResolvedValueOnce({ id: "liga-123" });
 
         render(
@@ -171,6 +171,7 @@ describe("CreateLeaguePage", () => {
                 password: "secreto123",
                 max_clubs: 16,
                 match_duration_minutes: 5,
+                formation: "TRIANGLE",
                 allows_draws: true, // añado esta linea, para mandar el payload correcto
                 players: [
                     { player_id: "p1", is_starter: true, behavior_id: "b1" },
@@ -188,7 +189,7 @@ describe("CreateLeaguePage", () => {
         });
     });
 
-    test("muestra mensaje de error cuando la creación de la liga falla (Error 400)", async () => {
+    test("5. Muestra mensaje de error cuando la creación de la liga falla (Error 400)", async () => {
         const errorResponse = new Error("El club ya pertenece a una liga activa.");
         errorResponse.status = 400;
         createLeagues.mockRejectedValueOnce(errorResponse);
@@ -215,7 +216,7 @@ describe("CreateLeaguePage", () => {
         });
     });
 
-    test("envía allows_draws en false cuando se marca la casilla sin empates", async () => {
+    test("6. Envía allows_draws en false cuando se marca la casilla sin empates", async () => {
         createLeagues.mockResolvedValueOnce({ id: "liga-123" });
 
         render(

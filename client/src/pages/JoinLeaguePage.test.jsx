@@ -60,7 +60,7 @@ describe("JoinLeaguePage", () => {
             </MemoryRouter>
         );
 
-    test("debe unirse exitosamente y redirigir al lobby (/leagues/league-123/lobby)", async () => {
+    test("1. debe unirse exitosamente y redirigir al lobby (/leagues/league-123/lobby)", async () => {
         joinLeague.mockResolvedValue({ success: true });
 
         renderPage();
@@ -79,7 +79,7 @@ describe("JoinLeaguePage", () => {
         });
     });
 
-    test("debe mostrar 'Liga no encontrada' si la API no devuelve la liga", async () => {
+    test("2. Debe mostrar 'Liga no encontrada' si la API no devuelve la liga", async () => {
         getLeagues.mockResolvedValue(null);
         getPlayers.mockResolvedValue([]);
         getBehaviors.mockResolvedValue([]);
@@ -95,7 +95,7 @@ describe("JoinLeaguePage", () => {
         expect(mockNavigate).toHaveBeenCalledWith("/leagues");
     });
 
-    test("debe solicitar contraseña si la liga es privada e ingresar con la clave correcta", async () => {
+    test("3. debe solicitar contraseña si la liga es privada e ingresar con la clave correcta", async () => {
         getLeagues.mockResolvedValue({ id: "league-123", is_private: true, password: "secretpass" });
         getPlayers.mockResolvedValue([]);
         getBehaviors.mockResolvedValue([]);
@@ -126,7 +126,7 @@ describe("JoinLeaguePage", () => {
         });
     });
 
-    test("debe enviar el formulario de inscripción y redirigir al lobby (/leagues/league-123/lobby)", async () => {
+    test("4. Debe enviar el formulario de inscripción y redirigir al lobby (/leagues/league-123/lobby)", async () => {
         getLeagues.mockResolvedValue({ id: "league-123", is_private: false });
         getPlayers.mockResolvedValue([{ id: "p1" }, { id: "p2" }, { id: "p3" }, { id: "p4" }, { id: "p5" }, { id: "p6" }]);
         getBehaviors.mockResolvedValue([{ id: "b1" }, { id: "b2" }, { id: "b3" }]);
@@ -149,6 +149,7 @@ describe("JoinLeaguePage", () => {
 
         await waitFor(() => {
             expect(joinLeague).toHaveBeenCalledWith("league-123", {
+                formation: "TRIANGLE",
                 players: [
                     { player_id: "p1", is_starter: true, behavior_id: "b1" },
                     { player_id: "p2", is_starter: true, behavior_id: "b2" },
@@ -162,7 +163,7 @@ describe("JoinLeaguePage", () => {
         });
     });
 
-    test("debe mostrar un mensaje de error si falla la API", async () => {
+    test("5. Debe mostrar un mensaje de error si falla la API", async () => {
         joinLeague.mockRejectedValue({ status: 409 });
 
         renderPage();

@@ -61,7 +61,6 @@ export function CreateFriendlyPage() {
 			const payload = {
 				formation,
 				...(password.trim() ? { password: password.trim() } : {}),
-				match_duration_minutes: 5,
 				players: [
 					...selection.starters.map((starter) => ({
 						player_id: starter.player_id,

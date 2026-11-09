@@ -5,7 +5,7 @@ import { useMatchSocket } from "../hooks/useMatchSocket";
 import { GoalBanner } from "../components/match/GoalBanner";
 import { MatchFinishedBanner } from "../components/match/MatchFinishedBanner";
 import { LineupPanel } from "../components/match/LineupPanel";
-import { getPlayers } from "../services/club";
+import { getPlayers, getMyClub  } from "../services/club";
 import { useEffect, useState } from "react";
 import { getBehaviors } from "../services/behaviors";
 import { PauseBanner } from "../components/match/PauseBanner";
@@ -31,6 +31,9 @@ export function MatchPage() {
     // ids de los jugadores de mi club, para saber cuál de las dos alineaciones es la mía
     const [myPlayerIds, setMyPlayerIds] = useState(new Set());
 
+    // Estado para manejar si el club tiene un DT asignado
+    const [hasCoach, setHasCoach] = useState(false);
+
     
     useEffect(() => {
         getPlayers()
@@ -39,6 +42,9 @@ export function MatchPage() {
         getBehaviors()
             .then((b) => setBehaviors(b))
             .catch(() => setBehaviors([]));
+        getMyClub()
+            .then((club) => setHasCoach(club.coach_behavior_id != null))
+            .catch(() => setHasCoach(false));
     }, []);
     //then: respuesta exitosa, catch: manejo de errores
 
@@ -88,7 +94,7 @@ export function MatchPage() {
             myPlayerIds.has(p.player_id))
     );
 
-    const canChange = isOwnMatch && !finished;
+    const canChange = isOwnMatch && !finished && !hasCoach;
 
 
     // Escuchar cuando 'pausesEnded' incrementa
@@ -177,7 +183,11 @@ export function MatchPage() {
                                 </button>
                             </>
                         )}
-
+                    {isOwnMatch && hasCoach && !finished && (
+                        <p className="bg-slate-800 border border-slate-600 text-amber-400 font-bold py-3 px-4 text-center uppercase text-sm">
+                            Tu DT está a cargo
+                        </p>
+                    )}
                     </div>
                     {/* Rival: solo lectura */}
                     <div className={`flex flex-col gap-4 w-64 shrink-0 ${rivalOrder}`}>

@@ -17,7 +17,7 @@ export function BehaviorsPage() {
 
   useEffect(() => {
     getBehaviors()
-      .then(setBehaviors) // Guarda los comportamientos disponibles
+      .then((b) => setBehaviors(b.filter((c) => c.kind === "player"))) // Guarda los comportamientos disponibles
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
@@ -60,7 +60,7 @@ export function BehaviorsPage() {
             Crear Comportamiento +
           </button>
         </div>
-        <BehaviorEditor isOpen={isOpen} onClose={handleClose} />
+        <BehaviorEditor isOpen={isOpen} onClose={handleClose} kind={"player"}/>
 
         {loading && <p className="text-slate-400">Cargando...</p>}
         {error && <p className="text-red-400">{error}</p>}

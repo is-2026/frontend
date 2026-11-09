@@ -13,7 +13,7 @@ const clubs = [
 const matches = [
     {
         id: "m1",
-        round: 1,
+        round_number: 1,
         status: "finished",
         home_club_id: "c1",
         away_club_id: "c2",
@@ -24,7 +24,7 @@ const matches = [
     },
     {
         id: "m2",
-        round: 2,
+        round_number: 2,
         status: "in_progress",
         home_club_id: "c2",
         away_club_id: "c3",
@@ -35,7 +35,7 @@ const matches = [
     },
     {
         id: "m3",
-        round: 3,
+        round_number: 3,
         status: "scheduled",
         home_club_id: "c1",
         away_club_id: "c3",

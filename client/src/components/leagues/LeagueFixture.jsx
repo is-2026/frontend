@@ -20,8 +20,8 @@ export function LeagueFixture({ matches, clubs }) {
     // armamos la lista de fechas sin repetir (los partidos ya vienen ordenados por fecha)
     const rounds = [];
     matches.forEach((match) => {
-        if (!rounds.includes(match.round)) {
-            rounds.push(match.round);
+        if (!rounds.includes(match.round_number)) {
+            rounds.push(match.round_number);
         }
     });
 
@@ -29,7 +29,7 @@ export function LeagueFixture({ matches, clubs }) {
         <div className="flex flex-col gap-5">
             {rounds.map((round) => {
                 // partidos de esta fecha
-                const roundMatches = matches.filter((match) => match.round === round);
+                const roundMatches = matches.filter((match) => match.round_number === round);
 
                 // clubes que no juegan esta fecha
                 const freeClubs = clubs.filter((club) => {

@@ -192,11 +192,11 @@ export function MatchPage() {
                         ) : ( 
                             <>
                                 {canChange ? (
-                                    <StartersPanel matchId={matchId} players={starters} behaviors={behaviors} />
+                                    <StartersPanel matchId={matchId} players={myStarters} behaviors={behaviors} />
                                 ) : (
-                                    <LineupPanel title="Titulares" players={starters} />
+                                    <LineupPanel title="Titulares" players={myStarters} />
                                 )}
-                                <LineupPanel title="Suplentes" players={substitutes} />
+                                <LineupPanel title="Suplentes" players={mySubstitutes} />
                             </>
                         )}
                         

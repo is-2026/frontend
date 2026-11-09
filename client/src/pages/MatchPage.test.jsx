@@ -4,7 +4,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { MatchPage } from './MatchPage';
 import { useMatchSocket } from '../hooks/useMatchSocket';
 import { getPlayers } from '../services/club';
-import { changeLiveBehavior, scheduleSubstitution } from "../services/matches";
+import { changeLiveBehavior, scheduleSubstitution, cancelSubstitution } from "../services/matches";
 import { getBehaviors } from "../services/behaviors";
 
 vi.mock('../hooks/useMatchSocket', () => ({
@@ -22,6 +22,7 @@ vi.mock('../services/behaviors', () => ({
 vi.mock('../services/matches', () => ({
     changeLiveBehavior: vi.fn(),
     scheduleSubstitution: vi.fn(),
+    cancelSubstitution: vi.fn(),
 }));
 
 describe('MatchPage', () => {
@@ -370,7 +371,7 @@ describe('MatchPage', () => {
         expect(rivalUtils.getByText('STR')).toBeInTheDocument();
         expect(rivalUtils.getByText('40')).toBeInTheDocument();
 
-        // El rival NO debe tener selector de comportamiento
+        // El rival no debe tener selector de comportamiento
         expect(rivalUtils.queryByRole('combobox')).not.toBeInTheDocument();
 
         // --- 3. FICHA EN CANCHA ---

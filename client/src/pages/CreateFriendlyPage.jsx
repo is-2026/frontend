@@ -4,6 +4,7 @@ import { createFriendlies } from "../services/friendlies";
 import { getPlayers } from "../services/club";
 import { getBehaviors } from "../services/behaviors";
 import { PlayerSelection } from "../components/PlayerSelection";
+import { FormationSelection } from "../components/FormationSelection"
 
 export function CreateFriendlyPage() {
     const navigate = useNavigate();
@@ -16,7 +17,8 @@ export function CreateFriendlyPage() {
     const [players, setPlayers] = useState([]);
     const [behaviors, setBehaviors] = useState([]);
     const [loadingData, setLoadingData] = useState(true);   
-    
+    const [formation, setFormation ] = useState("TRIANGLE");
+
     // estados de UI / feedback
     const [error, setError] = useState(null);
     const [sending, setSending] = useState(false);
@@ -57,6 +59,7 @@ export function CreateFriendlyPage() {
 
         try {
             const payload = {
+                formation,
                 ...(password.trim() ? { password: password.trim() } : {}),
                 match_duration_minutes: 5,
                 players: [
@@ -131,6 +134,13 @@ export function CreateFriendlyPage() {
             placeholder="Dejar en blanco para amistoso público"
           />
         </div>
+
+		{/* Selección de formación */}
+		<FormationSelection
+            value={formation} 
+            onChange={setFormation} 
+            className="mb-4"
+        />
 
         {/* Selección de Jugadores */}
         <div className="border-t border-white/10 pt-4">

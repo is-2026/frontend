@@ -20,7 +20,7 @@ export function BehaviorTester({ behaviorId , setTestLayout}) {
                 <GoalBanner goalInfo={goalInfo} />
 
                 {/* banner de fin de partido */}
-                <MatchFinishedBanner finished={finished} teams={teams} onExit={() => setTestLayout(false)}/>
+                <MatchFinishedBanner finished={finished} teams={teams} onExit={() => setTestLayout(false)} testing={true} />
             </div>
             <div className="flex justify-end gap-2 mt-4">
                 <button onClick={() => setTestLayout(false)} className="bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">

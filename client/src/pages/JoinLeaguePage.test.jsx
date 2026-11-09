@@ -60,7 +60,7 @@ describe("JoinLeaguePage", () => {
             </MemoryRouter>
         );
 
-    test("debe unirse exitosamente y redirigir al lobby (/leagues/league-123/lobby)", async () => {
+    test("1. debe unirse exitosamente y redirigir al lobby (/leagues/league-123/lobby)", async () => {
         joinLeague.mockResolvedValue({ success: true });
 
         renderPage();
@@ -79,7 +79,7 @@ describe("JoinLeaguePage", () => {
         });
     });
 
-    test("debe mostrar 'Liga no encontrada' si la API no devuelve la liga", async () => {
+    test("2. Debe mostrar 'Liga no encontrada' si la API no devuelve la liga", async () => {
         getLeagues.mockResolvedValue(null);
         getPlayers.mockResolvedValue([]);
         getBehaviors.mockResolvedValue([]);
@@ -95,70 +95,38 @@ describe("JoinLeaguePage", () => {
         expect(mockNavigate).toHaveBeenCalledWith("/leagues");
     });
 
-    test("en una liga privada pide la contraseña en el formulario y la envía", async () => {
-        getLeagues.mockResolvedValue({ id: "league-123" , is_private: true });
-        joinLeague.mockResolvedValue({ success: true });
+    test("3. debe solicitar contraseña si la liga es privada e ingresar con la clave correcta", async () => {
+        getLeagues.mockResolvedValue({ id: "league-123", is_private: true, password: "secretpass" });
+        getPlayers.mockResolvedValue([]);
+        getBehaviors.mockResolvedValue([]);
 
         renderPage();
 
         await waitFor(() => {
-            expect(screen.getByText(/alineación para la liga/i)).toBeInTheDocument();
+            expect(screen.getByText(/liga privada/i)).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByTestId("mock-select-btn"));
-        const confirmBtn = screen.getByRole("button", { name: /confirmar e inscribirse/i });
+        const inputPass = screen.getByPlaceholderText(/contraseña de la liga/i);
+        const submitBtn = screen.getByRole("button", { name: /continuar/i });
 
-        // sin contraseña no se puede confirmar
-        expect(confirmBtn).toBeDisabled();
-
-        fireEvent.change(screen.getByPlaceholderText(/contraseña de la liga/i), {
-            target: { value: "contrasecreta" },
-        });
-
-        expect(confirmBtn).not.toBeDisabled();
-
-        fireEvent.click(confirmBtn);
+        // intento con contraseña erronea
+        fireEvent.change(inputPass, { target: { value: "incorrecta" } });
+        fireEvent.click(submitBtn);
 
         await waitFor(() => {
-            expect(joinLeague).toHaveBeenCalledWith( "league-123", expect.objectContaining({ password: "contrasecreta"}));
-            expect(mockNavigate).toHaveBeenCalledWith("/leagues/league-123/lobby");
+            expect(screen.getByText(/la contraseña es incorrecta/i)).toBeInTheDocument();
         });
-    });
 
-    test("muestra mensajes de error ante un 400 o un 404", async () => {
-        getLeagues.mockResolvedValue({ id: "league-123", is_private: true });
-        joinLeague
-            .mockRejectedValueOnce({ status: 400, message: "Contraseña incorrecta" })
-            .mockRejectedValueOnce({ status: 404 });
-        
-        renderPage();
+        // intento con contraseña correcta
+        fireEvent.change(inputPass, { target: { value: "secretpass" } });
+        fireEvent.click(submitBtn);
 
         await waitFor(() => {
             expect(screen.getByText(/alineación para la liga/i)).toBeInTheDocument();
         });
-
-        fireEvent.change(screen.getByPlaceholderText(/contraseña de la liga/i), {
-            target: { value: "mala" },
-        });
-        fireEvent.click(screen.getByTestId("mock-select-btn"));
-        const confirmBtn = screen.getByRole("button", { name: /confirmar e inscribirse/i });
-        
-        // error 400, contra incorrecta, se muestra el msj del back
-        fireEvent.click(confirmBtn);
-        await waitFor(() => {
-            expect(screen.getByText(/contraseña incorrecta/i)).toBeInTheDocument();
-        });
-
-        // error 404, liga no existe, se muestra el msj del back
-        fireEvent.click(confirmBtn);
-        await waitFor(() => {
-            expect(screen.getByText(/la liga no existe/i)).toBeInTheDocument();
-        });
-
-        expect(mockNavigate).not.toHaveBeenCalledWith("/leagues/league-123/lobby");
     });
 
-    test("debe enviar el formulario de inscripción y redirigir al lobby (/leagues/league-123/lobby)", async () => {
+    test("4. Debe enviar el formulario de inscripción y redirigir al lobby (/leagues/league-123/lobby)", async () => {
         getLeagues.mockResolvedValue({ id: "league-123", is_private: false });
         getPlayers.mockResolvedValue([{ id: "p1" }, { id: "p2" }, { id: "p3" }, { id: "p4" }, { id: "p5" }, { id: "p6" }]);
         getBehaviors.mockResolvedValue([{ id: "b1" }, { id: "b2" }, { id: "b3" }]);
@@ -181,6 +149,7 @@ describe("JoinLeaguePage", () => {
 
         await waitFor(() => {
             expect(joinLeague).toHaveBeenCalledWith("league-123", {
+                formation: "TRIANGLE",
                 players: [
                     { player_id: "p1", is_starter: true, behavior_id: "b1" },
                     { player_id: "p2", is_starter: true, behavior_id: "b2" },
@@ -194,7 +163,7 @@ describe("JoinLeaguePage", () => {
         });
     });
 
-    test("debe mostrar un mensaje de error si falla la API", async () => {
+    test("5. Debe mostrar un mensaje de error si falla la API", async () => {
         joinLeague.mockRejectedValue({ status: 409 });
 
         renderPage();

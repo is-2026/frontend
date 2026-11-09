@@ -95,35 +95,67 @@ describe("JoinLeaguePage", () => {
         expect(mockNavigate).toHaveBeenCalledWith("/leagues");
     });
 
-    test("debe solicitar contraseña si la liga es privada e ingresar con la clave correcta", async () => {
-        getLeagues.mockResolvedValue({ id: "league-123", is_private: true, password: "secretpass" });
-        getPlayers.mockResolvedValue([]);
-        getBehaviors.mockResolvedValue([]);
+    test("en una liga privada pide la contraseña en el formulario y la envía", async () => {
+        getLeagues.mockResolvedValue({ id: "league-123" , is_private: true });
+        joinLeague.mockResolvedValue({ success: true });
 
         renderPage();
 
         await waitFor(() => {
-            expect(screen.getByText(/liga privada/i)).toBeInTheDocument();
+            expect(screen.getByText(/alineación para la liga/i)).toBeInTheDocument();
         });
 
-        const inputPass = screen.getByPlaceholderText(/contraseña de la liga/i);
-        const submitBtn = screen.getByRole("button", { name: /continuar/i });
+        fireEvent.click(screen.getByTestId("mock-select-btn"));
+        const confirmBtn = screen.getByRole("button", { name: /confirmar e inscribirse/i });
 
-        // intento con contraseña erronea
-        fireEvent.change(inputPass, { target: { value: "incorrecta" } });
-        fireEvent.click(submitBtn);
+        // sin contraseña no se puede confirmar
+        expect(confirmBtn).toBeDisabled();
+
+        fireEvent.change(screen.getByPlaceholderText(/contraseña de la liga/i), {
+            target: { value: "contrasecreta" },
+        });
+
+        expect(confirmBtn).not.toBeDisabled();
+
+        fireEvent.click(confirmBtn);
 
         await waitFor(() => {
-            expect(screen.getByText(/la contraseña es incorrecta/i)).toBeInTheDocument();
+            expect(joinLeague).toHaveBeenCalledWith( "league-123", expect.objectContaining({ password: "contrasecreta"}));
+            expect(mockNavigate).toHaveBeenCalledWith("/leagues/league-123/lobby");
         });
+    });
 
-        // intento con contraseña correcta
-        fireEvent.change(inputPass, { target: { value: "secretpass" } });
-        fireEvent.click(submitBtn);
+    test("muestra mensajes de error ante un 400 o un 404", async () => {
+        getLeagues.mockResolvedValue({ id: "league-123", is_private: true });
+        joinLeague
+            .mockRejectedValueOnce({ status: 400, message: "Contraseña incorrecta" })
+            .mockRejectedValueOnce({ status: 404 });
+        
+        renderPage();
 
         await waitFor(() => {
             expect(screen.getByText(/alineación para la liga/i)).toBeInTheDocument();
         });
+
+        fireEvent.change(screen.getByPlaceholderText(/contraseña de la liga/i), {
+            target: { value: "mala" },
+        });
+        fireEvent.click(screen.getByTestId("mock-select-btn"));
+        const confirmBtn = screen.getByRole("button", { name: /confirmar e inscribirse/i });
+        
+        // error 400, contra incorrecta, se muestra el msj del back
+        fireEvent.click(confirmBtn);
+        await waitFor(() => {
+            expect(screen.getByText(/contraseña incorrecta/i)).toBeInTheDocument();
+        });
+
+        // error 404, liga no existe, se muestra el msj del back
+        fireEvent.click(confirmBtn);
+        await waitFor(() => {
+            expect(screen.getByText(/la liga no existe/i)).toBeInTheDocument();
+        });
+
+        expect(mockNavigate).not.toHaveBeenCalledWith("/leagues/league-123/lobby");
     });
 
     test("debe enviar el formulario de inscripción y redirigir al lobby (/leagues/league-123/lobby)", async () => {

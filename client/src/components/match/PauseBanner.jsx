@@ -10,7 +10,7 @@ function secondsLeft(endsAt) {
     return Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
 }
 
-export function PauseBanner({ pause, substitutionDone }) {
+export function PauseBanner({ pause }) {
 
     const endsAt = Date.parse(pause.endsAt);
     const [left, setLeft] = useState(() => secondsLeft(endsAt));

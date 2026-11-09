@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { formatMatchTime } from "./utils/utils";
 
 

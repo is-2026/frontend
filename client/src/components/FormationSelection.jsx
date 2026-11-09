@@ -13,7 +13,7 @@ export function FormationSelection({ value, onChange, className = "" }) {
             <select
                 value={value}
                 onChange={(e) => onChange(e.target.value)} 
-                className="w-full border border-white/10 bg-slate-800 p-2 text-white focus:outline-none focus:border-white/30"
+                className="w-full border border-white/10 bg-slate-800 p-2 text-white focus:bg-slate-950 focus:outline-none focus:border-white/30"
             >
                 {FORMATIONS.map((f) => (
                     <option key={f.value} value={f.value}>

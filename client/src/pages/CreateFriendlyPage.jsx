@@ -129,7 +129,7 @@ export function CreateFriendlyPage() {
 						type="password"
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
-						className="w-full border border-white/10 bg-slate-800 p-2 text-white focus:outline-none focus:border-white/30"
+						className="w-full border border-white/10 bg-slate-800 p-2 text-white focus:bg-slate-950 focus:outline-none focus:border-white/30"
 						placeholder="Dejar en blanco para amistoso público"
 					/>
 				</div>
@@ -142,7 +142,7 @@ export function CreateFriendlyPage() {
 				/>
 
 				{/* Selección de Jugadores */}
-				<div className="border-t border-white/10 pt-4 ">
+				<div className="border-t border-white/10 pt-4">
 					<PlayerSelection
 						availablePlayers={players}
 						behaviors={behaviors}

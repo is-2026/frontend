@@ -7,10 +7,10 @@ const STATS = [
 ];
 export function LineupPanel({title, players, renderRight, kickerId, defenderId}) { //
 
-    const penaltyRole = (p) => {
-        if (kickerId != null && p.player_id == kickerId)
+    const penaltyRole = (player) => {
+        if (kickerId != null && player.player_id == kickerId)
             return <span className="text-xs font-bold">PATEA</span>;
-        if (defenderId != null && p.player_id == defenderId)
+        if (defenderId != null && player.player_id == defenderId)
             return <span className="text-xs font-bold">DEFIENDE</span>;
         return null;
     };
@@ -19,15 +19,15 @@ export function LineupPanel({title, players, renderRight, kickerId, defenderId})
         <div className="bg-slate-900 border border-slate-700 min-h-[10rem]">
             <h3 className="text-sm text-slate-400 mb-2 uppercase font-bold">{title}</h3>
             <ul className="space-y-1 text-sm">
-                {(players ?? []).map((p) => (
-                    <li key={p.player_id}>
+                {(players ?? []).map((player) => (
+                    <li key={player.player_id}>
                         {/* fila 1: número + nombre, y a la derecha el select (si hay) */}
                         <div className="flex justify-between items-center gap-2">
                             <span className="truncate">
-                                <span className="text-slate-400">#{p.number}</span> {p.name}
+                                <span className="text-slate-400">#{player.number}</span> {player.name}
                             </span>
-                            {renderRight?.(p)} 
-                            {penaltyRole(p)}
+                            {renderRight?.(player)} 
+                            {penaltyRole(player)}
                             {/* Si renderRight es null, no dibuja nada, lo mismo en penaltyRole */}
                         </div>
 
@@ -36,7 +36,7 @@ export function LineupPanel({title, players, renderRight, kickerId, defenderId})
                             {STATS.map(([label, key]) => (
                                 <span key={key}>
                                     <span className="text-slate-500">{label}</span>{" "}
-                                    <span className="text-slate-300">{p[key] ?? "-"}</span>
+                                    <span className="text-slate-300">{player[key] ?? "-"}</span>
                                 </span>
                             ))}
                         </div>

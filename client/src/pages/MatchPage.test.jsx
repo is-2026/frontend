@@ -1,4 +1,4 @@
-import { render, screen, act, fireEvent, within } from '@testing-library/react';
+import { render, screen, act, fireEvent, waitFor, within } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { MatchPage } from './MatchPage';
@@ -511,6 +511,50 @@ describe('MatchPage', () => {
         expect(screen.getByRole('button', { name: /Confirmar cambio/i })).toBeDisabled();
     });
 
+    test('16. Permite cancelar un cambio planificado antes de la pausa', async () => {
+        getPlayers.mockResolvedValue([{ id: 'h1' }]);
+        getBehaviors.mockResolvedValue(behaviorsMock);
+        
+        mockMatch({ pausesEnded: 1 });
+
+        //Mock de cambio planificado (pending)
+        scheduleSubstitution.mockResolvedValueOnce({
+            status: 'pending',
+            player_out_id: 'h1',
+            player_in_id: 'h2'
+        });
+
+        //Mock de cancelación exitosa
+        cancelSubstitution.mockResolvedValueOnce({ status: 'cancelled' });
+
+        await renderMatch();
+
+        //Abre panel de sustituciones
+        fireEvent.click(screen.getByRole('button', { name: /Realizar cambios/i }));
+
+        //Selecciona el cambio en el formulario
+        fireEvent.change(screen.getByDisplayValue('Quién sale...'), { target: { value: 'h1' } });
+        fireEvent.change(screen.getByDisplayValue('Quién entra...'), { target: { value: 'h2' } });
+        fireEvent.change(screen.getByDisplayValue('Qué comportamiento tendrá'), { target: { value: 'b1' } });
+
+        //Confirma el cambio para activar el estado 'pending'
+        fireEvent.click(screen.getByRole('button', { name: /Confirmar cambio/i })); 
+
+        //Espera al botón de cancelar generado por el estado pendiente
+        const cancelButton = await screen.findByRole('button', { name: /Cancelar cambio/i });
+        expect(cancelButton).toBeInTheDocument();
+
+        //Click en cancelar
+        fireEvent.click(cancelButton);
+
+        //Valida que se llamó al servicio de cancelación con el ID del partido
+        expect(cancelSubstitution).toHaveBeenCalledWith('123');
+
+        //Await para verificar que desaparece de la interfaz
+        await waitFor(() => {
+            expect(screen.queryByText(/Pendiente:/i)).not.toBeInTheDocument();
+        });
+    });
 
     test("16. Muestra el modal PenaltyOrderPanel al inicio  de los penales", async () => {
         getPlayers.mockResolvedValue([{ id: "h1" }]);

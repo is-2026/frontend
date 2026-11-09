@@ -35,7 +35,7 @@ export function LeagueInProgress({ league }) {
         };
 
         fetchData();
-    }, [league.id]);
+    }, [league]);
 
     // el campeon es el primero de la tabla
     const champion = isFinished && standings.length > 0 ? standings[0] : null;

@@ -171,6 +171,7 @@ describe("CreateLeaguePage", () => {
                 password: "secreto123",
                 max_clubs: 16,
                 match_duration_minutes: 5,
+                allows_draws: true, // añado esta linea, para mandar el payload correcto
                 players: [
                     { player_id: "p1", is_starter: true, behavior_id: "b1" },
                     { player_id: "p2", is_starter: true, behavior_id: "b2" },
@@ -211,6 +212,32 @@ describe("CreateLeaguePage", () => {
 
         await waitFor(() => {
             expect(screen.getByText("El club ya pertenece a una liga activa.")).toBeInTheDocument();
+        });
+    });
+
+    test("envía allows_draws en false cuando se marca la casilla sin empates", async () => {
+        createLeagues.mockResolvedValueOnce({ id: "liga-123" });
+
+        render(
+            <MemoryRouter>
+                <CreateLeaguePage />
+            </MemoryRouter>
+        );
+
+        await waitFor(() => {
+            expect(screen.getByText("Crear liga")).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId("select-valid-team"));
+        fireEvent.change(screen.getByLabelText("Nombre de la liga"), { target: { value: "Liga sin empates" } });
+        fireEvent.click(screen.getByLabelText("Sin empates"));
+
+        fireEvent.click(screen.getByRole("button", { name: "Confirmar y Crear Liga" }));
+
+        await waitFor(() => {
+            expect(createLeagues).toHaveBeenCalledWith(
+                expect.objectContaining({ allows_draws: false }),
+            );
         });
     });
 });

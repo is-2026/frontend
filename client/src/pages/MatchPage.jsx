@@ -13,6 +13,7 @@ import { SubstitutionPanel } from "../components/match/SubstitutionPanel";
 import { StartersPanel } from "../components/match/StartersPanel";
 import { PenaltyOrderPanel } from "../components/match/PenaltyOrderPanel" 
 import { PenaltyShootoutInfo } from "../components/match/PenaltyShootoutInfo" 
+import { SubstitutionMadeNotice } from "../components/match/SubstitutionMadeNotice"
 
 export function MatchPage() {
     const { matchId } = useParams();
@@ -24,45 +25,66 @@ export function MatchPage() {
     } = useMatchSocket(matchId);
 
     //Variables para cambio de behaviors
-    const [behaviors, setBehaviors] = useState([]);
     const navigate = useNavigate();
+    const [behaviors, setBehaviors] = useState([]);
     const [scheduled, setScheduled] = useState(null);
     const [finishedSub, setFinishedSub] = useState(false);
-    //Variable para mostrar formulario de sustitución
-    const [showForm, setShowForm] = useState(false);
+    const [showForm, setShowForm] = useState(false); //form substitucion
     
     // ids de los jugadores de mi club, para saber cuál de las dos alineaciones es la mía
     const [myPlayerIds, setMyPlayerIds] = useState(new Set());
+
+    
     useEffect(() => {
         getPlayers()
-            .then((players) => setMyPlayerIds(new Set((players ?? []).map((p) => p.id))))
+            .then((players) => setMyPlayerIds(new Set((players).map((p) => p.id))))
             .catch(() => setMyPlayerIds(new Set())); // si falla, se muestra el local
         getBehaviors()
-            .then((b) => setBehaviors(b || []))
+            .then((b) => setBehaviors(b))
             .catch(() => setBehaviors([]));
     }, []);
+    //then: respuesta exitosa, catch: manejo de errores
+
 
     //Cierra formulario de cambio en pausas luego de que acaba la pausa.
+    //También termina la planificación una vez terminada la pausa
     useEffect(() => {
         if (!pause) {
             setShowForm(false);
+            setScheduled(false);
         }
     }, [pause]);
 
+
+    //verifica si hay alguno de mis jugadores en away. Si no, es home.
     const mySide = lineups?.away?.some((p) => myPlayerIds.has(p.player_id)) ? "away" : "home";
-    const myLineup = lineups?.[mySide] ?? [];
-    const starters = myLineup.filter((p) => p.is_starter);
-    const substitutes = myLineup.filter((p) => !p.is_starter);
+    const myLineup = lineups?.[mySide]; //arma myLineup con mySide
+
+    //si mySide era home, rivalSide es away y viceversa
     const rivalSide = mySide === "home" ? "away" : "home";
-    const rivalLineup = lineups?.[rivalSide] ?? [];
-    const rivalStarters = rivalLineup.filter((p) => p.is_starter);
-    const rivalSubstitutes = rivalLineup.filter((p) => !p.is_starter);
+    const rivalLineup = lineups?.[rivalSide]; //arma rivalLineups con rivalSide
+
+
+    //Recibe un lineup, filtra is_starters en starters y los que no en subst
+    const splitLineup = (lineup = []) => ({
+    starters: lineup.filter((p) => p.is_starter),
+    substitutes: lineup.filter((p) => !p.is_starter),
+    });
+
+
+    //Obtiene starters y substitutes de cada lineup
+    const { starters: myStarters, substitutes: mySubstitutes } = splitLineup(myLineup);
+    const { starters: rivalStarters, substitutes: rivalSubstitutes } = splitLineup(rivalLineup);
 
     // el local va a la izquierda, el visitante a la derecha (igual que el marcador)
-    const myOrder = mySide === "home" ? "order-1" : "order-3";
+    //si mySide es home, va a la izq, sino a der
+    const myOrder = mySide === "home" ? "order-1" : "order-3"; 
+    
+    //si mySide es home, va a la der, sino a la izq
     const rivalOrder = mySide === "home" ? "order-3" : "order-1";
 
-    //Verifica si el partido pertenece a quien cambiará el comportamiento
+    //Verifica si el partido pertenece a quien cambiará el comportamiento.
+    //Esto es para evitar que un observador realice cambios o sustituciones.
     const isOwnMatch = (
         (lineups != null) &&
         [...lineups.home, ...lineups.away].some((p) =>
@@ -75,14 +97,10 @@ export function MatchPage() {
     //inShootout se usa durante el juego de los penales
     //inPenaltyWindow se usa para mostrar el panel de elección de pateadores
 
-    //Se limpia scheduled luego de la pausa. Lo necesita al inicio para mostrar el cambio, por eso no se borra al inicio.
-    useEffect(() => {
-    if (!pause) setScheduled(null);
-    }, [pause]);
 
     // Escuchar cuando 'pausesEnded' incrementa
     useEffect(() => {
-        // Si la pausa terminó y tenías un cambio planificado
+        // Si la pausa terminó y había un cambio planificado
         if (pausesEnded > 0 && scheduled) {
             setFinishedSub(true);
 
@@ -93,6 +111,7 @@ export function MatchPage() {
             return () => clearTimeout(timer);
         }
     }, [pausesEnded]);
+
 
     return (
         // fixed para sobreescribir configuracion default de app
@@ -136,7 +155,7 @@ export function MatchPage() {
                         <GoalBanner goalInfo={goalInfo} />
 
                         {/* banner de pausa */}
-                        { pause && <PauseBanner pause={pause} substitutionDone={Boolean(scheduled)}/> }
+                        { pause && <PauseBanner pause={pause}/> }
 
                         {/* Panel de penales */}
                         {(inPenaltyWindow && (                            
@@ -157,14 +176,8 @@ export function MatchPage() {
                         />
                         {/* Cartel de aviso cuando se completa la pausa */}
                         {finishedSub && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-30 pointer-events-none">
-                                <p className="text-3xl font-black text-white uppercase tracking-wider">
-                                    Cambio realizado
-                                </p>
-                        </div>
-
+                            <SubstitutionMadeNotice/>
                         )}
-                        
                     </div>
 
                     {/* Mi equipo */}
@@ -195,8 +208,8 @@ export function MatchPage() {
                                 {showForm && (
                                     <SubstitutionPanel
                                         matchId={matchId}
-                                        starters={starters}
-                                        substitutes={substitutes}
+                                        starters={myStarters}
+                                        substitutes={mySubstitutes}
                                         behaviors={behaviors}
                                         pausesEnded={pausesEnded}
                                         scheduled={scheduled}

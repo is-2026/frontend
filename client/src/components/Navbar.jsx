@@ -36,7 +36,7 @@ export default function Navbar() {
 
           {/* Menú Desktop */}
           <div className="hidden md:flex items-center space-x-2">
-            <NavLink to="/club" className={navLinkClass}>
+            <NavLink to="/club" end className={navLinkClass}>
               Mi Club
             </NavLink>
             <NavLink to="/club/players" className={navLinkClass}>

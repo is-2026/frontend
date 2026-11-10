@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { createClub, getMyClub, DEFAULT_AVATAR , updateDtBehavior} from './club';
+import { createClub, getMyClub, DEFAULT_AVATAR , updateDtBehavior, getClubInfo } from './club';
 import { request } from './api';
 
 // Mockear el cliente HTTP (api.js)
@@ -93,5 +93,20 @@ describe('club service (updateDtBehavior)', () => {
             method: 'PATCH',
             body: JSON.stringify({ behavior_id: null }),
         });
+    });
+});
+
+describe('club service (getClubInfo)', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    test('envía GET a /clubs/{club_id}', async () => {
+        request.mockResolvedValue({ id: 'c1', club_name: 'River' });
+
+        const result = await getClubInfo('c1');
+
+        expect(request).toHaveBeenCalledWith('/clubs/c1');
+        expect(result.club_name).toBe('River');
     });
 });

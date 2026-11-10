@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams , useNavigate } from "react-router-dom";
-import { getLeagues, leaveLeague, startLeague, cancelLeague } from "../services/leagues";
+import { getLeagueById, leaveLeague, startLeague, cancelLeague } from "../services/leagues";
 import { getMyClub } from "../services/club";
 import { useLeagueLobbySocket } from "../hooks/useLeagueLobbySocket";
 import { LeagueInProgress } from "../components/leagues/LeagueInProgress";
@@ -31,7 +31,7 @@ export function LeagueLobbyPage() {
         const fetchLeague = async () => {
             try {
                 setLoading(true);
-                const data = await getLeagues(leagueId);
+                const data = await getLeagueById(leagueId);
                 setLeague(data);
                  // pedimos mi club para saber si soy el creador
                 const myClub = await getMyClub();

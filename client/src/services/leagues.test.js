@@ -47,6 +47,16 @@ describe("leagues service", () => {
 
             await expect(getLeagues()).rejects.toThrow(errorMessage);
         });
+
+        test("con un texto filtra por nombre y devuelve un array (no busca por id)", async () => {
+            const mockLeagues = [{ id: "123", name: "Liga del ChiquiMafia" }];
+
+            request.mockResolvedValueOnce(mockLeagues);
+            const result = await getLeagues("Liga del Chiqui");
+
+            expect(request).toHaveBeenCalledWith("/leagues?name=Liga%20del%20Chiqui");
+            expect(result).toEqual(mockLeagues);
+        });
     });
 
     describe("createLeagues", () => {
@@ -88,22 +98,7 @@ describe("leagues service", () => {
         });
     });
 
-    describe("getLeague", () => {
-        test("obtiene el detalle de la liga por el id consultado usando getLeagues", async () => {
-            const mockLeague = {
-                id: "123",
-                name: "Liga del ChiquiMafia",
-                max_clubs: 30,
-                registered_clubs: [],
-            };
-
-            request.mockResolvedValueOnce(mockLeague);
-            const result = await getLeagues("123");
-
-            expect(request).toHaveBeenCalledWith("/leagues?name=123");
-            expect(result).toEqual(mockLeague);
-        });
-
+    describe("getLeagueById", () => {
         test("obtiene el detalle de la liga usando getLeagueById", async () => {
             const mockLeague = {
                 id: "123",
@@ -122,7 +117,8 @@ describe("leagues service", () => {
         test("da error si la liga no existe o la API falla", async () => {
             request.mockRejectedValueOnce(new Error("Liga no encontrada"));
 
-            await expect(getLeagues("999")).rejects.toThrow("Liga no encontrada");
+            await expect(getLeagueById("999")).rejects.toThrow("Liga no encontrada");
+            expect(request).toHaveBeenCalledWith("/leagues/999");
         });
     });
 

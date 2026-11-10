@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getLeagues, joinLeague } from "../services/leagues";
+import { getLeagueById, joinLeague } from "../services/leagues";
 import { getPlayers } from "../services/club";
 import { getBehaviors } from "../services/behaviors";
 import { PlayerSelection } from "../components/PlayerSelection";
@@ -30,7 +30,7 @@ export function JoinLeaguePage() {
         async function fetchData() {
             try {
                 const [league, clubPlayers, clubBehaviors] = await Promise.all([
-                    getLeagues(leagueId),
+                    getLeagueById(leagueId),
                     getPlayers(),
                     getBehaviors(),
                 ]);

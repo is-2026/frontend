@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { vi, describe, test, expect, beforeEach } from "vitest";
 import { JoinLeaguePage } from "./JoinLeaguePage";
-import { getLeagues, joinLeague } from "../services/leagues";
+import { getLeagues, getLeagueById, joinLeague } from "../services/leagues";
 import { getPlayers } from "../services/club";
 import { getBehaviors } from "../services/behaviors";
 
@@ -46,7 +46,7 @@ vi.mock("react-router-dom", async () => {
 describe("JoinLeaguePage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        getLeagues.mockResolvedValue({ id: "league-123", is_private: false });
+        getLeagueById.mockResolvedValue({ id: "league-123", is_private: false });
         getPlayers.mockResolvedValue([]);
         getBehaviors.mockResolvedValue([]);
     });
@@ -80,7 +80,7 @@ describe("JoinLeaguePage", () => {
     });
 
     test("2. Debe mostrar 'Liga no encontrada' si la API no devuelve la liga", async () => {
-        getLeagues.mockResolvedValue(null);
+        getLeagueById.mockResolvedValue(null);
         getPlayers.mockResolvedValue([]);
         getBehaviors.mockResolvedValue([]);
 
@@ -96,7 +96,7 @@ describe("JoinLeaguePage", () => {
     });
 
     test("3. debe solicitar contraseña si la liga es privada e ingresar con la clave correcta", async () => {
-    getLeagues.mockResolvedValue({ id: "league-123", is_private: true });
+    getLeagueById.mockResolvedValue({ id: "league-123", is_private: true });
     getPlayers.mockResolvedValue([{ id: "p1" }, { id: "p2" }, { id: "p3" }, { id: "p4" }, { id: "p5" }, { id: "p6" }]);
     getBehaviors.mockResolvedValue([{ id: "b1" }, { id: "b2" }, { id: "b3" }]);
 
@@ -142,7 +142,7 @@ describe("JoinLeaguePage", () => {
 });
 
     test("4. Debe enviar el formulario de inscripción y redirigir al lobby (/leagues/league-123/lobby)", async () => {
-        getLeagues.mockResolvedValue({ id: "league-123", is_private: false });
+        getLeagueById.mockResolvedValue({ id: "league-123", is_private: false });
         getPlayers.mockResolvedValue([{ id: "p1" }, { id: "p2" }, { id: "p3" }, { id: "p4" }, { id: "p5" }, { id: "p6" }]);
         getBehaviors.mockResolvedValue([{ id: "b1" }, { id: "b2" }, { id: "b3" }]);
         joinLeague.mockResolvedValue({ success: true });
@@ -193,6 +193,36 @@ describe("JoinLeaguePage", () => {
         await waitFor(() => {
             expect(screen.getByText(/tu club ya está inscripto en esta liga/i)).toBeInTheDocument();
             expect(mockNavigate).not.toHaveBeenCalledWith("/leagues/league-123/lobby");
+        });
+    });
+
+    test("6. Debe pedir el detalle de la liga con getLeagueById (no con el buscador) y pedir la contraseña si es privada", async () => {
+        // getLeagues ahora es el buscador por nombre y devuelve un array:
+        // si la página lo usara para el detalle, is_private quedaría undefined
+        getLeagues.mockResolvedValue([{ id: "league-123", is_private: true }]);
+        getLeagueById.mockResolvedValue({ id: "league-123", is_private: true });
+        joinLeague.mockResolvedValue({ success: true });
+
+        renderPage();
+
+        await waitFor(() => {
+            expect(screen.getByPlaceholderText(/contraseña de la liga/i)).toBeInTheDocument();
+        });
+
+        expect(getLeagueById).toHaveBeenCalledWith("league-123");
+        expect(getLeagues).not.toHaveBeenCalled();
+
+        fireEvent.click(screen.getByTestId("mock-select-btn"));
+        fireEvent.change(screen.getByPlaceholderText(/contraseña de la liga/i), {
+            target: { value: "secretpass" },
+        });
+        fireEvent.click(screen.getByRole("button", { name: /confirmar e inscribirse/i }));
+
+        await waitFor(() => {
+            expect(joinLeague).toHaveBeenCalledWith(
+                "league-123",
+                expect.objectContaining({ password: "secretpass" })
+            );
         });
     });
 });

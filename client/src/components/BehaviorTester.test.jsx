@@ -40,8 +40,8 @@ describe('BehaviorTester', () => {
 
         render(<BehaviorTester behaviorId="m1" setTestLayout={setTestLayout} />);
 
-        expect(screen.getByText('PARTIDO FINALIZADO')).toBeInTheDocument();
-        expect(screen.getByText('Ganó Prueba')).toBeInTheDocument();
+        expect(screen.getByText(/partido finalizado/i)).toBeInTheDocument();
+        expect(screen.getByText(/prueba 2 - 0 marcador/i)).toBeInTheDocument();
     });
 
     test('4. el botón Cerrar Prueba cierra el panel', () => {

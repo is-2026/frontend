@@ -12,12 +12,18 @@ export function createLeagues(data) {
 }
 
 /**
- * Obtiene el listado de todas las ligas disponibles o el detalle de una por ID.
- * @param {string} [leagueId]
+ * Obtiene el listado de todas las ligas disponibles.
+ * @param {string} [name] - filtro opcional por nombre
  */
-export function getLeagues(leagueId) {
-    return leagueId ? request(`/leagues/${leagueId}`) : request("/leagues");
-}
+export function getLeagues(clubName = "") {
+    const cleanName = clubName.trim();
+    const endpoint = cleanName 
+        ? `/leagues?name=${encodeURIComponent(cleanName)}` 
+        : `/leagues`;
+    return(request(endpoint));
+} 
+//EncodeURIComponent evita que la búsqueda falle o se rompa la URL 
+//si el usuario tipea espacios, tildes o símbolos en el campo de texto.
 
 /**
  * Obtiene el detalle de una liga específica por ID.

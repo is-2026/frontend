@@ -96,35 +96,50 @@ describe("JoinLeaguePage", () => {
     });
 
     test("3. debe solicitar contraseña si la liga es privada e ingresar con la clave correcta", async () => {
-        getLeagues.mockResolvedValue({ id: "league-123", is_private: true, password: "secretpass" });
-        getPlayers.mockResolvedValue([]);
-        getBehaviors.mockResolvedValue([]);
+    getLeagues.mockResolvedValue({ id: "league-123", is_private: true });
+    getPlayers.mockResolvedValue([{ id: "p1" }, { id: "p2" }, { id: "p3" }, { id: "p4" }, { id: "p5" }, { id: "p6" }]);
+    getBehaviors.mockResolvedValue([{ id: "b1" }, { id: "b2" }, { id: "b3" }]);
 
-        renderPage();
+    renderPage();
 
-        await waitFor(() => {
-            expect(screen.getByText(/liga privada/i)).toBeInTheDocument();
-        });
-
-        const inputPass = screen.getByPlaceholderText(/contraseña de la liga/i);
-        const submitBtn = screen.getByRole("button", { name: /continuar/i });
-
-        // intento con contraseña erronea
-        fireEvent.change(inputPass, { target: { value: "incorrecta" } });
-        fireEvent.click(submitBtn);
-
-        await waitFor(() => {
-            expect(screen.getByText(/la contraseña es incorrecta/i)).toBeInTheDocument();
-        });
-
-        // intento con contraseña correcta
-        fireEvent.change(inputPass, { target: { value: "secretpass" } });
-        fireEvent.click(submitBtn);
-
-        await waitFor(() => {
-            expect(screen.getByText(/alineación para la liga/i)).toBeInTheDocument();
-        });
+    // 1. Verificar que renderiza el campo de contraseña por ser privada
+    await waitFor(() => {
+        expect(screen.getByPlaceholderText(/contraseña de la liga/i)).toBeInTheDocument();
     });
+
+    // 2. Simular selección de alineación
+    fireEvent.click(screen.getByTestId("mock-select-btn"));
+
+    const inputPass = screen.getByPlaceholderText(/contraseña de la liga/i);
+    const submitBtn = screen.getByRole("button", { name: /confirmar e inscribirse/i });
+
+    // Sin ingresar la contraseña el botón permanece deshabilitado
+    expect(submitBtn).toBeDisabled();
+
+    // 3. Intento con contraseña errónea (simulando respuesta 400 de la API)
+    fireEvent.change(inputPass, { target: { value: "incorrecta" } });
+    expect(submitBtn).not.toBeDisabled();
+
+    joinLeague.mockRejectedValueOnce({ status: 400, message: "La contraseña es incorrecta." });
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+        expect(screen.getByText(/la contraseña es incorrecta/i)).toBeInTheDocument();
+    });
+
+    // 4. Intento con contraseña correcta (envía clave a la API y redirige)
+    fireEvent.change(inputPass, { target: { value: "secretpass" } });
+    joinLeague.mockResolvedValueOnce({ success: true });
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+        expect(joinLeague).toHaveBeenCalledWith(
+            "league-123",
+            expect.objectContaining({ password: "secretpass" })
+        );
+        expect(mockNavigate).toHaveBeenCalledWith("/leagues/league-123/lobby");
+    });
+});
 
     test("4. Debe enviar el formulario de inscripción y redirigir al lobby (/leagues/league-123/lobby)", async () => {
         getLeagues.mockResolvedValue({ id: "league-123", is_private: false });

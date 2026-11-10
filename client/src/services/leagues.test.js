@@ -100,7 +100,7 @@ describe("leagues service", () => {
             request.mockResolvedValueOnce(mockLeague);
             const result = await getLeagues("123");
 
-            expect(request).toHaveBeenCalledWith("/leagues/123");
+            expect(request).toHaveBeenCalledWith("/leagues?name=123");
             expect(result).toEqual(mockLeague);
         });
 

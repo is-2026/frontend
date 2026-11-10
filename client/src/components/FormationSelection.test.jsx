@@ -14,9 +14,9 @@ describe("FormationSelection Component", () => {
         expect(select).toBeInTheDocument();
 
         // Verificar que existan las 3 opciones con sus textos
-        expect(screen.getByRole("option", { name: "Triángulo (TRIANGLE)" })).toBeInTheDocument();
-        expect(screen.getByRole("option", { name: "Línea Ofensiva (OFFENSIVE_LINE)" })).toBeInTheDocument();
-        expect(screen.getByRole("option", { name: "Línea Defensiva (DEFENSIVE_LINE)" })).toBeInTheDocument();
+        expect(screen.getByRole("option", { name: "Triángulo" })).toBeInTheDocument();
+        expect(screen.getByRole("option", { name: "Línea Ofensiva" })).toBeInTheDocument();
+        expect(screen.getByRole("option", { name: "Línea Defensiva" })).toBeInTheDocument();
         expect(screen.getAllByRole("option")).toHaveLength(3);
     });
 

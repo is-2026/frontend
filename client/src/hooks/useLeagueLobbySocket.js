@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { LEAGUE_LOBBY_WS_PATH, wsUrl } from "../config";
-import { getLeagues } from "../services/leagues";
+import { getLeagueById } from "../services/leagues";
 
 export const useLeagueLobbySocket = (leagueId, setLeague, setError) => {
     const navigate = useNavigate();
@@ -55,7 +55,7 @@ export const useLeagueLobbySocket = (leagueId, setLeague, setError) => {
 
                     case "leagueUpdated":
                         // algo cambio en la liga en curso, volvemos a pedir el detalle
-                        getLeagues(data.league_id)
+                        getLeagueById(data.league_id)
                             .then((league) => setLeague(league))
                             .catch((err) => console.error("Error al actualizar la liga:", err));
                         break;

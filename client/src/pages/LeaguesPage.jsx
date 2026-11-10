@@ -123,7 +123,9 @@ export function LeaguesPage() {
                 <div className="bg-slate-900 border border-slate-800 p-8 text-center text-slate-400">
                     {search.trim()
                         ? `No hay ligas que coincidan con «${search}»`
-                        : "No hay ligas disponibles."}
+                        : tab === "available"
+                        ? "No hay ligas disponibles."
+                        : "No participás en ninguna liga."}
                 </div>
             )}
 

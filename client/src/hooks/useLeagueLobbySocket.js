@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { LEAGUE_LOBBY_WS_PATH, wsUrl } from "../config";
+import { getLeagueById } from "../services/leagues";
 
 export const useLeagueLobbySocket = (leagueId, setLeague, setError) => {
     const navigate = useNavigate();
@@ -7,9 +9,7 @@ export const useLeagueLobbySocket = (leagueId, setLeague, setError) => {
     useEffect(() => {
         if(!leagueId) return; // verificamos que la id de la liga exista, si no paramos ejec.
         
-        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        const wsUrl = `${protocol}//${window.location.host}/ws/leagues/${leagueId}/lobby`; // construimos la direccion url
-        const socket = new WebSocket(wsUrl); // creamos la instancia de ws y conectamos con el sv
+        const socket = new WebSocket(wsUrl(LEAGUE_LOBBY_WS_PATH(leagueId))); // conectamos al backend (localhost:8000) con el token
         
         socket.onmessage = (event) => {
             try {
@@ -43,12 +43,27 @@ export const useLeagueLobbySocket = (leagueId, setLeague, setError) => {
                         break;
 
                     case "leagueStarted":
-                        navigate(`/leagues/${leagueId}/lobby`); // cuando la liga empieza, redirigimos a la pantalla de la liga
+                        setLeague((prev) => {
+                            if(!prev) return prev;
+                            return {
+                                ...prev,
+                                is_started: true, // cuando la liga inicie marcarmos como iniciada, en tiempo real
+                                status: "started",
+                            };
+                        });
                         break;
 
+                    case "leagueUpdated":
+                        // algo cambio en la liga en curso, volvemos a pedir el detalle
+                        getLeagueById(data.league_id)
+                            .then((league) => setLeague(league))
+                            .catch((err) => console.error("Error al actualizar la liga:", err));
+                        break;
+                    
                     case "leagueCancelled":
                         setError("La liga fue cancelada por el creador."); // guardamos el mensaje de error para mostrar al usuario
                         break;
+                    
                 }
             } catch (err) { // capturamos cualquier falla en la lectura del mensaje
                 console.error("Error al procesar el mensaje del WebSocket:", err); // muestra mensaje de error

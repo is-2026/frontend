@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getLeagues, joinLeague } from "../services/leagues";
+import { getLeagueById, joinLeague } from "../services/leagues";
 import { getPlayers } from "../services/club";
 import { getBehaviors } from "../services/behaviors";
 import { PlayerSelection } from "../components/PlayerSelection";
+import { FormationSelection } from "../components/FormationSelection"
 
 export function JoinLeaguePage() {
     const { leagueId } = useParams();
@@ -13,11 +14,11 @@ export function JoinLeaguePage() {
     const [loading, setLoading] = useState(true);
     const [notFound, setNotFound] = useState(false);
     const [isPrivate, setIsPrivate] = useState(false);
-    const [confirmedPassword, setConfirmedPassword] = useState(false);
 
     const [players, setPlayers] = useState([]);
     const [behaviors, setBehaviors] = useState([]);
-
+    const [formation, setFormation] = useState("TRIANGLE");
+    
     // Estados del formulario
     const [password, setPassword] = useState("");
     const [selection, setSelection] = useState({ starters: [], substitutes: [] });
@@ -29,7 +30,7 @@ export function JoinLeaguePage() {
         async function fetchData() {
             try {
                 const [league, clubPlayers, clubBehaviors] = await Promise.all([
-                    getLeagues(leagueId),
+                    getLeagueById(leagueId),
                     getPlayers(),
                     getBehaviors(),
                 ]);
@@ -40,7 +41,6 @@ export function JoinLeaguePage() {
                 }
 
                 setIsPrivate(Boolean(league.is_private));
-                setConfirmedPassword(!league.is_private);
                 setPlayers(clubPlayers || []);
                 setBehaviors(clubBehaviors || []);
             } catch (e) {
@@ -64,6 +64,7 @@ export function JoinLeaguePage() {
 
         try {
             const body = {
+                formation,
                 ...(isPrivate ? { password } : {}),
                 players: [
                     ...selection.starters.map((t) => ({
@@ -79,29 +80,14 @@ export function JoinLeaguePage() {
             };
 
             await joinLeague(leagueId, body);
-            navigate(`/leagues/${leagueId}`);
+            navigate(`/leagues/${leagueId}/lobby`);
         } catch (e) {
             if (e.status === 400) setError(e.message || "Datos de inscripción inválidos.");
+            else if (e.status === 404) setError("La liga no existe.");
             else if (e.status === 409) setError("Tu club ya está inscripto en esta liga.");
             else setError("Ocurrió un error inesperado al unirse a la liga.");
         } finally {
             setSending(false);
-        }
-    }
-
-    async function handlePasswordSubmit() {
-        setError(null);
-        try {
-            const league = await getLeagues(leagueId);
-
-            if (league?.password && password !== league.password) {
-                setError("La contraseña es incorrecta.");
-                return;
-            }
-
-            setConfirmedPassword(true);
-        } catch (e) {
-            setError("Error al verificar la contraseña.");
         }
     }
 
@@ -123,49 +109,6 @@ export function JoinLeaguePage() {
         );
     }
 
-    if (isPrivate && !confirmedPassword) {
-        return (
-            <div className="mx-auto max-w-sm p-6">
-                <h1 className="mb-4 text-xl font-bold">Liga privada</h1>
-
-                <input
-                    type="password"
-                    placeholder="Contraseña de la liga"
-                    className="mb-3 w-full bg-slate-800 p-2"
-                    value={password}
-                    onChange={(e) => {
-                        setPassword(e.target.value);
-                        if (error) setError(null);
-                    }}
-                />
-
-                {error && (
-                    <div className="mt-2 mb-3 p-2 bg-red-900/40 border border-red-500/50 text-red-300 text-sm flex items-center gap-2">
-                        <span>{error}</span>
-                    </div>
-                )}
-
-                <div className="flex gap-2">
-                    <button
-                        type="button"
-                        className="w-1/2 bg-slate-800 py-2 font-medium hover:bg-slate-700"
-                        onClick={() => navigate("/leagues")}
-                    >
-                        Cancelar
-                    </button>
-                    <button
-                        type="button"
-                        className="w-1/2 bg-emerald-600 py-2 font-medium hover:bg-emerald-500 disabled:opacity-40"
-                        onClick={handlePasswordSubmit}
-                        disabled={!password}
-                    >
-                        Continuar
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="mx-auto max-w-xl p-6">
             <div className="flex items-center justify-between mb-4">
@@ -178,17 +121,34 @@ export function JoinLeaguePage() {
                 </button>
             </div>
 
+            {/* solo en ligas privadas se pide la contraseña */}
+            {isPrivate && (
+                <input
+                    type="password"
+                    placeholder="Contraseña de la liga"
+                    className="mb-4 w-full bg-slate-800 p-2"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+            )}
+
             <PlayerSelection
                 availablePlayers={players}
                 behaviors={behaviors}
                 onChange={setSelection}
             />
 
+            <FormationSelection
+                value={formation} 
+                onChange={setFormation} 
+                className="mb-4"
+            />
+
             {error && <p className="mt-4 text-red-400 text-sm">{error}</p>}
 
             <button
                 className="mt-6 w-full bg-emerald-600 py-2 font-medium hover:bg-emerald-500 disabled:opacity-40"
-                disabled={!validSelection || sending}
+                disabled={!validSelection || sending || (isPrivate && !password)}
                 onClick={handleConfirm}
             >
                 {sending ? "Inscribiendo..." : "Confirmar e Inscribirse"}

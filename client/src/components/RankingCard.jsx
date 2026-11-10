@@ -1,0 +1,19 @@
+import { Link } from "react-router-dom";
+import { DEFAULT_AVATAR } from "../services/club";
+
+export default function RankingCard({ club, isMine }) {
+    // Auxiliar para calcular la diferencia de goles
+    const goalDiff = club.goals_for - club.goals_against;
+    return (
+        <li className={`border ${isMine ? "border-blue-500 bg-blue-950" : "border-white/10 bg-slate-800"}`}>
+            <Link to={`/club/${club.club_id}`} className="flex items-center gap-4 p-4 w-full">
+                <span className="font-bold">{club.position}</span>
+                <img src={club.avatar_url || DEFAULT_AVATAR} alt={club.club_name} className="h-12 w-12" />
+                <div className="font-semibold">{club.club_name}</div>
+                <div className="ml-auto text-sm text-white/80">
+                    {club.points} pts · PJ {club.matches_played} · PG {club.won} · PG pen. {club.won_penalties} · PE {club.drawn} · PP {club.lost} · DG {goalDiff}
+                </div>
+            </Link>
+        </li>
+    );
+}

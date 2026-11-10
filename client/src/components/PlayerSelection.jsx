@@ -2,14 +2,16 @@ import { useState } from "react";
 
 // availablePlayers: [{ id, name }]
 // behaviors: [{ id, name }]
+// initialSelection (opcional): { starters: [{ player_id, behavior_id }], substitutes: [player_id] }
 // onChange(selection): { starters: [{ player_id, behavior_id }], substitutes: [player_id] }
 export function PlayerSelection({
   availablePlayers = [],
   behaviors = [],
+  initialSelection, 
   onChange,
 }) {
-  const [starters, setStarters] = useState([]);
-  const [substitutes, setSubstitutes] = useState([]);
+  const [starters, setStarters] = useState(initialSelection?.starters ?? []); // si viene initialSelection arrancamos con eso, sino vacío
+  const [substitutes, setSubstitutes] = useState(initialSelection?.substitutes ?? []);
 
   function emitSelection(newStarters, newSubstitutes) {
     if (typeof onChange === "function") {

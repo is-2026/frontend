@@ -114,7 +114,20 @@ describe("CreateFriendlyPage", () => {
         expect(submitButton).toBeDisabled();
     });
 
-    test("mantiene el botón de confirmar deshabilitado si la alineación no es válida", async () => {
+    test("mantiene el botón de confirmar deshabilitado si la alineación no es válida", async () => {        
+        render(
+            <MemoryRouter>
+                <CreateFriendlyPage />
+            </MemoryRouter>
+        );
+        await waitFor(() => {
+            expect(screen.getByText("Crear partido amistoso")).toBeInTheDocument();
+        });
+        const submitButton = screen.getByRole("button", { name: "Confirmar y Crear Amistoso"});
+        expect(submitButton).toBeDisabled();
+    });
+
+    test("crea un amistoso con la formación seleccionada y los jugadores indicados", async () => {
         render(
             <MemoryRouter>
                 <CreateFriendlyPage />
@@ -140,8 +153,8 @@ describe("CreateFriendlyPage", () => {
 
         await waitFor(() => {
             expect(createFriendlies).toHaveBeenCalledWith({
+                formation: "TRIANGLE",
                 password: "secreto123",
-                match_duration_minutes: 5,
                 players: [
                     { player_id: "p1", is_starter: true, behavior_id: "b1" },
                     { player_id: "p2", is_starter: true, behavior_id: "b2" },

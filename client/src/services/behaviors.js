@@ -27,8 +27,8 @@ export const getBehaviorById = async (id) => {
     });
 };
 
-/*
-export const getBehaviorById = async (id) => {
+
+/* export const getBehaviorById = async (id) => {
     // MOCK: Simula la base de datos para probar estilos y funcionalidad 
     const mockDb = {
         "1": { id: "1", name: "Comportamiento Defensivo", code: "defend()" },
@@ -45,5 +45,32 @@ export const getBehaviorById = async (id) => {
             }
         }, 500);
     });
+}; */
+
+
+export const createBehavior = async (data) => {
+    return await request('/club/behaviors', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    });
 };
-*/
+
+export const updateBehavior = async (id, data) => {
+    return await request(`/club/behaviors/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data)
+    });
+};
+
+export const deleteBehavior = async (id) => {
+    return await request(`/club/behaviors/${id}`, {
+        method: 'DELETE'
+    });
+};
+
+export const behaviorMatch = async (code) => {
+    return await request('/club/behaviors/test', {
+        method: 'POST',
+        body: JSON.stringify({ code })
+    });
+}

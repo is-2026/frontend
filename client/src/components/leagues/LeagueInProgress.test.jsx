@@ -28,7 +28,7 @@ const league = {
 const matches = [
     {
         id: "m1",
-        round: 1,
+        round_number: 1,
         status: "scheduled",
         home_club_id: "c1",
         away_club_id: "c2",
@@ -36,7 +36,6 @@ const matches = [
         away_club_name: "Boca",
         home_score: 0,
         away_score: 0,
-        starts_at: null,
     },
 ];
 

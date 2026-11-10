@@ -2,13 +2,12 @@ import { render, screen, waitFor, fireEvent, act } from "@testing-library/react"
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { LeagueLobbyPage } from "./LeagueLobbyPage";
-import { getLeague, getLeagues, leaveLeague, startLeague, cancelLeague } from "../services/leagues";
+import { getLeagueById, leaveLeague, startLeague, cancelLeague } from "../services/leagues";
 import { useLeagueLobbySocket } from "../hooks/useLeagueLobbySocket";
 import { getMyClub } from "../services/club";
 
 // mock completo del servicio de leagues
 vi.mock("../services/leagues", () => ({
-    getLeague: vi.fn(),
     getLeagues: vi.fn(),
     getLeagueById: vi.fn(),
     createLeagues: vi.fn(),
@@ -46,8 +45,7 @@ describe("LeagueLobbyPage", () => {
     };
 
     test("muestra el estado de carga inicialmente", () => {
-        getLeague.mockImplementation(() => new Promise(() => {}));
-        getLeagues.mockImplementation(() => new Promise(() => {}));
+        getLeagueById.mockImplementation(() => new Promise(() => {}));
 
         renderWithRouter("123");
 
@@ -68,8 +66,7 @@ describe("LeagueLobbyPage", () => {
             ],
         };
 
-        getLeague.mockResolvedValueOnce(mockLeague);
-        getLeagues.mockResolvedValueOnce(mockLeague);
+        getLeagueById.mockResolvedValueOnce(mockLeague);
 
         renderWithRouter("123");
 
@@ -77,6 +74,7 @@ describe("LeagueLobbyPage", () => {
             expect(screen.getByText("Liga del ChiquiMafia")).toBeInTheDocument();
         });
 
+        expect(getLeagueById).toHaveBeenCalledWith("123");
         expect(screen.getByText("5 / 30")).toBeInTheDocument();
         expect(screen.getByText("River Plate")).toBeInTheDocument();
         expect(screen.getByText("Voke")).toBeInTheDocument();
@@ -93,8 +91,7 @@ describe("LeagueLobbyPage", () => {
             registered_clubs: [],
         };
 
-        getLeague.mockResolvedValueOnce(mockLeague);
-        getLeagues.mockResolvedValueOnce(mockLeague);
+        getLeagueById.mockResolvedValueOnce(mockLeague);
 
         renderWithRouter("123");
 
@@ -109,8 +106,7 @@ describe("LeagueLobbyPage", () => {
     });
 
     test("muestra un mensaje de error si falla la petición HTTP", async () => {
-        getLeague.mockRejectedValueOnce(new Error("No se pudo obtener la liga."));
-        getLeagues.mockRejectedValueOnce(new Error("No se pudo obtener la liga."));
+        getLeagueById.mockRejectedValueOnce(new Error("No se pudo obtener la liga."));
 
         renderWithRouter("123");
 
@@ -127,8 +123,7 @@ describe("LeagueLobbyPage", () => {
             registered_clubs: [],
         };
 
-        getLeague.mockResolvedValueOnce(mockLeague);
-        getLeagues.mockResolvedValueOnce(mockLeague);
+        getLeagueById.mockResolvedValueOnce(mockLeague);
 
         renderWithRouter("123");
 
@@ -140,7 +135,7 @@ describe("LeagueLobbyPage", () => {
     });
 
     test("muestra un mensaje de error si falla al intentar abandonar la liga", async () => {
-        getLeagues.mockResolvedValueOnce({
+        getLeagueById.mockResolvedValueOnce({
             id: "123",
             name: "Liga Test",
             max_clubs: 10,
@@ -163,7 +158,7 @@ describe("LeagueLobbyPage", () => {
     });
 
     test("no muestra el botón de iniciar liga si el usuario no es el creador", async () => {
-        getLeagues.mockResolvedValueOnce({
+        getLeagueById.mockResolvedValueOnce({
             id: "123",
             name: "Liga Test",
             max_clubs: 10,
@@ -185,7 +180,7 @@ describe("LeagueLobbyPage", () => {
     });
 
     test("muestra el botón deshabilitado y advertencia si hay menos de 3 clubes inscriptos", async () => {
-        getLeagues.mockResolvedValueOnce({
+        getLeagueById.mockResolvedValueOnce({
             id: "123",
             name: "Liga Test",
             max_clubs: 10,
@@ -210,7 +205,7 @@ describe("LeagueLobbyPage", () => {
     });
 
     test("abre el modal de confirmación al hacer clic en 'Iniciar liga'", async () => {
-        getLeagues.mockResolvedValueOnce({
+        getLeagueById.mockResolvedValueOnce({
             id: "123",
             name: "Liga Test",
             max_clubs: 10,
@@ -238,7 +233,7 @@ describe("LeagueLobbyPage", () => {
     });
 
     test("inicia la liga correctamente al confirmar en el modal", async () => {
-        getLeagues.mockResolvedValueOnce({
+        getLeagueById.mockResolvedValueOnce({
             id: "123",
             name: "Liga Test",
             max_clubs: 10,
@@ -268,7 +263,7 @@ describe("LeagueLobbyPage", () => {
     });
 
     test("no muestra el botón de cancelar liga si el usuario no es el creador", async () => {
-        getLeagues.mockResolvedValueOnce({
+        getLeagueById.mockResolvedValueOnce({
             id: "123",
             name: "Liga Test",
             max_clubs: 10,
@@ -286,7 +281,7 @@ describe("LeagueLobbyPage", () => {
     });
 
     test("pide confirmación y cancela la liga mostrando el mensaje de éxito", async () => {
-        getLeagues.mockResolvedValueOnce({
+        getLeagueById.mockResolvedValueOnce({
             id: "123",
             name: "Liga Test",
             max_clubs: 10,
@@ -316,7 +311,7 @@ describe("LeagueLobbyPage", () => {
     });
 
     test("muestra el mensaje del backend si falla al cancelar la liga", async () => {
-        getLeagues.mockResolvedValueOnce({
+        getLeagueById.mockResolvedValueOnce({
             id: "123",
             name: "Liga Test",
             max_clubs: 10,
@@ -344,7 +339,7 @@ describe("LeagueLobbyPage", () => {
     });
 
     test("muestra el aviso de liga cancelada con un botón para volver a las ligas", async () => {
-        getLeagues.mockResolvedValueOnce({
+        getLeagueById.mockResolvedValueOnce({
             id: "123",
             name: "Liga Test",
             max_clubs: 10,

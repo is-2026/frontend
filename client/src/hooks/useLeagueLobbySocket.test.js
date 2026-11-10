@@ -1,7 +1,7 @@
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { describe, test, expect, beforeEach, vi } from "vitest";
 import { useLeagueLobbySocket } from "./useLeagueLobbySocket";
-import { getLeagues } from "../services/leagues";
+import { getLeagueById } from "../services/leagues";
 
 // mock de react-router-dom con funciones de Vitest
 const mockNavigate = vi.fn();
@@ -11,7 +11,7 @@ vi.mock("react-router-dom", () => ({
 
 // mock del servicio de ligas (para leagueUpdated)
 vi.mock("../services/leagues", () => ({
-    getLeagues: vi.fn(),
+    getLeagueById: vi.fn(),
 }));
 
 // mock de config para controlar la URL del WebSocket
@@ -162,7 +162,7 @@ describe("useLeagueLobbySocket Hook", () => {
 
     test("maneja el evento 'leagueUpdated' volviendo a pedir el detalle de la liga", async () => {
         const ligaActualizada = { id: "123", name: "Liga Test", status: "finished" };
-        getLeagues.mockResolvedValueOnce(ligaActualizada);
+        getLeagueById.mockResolvedValueOnce(ligaActualizada);
 
         renderHook(() => useLeagueLobbySocket("123", mockSetLeague, mockSetError));
         const socket = MockWebSocket.instances[0];
@@ -171,7 +171,7 @@ describe("useLeagueLobbySocket Hook", () => {
             socket.sendMessage({ type: "leagueUpdated", data: { league_id: "123" } });
         });
 
-        expect(getLeagues).toHaveBeenCalledWith("123");
+        expect(getLeagueById).toHaveBeenCalledWith("123");
         await waitFor(() => {
             expect(mockSetLeague).toHaveBeenCalledWith(ligaActualizada);
         });

@@ -30,7 +30,7 @@ describe("ClubLink Component", () => {
         expect(screen.queryByRole("link")).not.toBeInTheDocument();
     });
 
-    test("3. Renderiza un Link con la ruta /clubs/:id y el nombre correcto cuando se pasan ID y nombre", () => {
+    test("3. Renderiza un Link con la ruta /club/:id y el nombre correcto cuando se pasan ID y nombre", () => {
         render(
             <MemoryRouter>
                 <ClubLink id="club-456" name="Boca Juniors" />
@@ -39,6 +39,6 @@ describe("ClubLink Component", () => {
 
         const linkElement = screen.getByRole("link", { name: "Boca Juniors" });
         expect(linkElement).toBeInTheDocument();
-        expect(linkElement).toHaveAttribute("href", "/clubs/club-456");
+        expect(linkElement).toHaveAttribute("href", "/club/club-456");
     });
 });

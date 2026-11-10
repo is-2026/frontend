@@ -6,7 +6,7 @@ const STATUS_LABELS = {
     finished: "Finalizada",
 };
 
-export default function MyLeagueCard({ league }) {
+export function MyLeagueCard({ league }) {
     const navigate = useNavigate();
     const currentClubsCount = league.registered_clubs ? league.registered_clubs.length : 0;
     

@@ -8,8 +8,8 @@ import { request } from "./api"; // Import de la función request de api. Ver ar
 export function getFriendlies(clubName="") {
   const cleanName = clubName.trim();
     const endpoint = cleanName 
-        ? request(`/friendlies?club_name=${encodeURIComponent(cleanName)}`) 
-        : request(`/friendlies`);
+        ? `/friendlies?club_name=${encodeURIComponent(cleanName)}`
+        : `/friendlies`;
     return(request(endpoint));
 } 
 

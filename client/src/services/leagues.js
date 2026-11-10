@@ -18,8 +18,8 @@ export function createLeagues(data) {
 export function getLeagues(clubName = "") {
     const cleanName = clubName.trim();
     const endpoint = cleanName 
-        ? request(`/leagues?name=${encodeURIComponent(cleanName)}`) 
-        : request(`/leagues`);
+        ? `/leagues?name=${encodeURIComponent(cleanName)}` 
+        : `/leagues`;
     return(request(endpoint));
 } 
 //EncodeURIComponent evita que la búsqueda falle o se rompa la URL 

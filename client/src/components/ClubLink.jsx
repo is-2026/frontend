@@ -6,7 +6,7 @@ export function ClubLink({ name, id }) {
     // Si recibe ID navega al perfil del club, de lo contrario muestra el texto
     return id ? (
         <Link 
-            to={`/clubs/${id}`} 
+            to={`/club/${id}`} 
             className="text-emerald-400 hover:underline font-medium"
         >
             {name}

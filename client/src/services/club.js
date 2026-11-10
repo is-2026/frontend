@@ -94,3 +94,7 @@ export const updateDtBehavior = async (coach_behavior_id) => {
         body: JSON.stringify({ behavior_id: coach_behavior_id })
     });
 };
+
+export function getClubInfo(club_Id) {
+    return request(`/clubs/${club_Id}`);
+}

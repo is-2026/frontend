@@ -64,6 +64,7 @@ export default function App() {
       {/* Rutas Protegidas / Internas: Tienen el Navbar arriba */}
       <Route element={<MainLayout />}>
         <Route path="/club" element={<ClubDashboardPage />} />
+        <Route path="/club/:id" element={<ClubDashboardPage />} />
         <Route path="/club/players" element={<PlayersPage />} />
         <Route path="/club/dt" element={<DtPage />} />
         <Route path="/club/players/create" element={<CreatePlayerPage />} />

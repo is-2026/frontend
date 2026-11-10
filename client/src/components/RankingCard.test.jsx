@@ -26,7 +26,7 @@ describe("RankingCard Component", () => {
   it("el nombre del club debe llevar a su perfil", () => {
     render(<MemoryRouter><RankingCard club={club} isMine={false} /></MemoryRouter>);
 
-    expect(screen.getByRole("link", { name: "River" }).getAttribute("href")).toBe("/clubs/c1");
+    expect(screen.getByRole("link", { name: "River" }).getAttribute("href")).toBe("/club/c1");
   });
 
   it("debe mostrar el avatar del club", () => {
